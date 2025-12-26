@@ -1,4 +1,4 @@
-# 💻 Byte - Modern Computer E-commerce Platform
+# 💻 Byte - Computer E-commerce Platform
 
 ## MERN Stack
 
@@ -22,6 +22,9 @@
 - **Tailwind CSS 4**
 - **React Router 7**
 - **Axios**
+
+- **React Icons**
+- **React-Toastify**
 
 ### Backend (API Connection)
 
