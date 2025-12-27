@@ -1,6 +1,4 @@
-# 💻 Byte - Computer E-commerce Platform
-
-## MERN Stack
+# 💻 ByteShop - Computer E-commerce Platform (MERN Stack)
 
 ---
 
