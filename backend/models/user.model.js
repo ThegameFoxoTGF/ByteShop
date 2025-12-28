@@ -31,7 +31,6 @@ const UserSchema = new mongoose.Schema({
         last_name: { type: String, trim: true },
         phone: { type: String, trim: true },
         birthday: { type: Date },
-        avatar: { type: String, trim: true },
     },
 
     address: [AddressSchema],

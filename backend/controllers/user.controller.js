@@ -63,6 +63,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
             _id: user._id,
             first_name: user.profile.first_name,
             last_name: user.profile.last_name,
+            birthday: user.profile.birthday,
+            phone: user.profile.phone,
             email: user.email,
         });
     } else {
@@ -70,6 +72,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
         throw new Error("ไม่พบผู้ใช้");
     }
 });
+
 
 const updateUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
@@ -94,7 +97,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     if (user) {
         if (user.role === "admin" || user.role === "staff") {
             res.status(400);
-            throw new Error("ไม่สามารถลบผู้ใช้ประเภท admin ได้");
+            throw new Error("ไม่สามารถลบผู้ใช้ประเภท admin หรือ staff ได้");
         }
         await User.deleteOne({ _id: user._id });
         res.json({ message: "ลบผู้ใช้เรียบร้อย" });
@@ -119,7 +122,23 @@ const updateUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (user) {
-        
+        user.profile.first_name = req.body.first_name || user.profile.first_name;
+        user.profile.last_name = req.body.last_name || user.profile.last_name;
+        user.email = req.body.email || user.email;
+        user.role = req.body.role || user.role;
+
+        if (req.body.password) {
+            user.password = req.body.password;
+        }
+        const updatedUser = await user.save();
+        res.json({
+            _id: updatedUser._id,
+            first_name: updatedUser.profile.first_name,
+            last_name: updatedUser.profile.last_name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+        });
+
     } else {
         res.status(404);
         throw new Error("ไม่พบผู้ใช้");
