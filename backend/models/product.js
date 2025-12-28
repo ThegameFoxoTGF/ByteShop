@@ -7,8 +7,16 @@ const ProductSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, trim: true },
     
-    category_id: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
-    brand: { type: String, trim: true },
+    category_id: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Category", 
+        required: true 
+    },
+    brand: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Brand", 
+        required: true
+    },
     model_number: { type: String, trim: true },
     series: { type: String, trim: true },
 
@@ -20,12 +28,12 @@ const ProductSchema = new mongoose.Schema({
     discount: { type: Number, default: 0 },
 
     quantity: { type: Number, default: 0 }, 
-    weight_g: Number,
+    weight_g: { type: Number },
     dimensions: { 
-        length: String,
-        width: String,
-        height: String,
-     },
+        length: { type: String },
+        width: { type: String },
+        height: { type: String },
+    },
 
     track_serial: { type: Boolean, default: false },
     low_stock_alert: { type: Number, default: 5 },
@@ -35,16 +43,16 @@ const ProductSchema = new mongoose.Schema({
 
     search_keywords: [ String ],
     filters: [{ 
-        key: String,
-        label: String,
-        value: String,
-     }],
+        key: { type: String },
+        label: { type: String },
+        value: { type: String },
+    }],
     specifications: [{ 
-        key: String,
-        label: String,
-        value: String,
-        unit: String
-     }],
+        key: { type: String },
+        label: { type: String },
+        value: { type: String },
+        unit: { type: String }
+    }],
 },{
     timestamps: true,
     versionKey: false

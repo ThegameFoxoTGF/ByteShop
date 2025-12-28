@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 const AddressSchema = new mongoose.Schema({
     name: { type: String, trim: true },
     phone: { type: String, trim: true },
-    label: { type: String, trim: true }, // e.g. "Home", "Office"
+    label: { type: String, trim: true },
     address_line: { type: String, trim: true },
     sub_district: { type: String, trim: true },
     district: { type: String, trim: true },
@@ -29,7 +29,9 @@ const UserSchema = new mongoose.Schema({
     profile: {
         first_name: { type: String, trim: true },
         last_name: { type: String, trim: true },
-        phone: { type: String, trim: true }
+        phone: { type: String, trim: true },
+        birthday: { type: Date },
+        avatar: { type: String, trim: true },
     },
 
     address: [AddressSchema],
@@ -37,23 +39,27 @@ const UserSchema = new mongoose.Schema({
 
     role: {
         type: String,
-        enum: ['customer','employee', 'admin'],
+        enum: ['customer','staff', 'admin'],
         default: 'customer',
     },
     position: { type : String, required: function() { return this.role != 'customer' } },
 
-    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'products' }],
+    wishlist: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'products' 
+    }],
 
 }, { 
     timestamps: true, 
     versionKey: false 
 });
 
-//hash password
+// Encrypt password using bcrypt
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
-        return next();
+        next();
     };
+
     try {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);

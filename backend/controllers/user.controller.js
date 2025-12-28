@@ -1,114 +1,139 @@
-import User from "../models/user.js";
+import asyncHandler from "../middleware/asynchandler.js";
+import generateToken from "../utils/generatetoken.js";
+import User from "../models/user.model.js";
 
-// Admin/Employee: Get all users
-const getAllUsers = async (req, res) => {
-    try {
-        const users = await User.find().select("-password");
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+const authUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (user && (await user.matchPassword(password))) {
+        generateToken(res, user._id);
+        res.status(200).json({
+            _id: user._id,
+            first_name: user.profile.first_name,
+            last_name: user.profile.last_name,
+            email: user.email,
+        });
+    } else {
+        res.status(401);
+        throw new Error("อีเมล หรือ รหัสผ่านไม่ถูกต้อง");
     }
+});
+
+const registerUser = asyncHandler(async (req, res) => {
+    const { first_name, last_name, email, password } = req.body;
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+        res.status(400);
+        throw new Error("อีเมลนี้ถูกใช้แล้ว");
+    }
+
+    const user = await User.create({
+        profile: {
+            first_name,
+            last_name,
+        },
+        email,
+        password,
+    });
+
+    if (user) {
+        generateToken(res, user._id);
+        res.status(201).json({
+            _id: user._id,
+            first_name: user.profile.first_name,
+            last_name: user.profile.last_name,
+            email: user.email,
+        });
+    } else {
+        res.status(400);
+        throw new Error("ข้อมูลผู้ใช้ไม่ถูกต้อง");
+    }
+});
+
+const logoutUser = (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({ message: "ออกจากระบบเรียบร้อย" });
 };
 
-// Admin/Employee: Get single user
-const getUserById = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id).select("-password");
-        if (!user) return res.status(404).json({ message: "User not found" });
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+const getUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        res.json({
+            _id: user._id,
+            first_name: user.profile.first_name,
+            last_name: user.profile.last_name,
+            email: user.email,
+        });
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
     }
-};
+});
 
-// Create a new User (Admin/Employee only? or signup handled by auth?)
-// Usually signup is in AuthController. This might be "Add Employee" or similar.
-// For now, standard CRUD using new Schema structure.
-const createUser = async (req, res) => {
-     try {
-        // Basic create - logic similar to signup but might include role setting
-        const user = await User.create(req.body);
-        res.status(201).json(user);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+
+
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
     }
-}
+});
 
+const getUsers = asyncHandler(async (req, res) => {
+    const users = await User.find({});
+    res.json(users);
+});
 
-// Update User (Admin or Self)
-const updateUserProfile = async (req, res) => {
-    try {
-        // If admin updates other user, use params.id. If self, use req.user._id
-        // This function handles "Self Update" mostly.
-        const userId = req.user._id; 
-        const user = await User.findById(userId);
+const deleteUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
 
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        // Update fields if provided
-        if (req.body.profile) {
-            user.profile = { ...user.profile, ...req.body.profile }; // Merge profile object
+    if (user) {
+        if (user.role === "admin" || user.role === "staff") {
+            res.status(400);
+            throw new Error("ไม่สามารถลบผู้ใช้ประเภท admin ได้");
         }
+        await User.deleteOne({ _id: user._id });
+        res.json({ message: "ลบผู้ใช้เรียบร้อย" });
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id).select("-password");
+
+    if (user) {
+        res.json(user);
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const updateUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
         
-        // Handle Addresses - This might replace the whole array or add/edit specific index.
-        // For simplicity: Replace if provided. 
-        if (req.body.address) {
-            user.address = req.body.address;
-        }
-
-        if (req.body.tax_info) {
-           user.tax_info = req.body.tax_info;
-        }
-        
-        // Handling role/position - protected by checks usually
-        // if (req.body.position && user.role !== 'customer') ...
-
-        if (req.body.password) {
-            user.password = req.body.password;
-        }
-
-        const updatedUser = await user.save();
-        
-        // Return without password
-        const userResponse = updatedUser.toObject();
-        delete userResponse.password;
-
-        res.status(200).json(userResponse);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
     }
-};
-
-// Admin update user (Role, Status etc)
-const updateUser = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        Object.assign(user, req.body);
-        const updatedUser = await user.save();
-        res.status(200).json(updatedUser);
-
-    } catch (error) {
-         res.status(500).json({ error: error.message });
-    }
-}
-
-const deleteUser = async (req, res) => {
-    try {
-        const user = await User.findByIdAndDelete(req.params.id);
-        if (!user) return res.status(404).json({ message: "User not found" });
-        res.status(200).json({ message: "User deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+});
 
 export {
-    getAllUsers,
+    authUser,
+    registerUser,
+    logoutUser,
+    getUserProfile,
+    updateUserProfile,
+    getUsers,
+    deleteUser,
     getUserById,
-    createUser,
-    updateUserProfile, // Self
-    updateUser, // Admin
-    deleteUser
-};
+    updateUser,
+}

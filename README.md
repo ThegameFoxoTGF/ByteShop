@@ -2,7 +2,7 @@
 
 ---
 
-## 📚 บทบาทและสิทธิ์การใช้งาน (Roles & Permissions)
+## 📚 Roles & Permissions
 
 ### 🌏 ผู้ใช้ทั่วไป
 
@@ -54,7 +54,7 @@
 - **React Router 7**
 - **Axios**
 - **React Icons**
-- **React-Toastify**
+- **React Toastify**
 
 ### Backend (API Connection)
 
@@ -66,5 +66,6 @@
 - **dotenv**
 - **cors**
 - **multer**
+- **cookie parser**
 
 ---
