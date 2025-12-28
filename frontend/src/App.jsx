@@ -21,6 +21,7 @@ function App() {
           <Navbar />
           <div className="container mx-auto px-4 py-8">
             <Routes>
+              
               <Route path="/" element={<Home />} />
               
               {/* Guest Routes (Redirect to / if logged in) */}
@@ -34,6 +35,7 @@ function App() {
                 <Route path="/admin/create-category" element={<CreateCategory />} />
                 <Route path="/admin/create-product" element={<CreateProduct />} />
               </Route>
+              
             </Routes>
           </div>
           <ToastContainer position="bottom-right" autoClose={3000} />
