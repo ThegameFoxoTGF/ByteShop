@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 const AddressSchema = new mongoose.Schema({
     name: { type: String, trim: true },
@@ -41,6 +41,7 @@ const UserSchema = new mongoose.Schema({
         enum: ['customer','staff', 'admin'],
         default: 'customer',
     },
+    
     position: { type : String, required: function() { return this.role != 'customer' } },
 
     wishlist: [{ 

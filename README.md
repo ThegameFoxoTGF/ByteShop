@@ -68,4 +68,13 @@
 - **multer**
 - **cookie parser**
 
+### Development Tools
+
+- **VsCode**
+- **Git**
+- **GitHub Desktop**
+- **Postman**
+- **MongoDB Compass**
+- **MongoDB Atlas**
+
 ---

@@ -2,6 +2,8 @@ import asyncHandler from "../middleware/asynchandler.js";
 import generateToken from "../utils/generatetoken.js";
 import User from "../models/user.model.js";
 
+//{ Public }------------------------------------------------------
+
 const authUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -21,7 +23,14 @@ const authUser = asyncHandler(async (req, res) => {
 
 const registerUser = asyncHandler(async (req, res) => {
     const { first_name, last_name, email, password } = req.body;
+    
+    if (!first_name || !last_name || !email || !password) {
+        res.status(400);
+        throw new Error("ข้อมูลไม่ครบถ้วน");
+    }
+
     const userExists = await User.findOne({ email });
+
     if (userExists) {
         res.status(400);
         throw new Error("อีเมลนี้ถูกใช้แล้ว");
@@ -51,9 +60,11 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = (req, res) => {
-    res.clearCookie("token");
+    res.clearCookie("jwt");
     res.status(200).json({ message: "ออกจากระบบเรียบร้อย" });
 };
+
+//{ User }--------------------------------------------------------
 
 const getUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
@@ -61,11 +72,45 @@ const getUserProfile = asyncHandler(async (req, res) => {
     if (user) {
         res.json({
             _id: user._id,
-            first_name: user.profile.first_name,
-            last_name: user.profile.last_name,
-            birthday: user.profile.birthday,
-            phone: user.profile.phone,
             email: user.email,
+            profile: user.profile,
+        });
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        user.profile.first_name = req.body.first_name || user.profile.first_name;
+        user.profile.last_name = req.body.last_name || user.profile.last_name;
+        user.profile.phone = req.body.phone || user.profile.phone;
+        user.profile.birthday = req.body.birthday || user.profile.birthday;
+        user.email = req.body.email || user.email;
+
+        const updatedUser = await user.save();
+        res.json({
+            _id: updatedUser._id,
+            profile: updatedUser.profile,
+            email: updatedUser.email,
+        });
+
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const getShippingAddress = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        res.json({
+            _id: user._id,
+            address: user.address
         });
     } else {
         res.status(404);
@@ -74,17 +119,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 });
 
 
-const updateUserProfile = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id);
-
-    if (user) {
-
-
-    } else {
-        res.status(404);
-        throw new Error("ไม่พบผู้ใช้");
-    }
-});
+//{ Admin }-------------------------------------------------------
 
 const getUsers = asyncHandler(async (req, res) => {
     const users = await User.find({});
@@ -155,4 +190,5 @@ export {
     deleteUser,
     getUserById,
     updateUser,
+    getShippingAddress,
 }

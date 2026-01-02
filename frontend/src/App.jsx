@@ -30,12 +30,6 @@ function App() {
                 <Route path="/register" element={<Register />} />
               </Route>
               
-              {/* Admin/Employee Routes */}
-              <Route element={<ProtectedRoute allowedRoles={['admin', 'employee']} />}>
-                <Route path="/admin/create-category" element={<CreateCategory />} />
-                <Route path="/admin/create-product" element={<CreateProduct />} />
-              </Route>
-              
             </Routes>
           </div>
           <ToastContainer position="bottom-right" autoClose={3000} />

@@ -9,6 +9,7 @@ import {
     deleteUser,
     getUserById,
     updateUser,
+    getShippingAddress,
 } from "../controllers/user.controller.js";
 import { protect, admin } from "../middleware/auth.middleware.js";
 
@@ -22,12 +23,16 @@ router.route("/logout").post(logoutUser)
 
 router
     .route("/profile")
-    .get(protect, )
-    .put(protect, );
+    .get(protect, getUserProfile)
+    .put(protect, updateUserProfile);
 router
     .route("/:id")
-    .delete(protect, admin, )
-    .get(protect, admin, )
-    .put(protect, admin, );
+    .delete(protect, admin, deleteUser)
+    .get(protect, admin, getUserById)
+    .put(protect, admin, updateUser);
+
+router
+    .route("/address/shipping")
+    .get(protect, getShippingAddress);
 
 export default router;

@@ -7,12 +7,10 @@ import cookieParser from "cookie-parser";
 
 import { connectDB } from "./config/db.js"
 
-//--------------------------------------------------------------------
-//Routes Import
+//{ Routes Import }---------------------------------------------------
 import userRoutes from "./routes/user.routes.js";
 
-//--------------------------------------------------------------------
-
+//{ Middleware }------------------------------------------------------
 import { notFound, errorHandler } from "./middleware/error.middleware.js";
 
 const PORT = process.env.PORT || 5000;
@@ -25,12 +23,10 @@ app.use(cors({origin: "http://localhost:5173"}));
 app.use(express.json());
 app.use(cookieParser());
 
-//--------------------------------------------------------------------
-//Routes Path
+//{ Routes Path }-----------------------------------------------------
 app.use("/api/user", userRoutes);
 
-//--------------------------------------------------------------------
-
+//{ Middleware }------------------------------------------------------
 app.use(notFound);
 app.use(errorHandler);
 
