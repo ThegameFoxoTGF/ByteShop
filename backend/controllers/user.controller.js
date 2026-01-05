@@ -1,114 +1,324 @@
-import User from "../models/user.js";
+import asyncHandler from "../middleware/asyncHandler.js";
+import generateToken from "../utils/generatetoken.js";
+import User from "../models/user.model.js";
+import { generateOtp, generatePasswordToken, otpTemplate } from "../utils/generateotp.js";
+import sendEmail from "../utils/sendemail.js";
 
-// Admin/Employee: Get all users
-const getAllUsers = async (req, res) => {
-    try {
-        const users = await User.find().select("-password");
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
 
-// Admin/Employee: Get single user
-const getUserById = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id).select("-password");
-        if (!user) return res.status(404).json({ message: "User not found" });
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-// Create a new User (Admin/Employee only? or signup handled by auth?)
-// Usually signup is in AuthController. This might be "Add Employee" or similar.
-// For now, standard CRUD using new Schema structure.
-const createUser = async (req, res) => {
-     try {
-        // Basic create - logic similar to signup but might include role setting
-        const user = await User.create(req.body);
-        res.status(201).json(user);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+const processOtp = async (email) => {
+    const otp = generateOtp();
+    const otphtml = otpTemplate(otp);
+    const options = {
+        to: email,
+        subject: "ByteShop OTP",
+        html: otphtml,
+    };
+    await sendEmail(options);
+    return otp;
 }
 
+const sendOtp = asyncHandler(async (req, res) => {
+    const email = req.body.email || (req.user && req.user.email);
+    const user = await User.findOne({ email });
 
-// Update User (Admin or Self)
-const updateUserProfile = async (req, res) => {
-    try {
-        // If admin updates other user, use params.id. If self, use req.user._id
-        // This function handles "Self Update" mostly.
-        const userId = req.user._id; 
-        const user = await User.findById(userId);
+    if (!email) {
+        res.status(400);
+        throw new Error("อีเมลไม่ถูกต้อง");
+    }
 
-        if (!user) return res.status(404).json({ message: "User not found" });
+    if (user) {
 
-        // Update fields if provided
-        if (req.body.profile) {
-            user.profile = { ...user.profile, ...req.body.profile }; // Merge profile object
+        const otp = await processOtp(user.email);
+
+        user.otp = {
+            otp_code: otp,
+            otp_expires: Date.now() + 5 * 60 * 1000,
+        };
+
+        await user.save();
+        res.json({ message: "ขอ OTP เรียบร้อย", sentTo: email });
+    }else{
+        res.status(400);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+//{ Public }------------------------------------------------------
+
+const authUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (user && (await user.matchPassword(password))) {
+
+        if(!user.is_verified){
+
+            const otp = await processOtp(user.email);
+
+            user.otp = {
+                otp_code: otp,
+                otp_expires: Date.now() + 5 * 60 * 1000,
+            };
+
+            await user.save();
+
+            res.status(401);
+            throw new Error("อีเมลยังไม่ถูกยืนยัน กรุณาตรวจสอบอีเมลของคุณ");
         }
-        
-        // Handle Addresses - This might replace the whole array or add/edit specific index.
-        // For simplicity: Replace if provided. 
-        if (req.body.address) {
-            user.address = req.body.address;
+
+        generateToken(res, user._id);
+        res.status(200).json({
+            _id: user._id,
+            first_name: user.profile.first_name,
+            last_name: user.profile.last_name,
+            email: user.email,
+        });
+    } else {
+        res.status(401);
+        throw new Error("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+    }
+});
+
+const registerUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+        res.status(400);
+        throw new Error("ข้อมูลไม่ครบถ้วน");
+    }
+
+    const userExists = await User.findOne({ email });
+
+    if (userExists) {
+        res.status(400);
+        throw new Error("อีเมลนี้ถูกใช้แล้ว");
+    }
+
+    const otp = await processOtp(email);
+
+    const user = await User.create({
+        email,
+        password,
+        otp: {
+            otp_code: otp,
+            otp_expires: Date.now() + 5 * 60 * 1000,
+        },
+        is_verified: false,
+    });
+
+    if (user) {
+        generateToken(res, user._id);
+        res.status(201).json({
+            _id: user._id,
+            email: user.email,
+            is_verified: user.is_verified,
+            type: "register",
+        });
+    } else {
+        res.status(400);
+        throw new Error("ข้อมูลผู้ใช้ไม่ถูกต้อง");
+    }
+});
+
+const logoutUser = (req, res) => {
+    res.clearCookie("jwt");
+    res.status(200).json({ message: "ออกจากระบบเรียบร้อย" });
+};
+
+//{ User }--------------------------------------------------------
+
+const getUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        res.json({
+            _id: user._id,
+            email: user.email,
+            profile: user.profile,
+        });
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        user.profile.first_name = req.body.first_name || user.profile.first_name;
+        user.profile.last_name = req.body.last_name || user.profile.last_name;
+        user.profile.phone = req.body.phone || user.profile.phone;
+        user.profile.birthday = req.body.birthday || user.profile.birthday;
+        user.email = req.body.email || user.email;
+
+        const updatedUser = await user.save();
+        res.json({
+            _id: updatedUser._id,
+            profile: updatedUser.profile,
+            email: updatedUser.email,
+        });
+
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+//{ Reset Password }--------------------------------------------
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (user) {
+
+        const otp = await processOtp(user.email);
+
+        user.otp = {
+            otp_code: otp,
+            otp_expires: Date.now() + 5 * 60 * 1000,
+        };
+
+        await user.save();
+        res.json({ message: "ขอ OTP เรียบร้อย", sentTo: email , type: "forgot" });
+    }else{
+        res.status(400);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const verifyOtp = asyncHandler(async (req, res) => {
+    const { email, otp , type} = req.body;
+    let responseData = {};
+    const user = await User.findOne({ email });
+    if (user) {
+        if (user.otp.otp_code !== otp) {
+            res.status(400);
+            throw new Error("OTP ไม่ถูกต้อง");
+        }
+        if (user.otp.otp_expires < Date.now()) {
+            res.status(400);
+            throw new Error("OTP หมดอายุ กรุณาขอ OTP อีกครั้ง");
         }
 
-        if (req.body.tax_info) {
-           user.tax_info = req.body.tax_info;
+        if(type === "register"){
+            user.is_verified = true;
+
+            generateToken(res, user._id);
+            responseData = {
+                _id: user._id,
+                profile: user.profile,
+                email: user.email,
+                is_verified: true,
+            };
         }
-        
-        // Handling role/position - protected by checks usually
-        // if (req.body.position && user.role !== 'customer') ...
+
+        if(type === "forgot"){
+            const passwordToken = generatePasswordToken();
+            user.passwordToken = passwordToken;
+            user.passwordTokenExpires = Date.now() + 5 * 60 * 1000;
+            responseData.passwordToken = passwordToken;
+        }
+
+        user.otp = {
+            otp_code: null,
+            otp_expires: null,
+        };
+        await user.save();
+        res.json({ message: "ยืนยัน OTP เรียบร้อย", responseData });
+    }else{
+        res.status(400);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+    const { email, newPassword, passwordToken } = req.body;
+    const user = await User.findOne({ email, passwordToken, passwordTokenExpires: { $gt: Date.now() } });
+    if (user) {
+        user.password = newPassword;
+        user.passwordToken = undefined;
+        user.passwordTokenExpires = undefined;
+        await user.save();
+        res.json({ message: "เปลี่ยนรหัสผ่านเรียบร้อย" });
+    } else {
+        res.status(400);
+        throw new Error("รหัสยืนยันไม่ถูกต้องหรือหมดอายุแล้ว กรุณาเริ่มขั้นตอนใหม่อีกครั้ง");
+    }
+});
+
+//{ Admin }-------------------------------------------------------
+
+const getUsers = asyncHandler(async (req, res) => {
+    const users = await User.find({});
+    res.json(users);
+});
+
+const deleteUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+        if (user.role === "admin" || user.role === "staff") {
+            res.status(400);
+            throw new Error("ไม่สามารถลบผู้ใช้ประเภท admin หรือ staff ได้");
+        }
+        await User.deleteOne({ _id: user._id });
+        res.json({ message: "ลบผู้ใช้เรียบร้อย" });
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id).select("-password");
+
+    if (user) {
+        res.json(user);
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const updateUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+        user.profile.first_name = req.body.first_name || user.profile.first_name;
+        user.profile.last_name = req.body.last_name || user.profile.last_name;
+        user.email = req.body.email || user.email;
+        user.role = req.body.role || user.role;
 
         if (req.body.password) {
             user.password = req.body.password;
         }
-
         const updatedUser = await user.save();
-        
-        // Return without password
-        const userResponse = updatedUser.toObject();
-        delete userResponse.password;
+        res.json({
+            _id: updatedUser._id,
+            first_name: updatedUser.profile.first_name,
+            last_name: updatedUser.profile.last_name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+        });
 
-        res.status(200).json(userResponse);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
     }
-};
-
-// Admin update user (Role, Status etc)
-const updateUser = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        Object.assign(user, req.body);
-        const updatedUser = await user.save();
-        res.status(200).json(updatedUser);
-
-    } catch (error) {
-         res.status(500).json({ error: error.message });
-    }
-}
-
-const deleteUser = async (req, res) => {
-    try {
-        const user = await User.findByIdAndDelete(req.params.id);
-        if (!user) return res.status(404).json({ message: "User not found" });
-        res.status(200).json({ message: "User deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+});
 
 export {
-    getAllUsers,
+    authUser,
+    registerUser,
+    logoutUser,
+    getUserProfile,
+    updateUserProfile,
+    getUsers,
+    deleteUser,
     getUserById,
-    createUser,
-    updateUserProfile, // Self
-    updateUser, // Admin
-    deleteUser
-};
+    updateUser,
+    sendOtp,
+    forgotPassword,
+    verifyOtp,
+    resetPassword,
+}
+

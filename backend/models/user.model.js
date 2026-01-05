@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 const AddressSchema = new mongoose.Schema({
     name: { type: String, trim: true },
     phone: { type: String, trim: true },
-    label: { type: String, trim: true }, // e.g. "Home", "Office"
+    label: { type: String, trim: true },
     address_line: { type: String, trim: true },
     sub_district: { type: String, trim: true },
     district: { type: String, trim: true },
@@ -18,18 +18,38 @@ const TaxInfoSchema = new mongoose.Schema({
     tax_id: { type: String, trim: true },
     company_name: { type: String, trim: true },
     branch: { type: String, trim: true },
-    address: AddressSchema
+    name: { type: String, trim: true },
+    phone: { type: String, trim: true },
+    label: { type: String, trim: true },
+    address_line: { type: String, trim: true },
+    sub_district: { type: String, trim: true },
+    district: { type: String, trim: true },
+    province: { type: String, trim: true },
+    zip_code: { type: String, trim: true, maxlength: 5, minlength: 5 },
+    detail: { type: String, trim: true },
+    is_default: { type: Boolean, default: false }
 });
 
 const UserSchema = new mongoose.Schema({
     is_active: { type: Boolean, default: true },
     email : { type: String, required: true, unique: true ,lowercase: true, trim: true },
     password : { type: String, required: true , minlength: 6 },
-    
+
+    otp: {
+        otp_code: { type: String },
+        otp_expires: { type: Date },
+    },
+
+    passwordToken: { type: String },
+    passwordTokenExpires: { type: Date },
+
+    is_verified: { type: Boolean, default: false },
+
     profile: {
         first_name: { type: String, trim: true },
         last_name: { type: String, trim: true },
-        phone: { type: String, trim: true }
+        phone: { type: String, trim: true },
+        birthday: { type: Date },
     },
 
     address: [AddressSchema],
@@ -37,23 +57,28 @@ const UserSchema = new mongoose.Schema({
 
     role: {
         type: String,
-        enum: ['customer','employee', 'admin'],
+        enum: ['customer','staff', 'admin'],
         default: 'customer',
     },
+    
     position: { type : String, required: function() { return this.role != 'customer' } },
 
-    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'products' }],
+    wishlist: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'products' 
+    }],
 
 }, { 
     timestamps: true, 
     versionKey: false 
 });
 
-//hash password
+// Encrypt password using bcrypt
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
-        return next();
+        next();
     };
+
     try {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
