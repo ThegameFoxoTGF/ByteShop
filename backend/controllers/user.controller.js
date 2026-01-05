@@ -1,6 +1,47 @@
-import asyncHandler from "../middleware/asynchandler.js";
+import asyncHandler from "../middleware/asyncHandler.js";
 import generateToken from "../utils/generatetoken.js";
 import User from "../models/user.model.js";
+import { generateOtp, generatePasswordToken, otpTemplate } from "../utils/generateotp.js";
+import sendEmail from "../utils/sendemail.js";
+
+
+const processOtp = async (email) => {
+    const otp = generateOtp();
+    const otphtml = otpTemplate(otp);
+    const options = {
+        to: email,
+        subject: "ByteShop OTP",
+        html: otphtml,
+    };
+    await sendEmail(options);
+    return otp;
+}
+
+const sendOtp = asyncHandler(async (req, res) => {
+    const email = req.body.email || (req.user && req.user.email);
+    const user = await User.findOne({ email });
+
+    if (!email) {
+        res.status(400);
+        throw new Error("อีเมลไม่ถูกต้อง");
+    }
+
+    if (user) {
+
+        const otp = await processOtp(user.email);
+
+        user.otp = {
+            otp_code: otp,
+            otp_expires: Date.now() + 5 * 60 * 1000,
+        };
+
+        await user.save();
+        res.json({ message: "ขอ OTP เรียบร้อย", sentTo: email });
+    }else{
+        res.status(400);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
 
 //{ Public }------------------------------------------------------
 
@@ -8,6 +49,22 @@ const authUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (user && (await user.matchPassword(password))) {
+
+        if(!user.is_verified){
+
+            const otp = await processOtp(user.email);
+
+            user.otp = {
+                otp_code: otp,
+                otp_expires: Date.now() + 5 * 60 * 1000,
+            };
+
+            await user.save();
+
+            res.status(401);
+            throw new Error("อีเมลยังไม่ถูกยืนยัน กรุณาตรวจสอบอีเมลของคุณ");
+        }
+
         generateToken(res, user._id);
         res.status(200).json({
             _id: user._id,
@@ -17,14 +74,14 @@ const authUser = asyncHandler(async (req, res) => {
         });
     } else {
         res.status(401);
-        throw new Error("อีเมล หรือ รหัสผ่านไม่ถูกต้อง");
+        throw new Error("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
     }
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { first_name, last_name, email, password } = req.body;
+    const { email, password } = req.body;
     
-    if (!first_name || !last_name || !email || !password) {
+    if (!email || !password) {
         res.status(400);
         throw new Error("ข้อมูลไม่ครบถ้วน");
     }
@@ -36,22 +93,25 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("อีเมลนี้ถูกใช้แล้ว");
     }
 
+    const otp = await processOtp(email);
+
     const user = await User.create({
-        profile: {
-            first_name,
-            last_name,
-        },
         email,
         password,
+        otp: {
+            otp_code: otp,
+            otp_expires: Date.now() + 5 * 60 * 1000,
+        },
+        is_verified: false,
     });
 
     if (user) {
         generateToken(res, user._id);
         res.status(201).json({
             _id: user._id,
-            first_name: user.profile.first_name,
-            last_name: user.profile.last_name,
             email: user.email,
+            is_verified: user.is_verified,
+            type: "register",
         });
     } else {
         res.status(400);
@@ -104,20 +164,86 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
-const getShippingAddress = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id);
-
+//{ Reset Password }--------------------------------------------
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
     if (user) {
-        res.json({
-            _id: user._id,
-            address: user.address
-        });
-    } else {
-        res.status(404);
+
+        const otp = await processOtp(user.email);
+
+        user.otp = {
+            otp_code: otp,
+            otp_expires: Date.now() + 5 * 60 * 1000,
+        };
+
+        await user.save();
+        res.json({ message: "ขอ OTP เรียบร้อย", sentTo: email , type: "forgot" });
+    }else{
+        res.status(400);
         throw new Error("ไม่พบผู้ใช้");
     }
 });
 
+const verifyOtp = asyncHandler(async (req, res) => {
+    const { email, otp , type} = req.body;
+    let responseData = {};
+    const user = await User.findOne({ email });
+    if (user) {
+        if (user.otp.otp_code !== otp) {
+            res.status(400);
+            throw new Error("OTP ไม่ถูกต้อง");
+        }
+        if (user.otp.otp_expires < Date.now()) {
+            res.status(400);
+            throw new Error("OTP หมดอายุ กรุณาขอ OTP อีกครั้ง");
+        }
+
+        if(type === "register"){
+            user.is_verified = true;
+
+            generateToken(res, user._id);
+            responseData = {
+                _id: user._id,
+                profile: user.profile,
+                email: user.email,
+                is_verified: true,
+            };
+        }
+
+        if(type === "forgot"){
+            const passwordToken = generatePasswordToken();
+            user.passwordToken = passwordToken;
+            user.passwordTokenExpires = Date.now() + 5 * 60 * 1000;
+            responseData.passwordToken = passwordToken;
+        }
+
+        user.otp = {
+            otp_code: null,
+            otp_expires: null,
+        };
+        await user.save();
+        res.json({ message: "ยืนยัน OTP เรียบร้อย", responseData });
+    }else{
+        res.status(400);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+    const { email, newPassword, passwordToken } = req.body;
+    const user = await User.findOne({ email, passwordToken, passwordTokenExpires: { $gt: Date.now() } });
+    if (user) {
+        user.password = newPassword;
+        user.passwordToken = undefined;
+        user.passwordTokenExpires = undefined;
+        await user.save();
+        res.json({ message: "เปลี่ยนรหัสผ่านเรียบร้อย" });
+    } else {
+        res.status(400);
+        throw new Error("รหัสยืนยันไม่ถูกต้องหรือหมดอายุแล้ว กรุณาเริ่มขั้นตอนใหม่อีกครั้ง");
+    }
+});
 
 //{ Admin }-------------------------------------------------------
 
@@ -190,5 +316,9 @@ export {
     deleteUser,
     getUserById,
     updateUser,
-    getShippingAddress,
+    sendOtp,
+    forgotPassword,
+    verifyOtp,
+    resetPassword,
 }
+

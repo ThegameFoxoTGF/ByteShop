@@ -1,4 +1,5 @@
 const notFound = (req, res, next) => {
+    console.log(req.originalUrl);
     const error = new Error(`ไม่พบหน้าเว็บที่ต้องการ - ${req.originalUrl}`);
     res.status(404);
     next(error);

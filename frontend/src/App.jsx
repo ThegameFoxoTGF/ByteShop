@@ -8,10 +8,9 @@ import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import ProtectedRoute from './components/ProtectedRoute.jsx';
+
 import GuestRoute from './components/GuestRoute.jsx';
-import CreateCategory from './pages/admin/CreateCategory.jsx';
-import CreateProduct from './pages/admin/CreateProduct.jsx';
+
 
 function App() {
   return (
@@ -24,7 +23,6 @@ function App() {
               
               <Route path="/" element={<Home />} />
               
-              {/* Guest Routes (Redirect to / if logged in) */}
               <Route element={<GuestRoute />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

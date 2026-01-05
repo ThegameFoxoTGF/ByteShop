@@ -9,6 +9,9 @@ import { connectDB } from "./config/db.js"
 
 //{ Routes Import }---------------------------------------------------
 import userRoutes from "./routes/user.routes.js";
+import brandRoutes from "./routes/brand.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
 
 //{ Middleware }------------------------------------------------------
 import { notFound, errorHandler } from "./middleware/error.middleware.js";
@@ -25,6 +28,9 @@ app.use(cookieParser());
 
 //{ Routes Path }-----------------------------------------------------
 app.use("/api/user", userRoutes);
+app.use("/api/brand", brandRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/category", categoryRoutes);
 
 //{ Middleware }------------------------------------------------------
 app.use(notFound);

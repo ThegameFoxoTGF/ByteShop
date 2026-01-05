@@ -12,7 +12,7 @@ const ProductSchema = new mongoose.Schema({
         ref: "Category", 
         required: true 
     },
-    brand: {
+    brand_id: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: "Brand", 
         required: true
@@ -21,10 +21,11 @@ const ProductSchema = new mongoose.Schema({
     series: { type: String, trim: true },
 
     description: { type: String },
-    image: [ String ],
+    main_image: { url: String , public_id: String },
+    image: [{ url: String , public_id: String }],
 
-    sell_price: { type: Number, required: true },
-    market_price: { type: Number },
+    original_price: { type: Number, required: true },
+    selling_price: { type: Number },
     discount: { type: Number, default: 0 },
 
     quantity: { type: Number, default: 0 }, 
@@ -35,13 +36,10 @@ const ProductSchema = new mongoose.Schema({
         height: { type: String },
     },
 
-    track_serial: { type: Boolean, default: false },
-    low_stock_alert: { type: Number, default: 5 },
-
     warranty_period: { type: Number },
     warranty_provider: { type: String },
 
-    search_keywords: [ String ],
+    search_keywords: [{ type: String }],
     filters: [{ 
         key: { type: String },
         label: { type: String },

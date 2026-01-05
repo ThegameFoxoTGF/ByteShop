@@ -10,12 +10,9 @@ const fieldTemplate = new mongoose.Schema({
 
 const CategorySchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true, unique: true },
+    label: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true },
-    parent: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
-    children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
-    is_active: { type: Boolean, default: true },
 
-    search_keywords: [ String ],
     filters: [fieldTemplate],
     specifications: [fieldTemplate],
 
