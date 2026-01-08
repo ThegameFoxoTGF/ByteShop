@@ -28,12 +28,14 @@ const ProductSchema = new mongoose.Schema({
     selling_price: { type: Number },
     discount: { type: Number, default: 0 },
 
-    quantity: { type: Number, default: 0 }, 
+    stock: { type: Number, default: 0 },
+    reserved_stock: { type: Number, default: 0 },
     weight_g: { type: Number },
     dimensions: { 
         length: { type: String },
         width: { type: String },
         height: { type: String },
+        unit: { type: String },
     },
 
     warranty_period: { type: Number },
@@ -54,6 +56,19 @@ const ProductSchema = new mongoose.Schema({
 },{
     timestamps: true,
     versionKey: false
+})
+
+ProductSchema.pre("save", function (next) {
+    if (this.isModified('original_price') || this.isModified('discount')) {
+        this.selling_price = this.original_price - (this.discount || 0);
+
+        if (this.selling_price < 0) this.selling_price = this.original_price;
+    }
+    next();
+})
+
+ProductSchema.virtual('available_stock').get(function () {
+    return this.stock - this.reserved_stock;
 })
 
 const Product = mongoose.model("Product", ProductSchema);

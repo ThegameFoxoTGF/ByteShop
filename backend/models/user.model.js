@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 const AddressSchema = new mongoose.Schema({
     name: { type: String, trim: true },
-    phone: { type: String, trim: true },
+    phone_number: { type: String, trim: true },
     label: { type: String, trim: true },
     address_line: { type: String, trim: true },
     sub_district: { type: String, trim: true },
@@ -19,7 +19,7 @@ const TaxInfoSchema = new mongoose.Schema({
     company_name: { type: String, trim: true },
     branch: { type: String, trim: true },
     name: { type: String, trim: true },
-    phone: { type: String, trim: true },
+    phone_number: { type: String, trim: true },
     label: { type: String, trim: true },
     address_line: { type: String, trim: true },
     sub_district: { type: String, trim: true },
@@ -48,7 +48,7 @@ const UserSchema = new mongoose.Schema({
     profile: {
         first_name: { type: String, trim: true },
         last_name: { type: String, trim: true },
-        phone: { type: String, trim: true },
+        phone_number: { type: String, trim: true },
         birthday: { type: Date },
     },
 

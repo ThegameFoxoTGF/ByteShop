@@ -9,9 +9,10 @@ import { connectDB } from "./config/db.js"
 
 //{ Routes Import }---------------------------------------------------
 import userRoutes from "./routes/user.routes.js";
-import brandRoutes from "./routes/brand.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
+import brandRoutes from "./routes/brand.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import cartRoutes from "./routes/cart.routes.js";
 
 //{ Middleware }------------------------------------------------------
 import { notFound, errorHandler } from "./middleware/error.middleware.js";
@@ -28,9 +29,10 @@ app.use(cookieParser());
 
 //{ Routes Path }-----------------------------------------------------
 app.use("/api/user", userRoutes);
-app.use("/api/brand", brandRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/brand", brandRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/cart", cartRoutes);
 
 //{ Middleware }------------------------------------------------------
 app.use(notFound);

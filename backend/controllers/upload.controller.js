@@ -1,6 +1,9 @@
 import cloudinary from "../config/cloudinary.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 
+// @desc    Upload image
+// @route   POST /api/upload
+// @access  Public
 const uploadImage = asyncHandler(async (req, res) => {
 
     if (!req.file) {
@@ -34,6 +37,23 @@ const uploadImage = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Delete image
+// @route   POST /api/delete
+// @access  Public
+const deleteImage = asyncHandler(async (req, res) => {
+    const { public_id } = req.body;
+    if (!public_id) {
+        res.status(400)
+        throw new Error("กรุณาให้ public_id")
+    }
+
+    const result = await cloudinary.uploader.destroy(public_id);
+    res.json({
+        message: "ลบรูปภาพสำเร็จ",
+    })
+});
+
 export {
-    uploadImage
+    uploadImage,
+    deleteImage
 }

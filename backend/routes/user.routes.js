@@ -40,7 +40,7 @@ router.route("/").get(protect, admin, getUsers);
 
 router.route("/register").post(registerUser)
 router.route("/login").post(authUser)
-router.route("/logout").post(logoutUser)
+router.route("/logout").post(protect, logoutUser)
 
 router
     .route("/profile")
@@ -56,7 +56,7 @@ router
     .post(sendOtp)
 
 router.post("/forget", forgotPassword)
-router.put("/reset-password", resetPassword)
+router.put("/forget-reset", resetPassword)
 
 router
     .route("/:id")

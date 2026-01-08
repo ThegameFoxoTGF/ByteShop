@@ -4,7 +4,6 @@ import User from "../models/user.model.js";
 import { generateOtp, generatePasswordToken, otpTemplate } from "../utils/generateotp.js";
 import sendEmail from "../utils/sendemail.js";
 
-
 const processOtp = async (email) => {
     const otp = generateOtp();
     const otphtml = otpTemplate(otp);
@@ -17,6 +16,9 @@ const processOtp = async (email) => {
     return otp;
 }
 
+// @desc    Send OTP
+// @route   POST /api/user/otp
+// @access  Public
 const sendOtp = asyncHandler(async (req, res) => {
     const email = req.body.email || (req.user && req.user.email);
     const user = await User.findOne({ email });
@@ -43,8 +45,9 @@ const sendOtp = asyncHandler(async (req, res) => {
     }
 });
 
-//{ Public }------------------------------------------------------
-
+// @desc    Auth user & get token
+// @route   POST /api/user/login
+// @access  Public
 const authUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -78,6 +81,9 @@ const authUser = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Register new user
+// @route   POST /api/user/register
+// @access  Public
 const registerUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     
@@ -119,13 +125,17 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Logout user
+// @route   POST /api/user/logout
+// @access  Private
 const logoutUser = (req, res) => {
     res.clearCookie("jwt");
     res.status(200).json({ message: "ออกจากระบบเรียบร้อย" });
 };
 
-//{ User }--------------------------------------------------------
-
+// @desc    Get user profile
+// @route   GET /api/user/profile
+// @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
@@ -141,6 +151,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Update user profile
+// @route   PUT /api/user/profile
+// @access  Private
 const updateUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
@@ -164,7 +177,9 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
-//{ Reset Password }--------------------------------------------
+// @desc    Forgot password
+// @route   POST /api/user/forgot
+// @access  Public
 const forgotPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email });
@@ -185,6 +200,9 @@ const forgotPassword = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Verify OTP
+// @route   POST /api/user/verify
+// @access  Public
 const verifyOtp = asyncHandler(async (req, res) => {
     const { email, otp , type} = req.body;
     let responseData = {};
@@ -230,6 +248,9 @@ const verifyOtp = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Reset password
+// @route   POST /api/user/forgot-reset
+// @access  Public
 const resetPassword = asyncHandler(async (req, res) => {
     const { email, newPassword, passwordToken } = req.body;
     const user = await User.findOne({ email, passwordToken, passwordTokenExpires: { $gt: Date.now() } });
@@ -245,13 +266,31 @@ const resetPassword = asyncHandler(async (req, res) => {
     }
 });
 
-//{ Admin }-------------------------------------------------------
-
+// @desc    Get all users
+// @route   GET /api/user
+// @access  Private/Admin
 const getUsers = asyncHandler(async (req, res) => {
-    const users = await User.find({});
+    const users = await User.find({}).sort({ name: 1 });
     res.json(users);
 });
 
+// @desc    Get user by ID
+// @route   GET /api/user/:id
+// @access  Private/Admin
+const getUserById = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id).select("-password");
+
+    if (user) {
+        res.json(user);
+    } else {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+});
+
+// @desc    Delete user
+// @route   DELETE /api/user/:id
+// @access  Private/Admin
 const deleteUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
 
@@ -268,17 +307,9 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
 });
 
-const getUserById = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id).select("-password");
-
-    if (user) {
-        res.json(user);
-    } else {
-        res.status(404);
-        throw new Error("ไม่พบผู้ใช้");
-    }
-});
-
+// @desc    Update user
+// @route   PUT /api/user/:id
+// @access  Private/Admin
 const updateUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
 
