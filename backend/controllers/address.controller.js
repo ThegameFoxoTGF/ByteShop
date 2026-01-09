@@ -1,8 +1,9 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/user.model.js";
 
-//{ Address }-----------------------------------------------------
-
+// @desc    Add Address
+// @route   POST /api/address/shipping
+// @access  Private
 const addAddress = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
@@ -31,7 +32,9 @@ const addAddress = asyncHandler(async (req, res) => {
     }
 });
 
-
+// @desc    Get Address
+// @route   GET /api/address/shipping
+// @access  Private
 const getAddress = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id).select("address");
 
@@ -45,6 +48,9 @@ const getAddress = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Update Address
+// @route   PUT /api/address/shipping/:id
+// @access  Private
 const updateAddress = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     const address = user.address.id(req.params.id);
@@ -73,6 +79,9 @@ const updateAddress = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Delete Address
+// @route   DELETE /api/address/shipping/:id
+// @access  Private
 const deleteAddress = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     const address = user.address.id(req.params.id);
@@ -90,8 +99,9 @@ const deleteAddress = asyncHandler(async (req, res) => {
     }
 });
 
-//{ Tax }---------------------------------------------------------
-
+// @desc    Add Tax
+// @route   POST /api/address/tax
+// @access  Private
 const addTax = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
@@ -120,6 +130,9 @@ const addTax = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Get Tax
+// @route   GET /api/address/tax
+// @access  Private
 const getTax = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id).select("tax_info");
     
@@ -131,6 +144,9 @@ const getTax = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Update Tax
+// @route   PUT /api/address/tax/:id
+// @access  Private
 const updateTax = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     const tax = user.tax_info.id(req.params.id);
@@ -158,6 +174,9 @@ const updateTax = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Delete Tax
+// @route   Delete /api/address/tax/:id
+// @access  Private
 const deleteTax = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     const tax = user.tax_info.id(req.params.id);

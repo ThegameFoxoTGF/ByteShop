@@ -131,6 +131,30 @@ const createOrder = asyncHandler(async (req, res) => {
 
 });
 
+// @desc    Get all orders
+// @route   GET /api/order
+// @access  Private
+const getAllOrders = asyncHandler(async (req, res) => {
+    const order = await Order.find({ user_id: req.user._id });
+    if (!order) {
+        res.status(404);
+        throw new Error("ไม่พบคำสั่งซื้อ");
+    }
+    res.json(order);
+});
+
+// @desc    Get order by order id
+// @route   GET /api/order/:id
+// @access  Private
+const getByOrderId = asyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+        res.status(404);
+        throw new Error("ไม่พบคำสั่งซื้อ");
+    }
+    res.json(order);
+});
+
 // @desc    Approve order
 // @route   PUT /api/order/:id/approve
 // @access  Private
@@ -211,6 +235,8 @@ const updateOrdertoPaid = asyncHandler(async (req, res) => {
 
 export {
     createOrder,
+    getAllOrders,
+    getByOrderId,
     approveOrder,
     updateOrdertoPaid
 }
