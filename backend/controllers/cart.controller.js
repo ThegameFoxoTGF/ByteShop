@@ -11,7 +11,7 @@ const checkProductStock = async (productId, requiredQuantity) => {
     }
 
     if (requiredQuantity > product.stock) {
-        throw new Error("สินค้าไม่เพียงพอ")
+        throw new Error("จำนวนสินค้าไม่เพียงพอ")
     }
 
     return product;
@@ -39,7 +39,7 @@ const calculateTotalPrice = (cart) => {
 const getUserCart = asyncHandler(async (req, res) => {
     const cart = await Cart.findOne({ user: req.user._id })
         .populate({
-            path: "items.product", 
+            path: "items.product",
             select: "name original_price selling_price discount main_image stock"
         });
 
@@ -51,25 +51,16 @@ const getUserCart = asyncHandler(async (req, res) => {
 
     let isChanged = false;
 
-    const originalLength = cart.items.length;
-    cart.items = cart.items.filter(item => {
-        const product = item.product;
-
-        return product && product.is_active;
-    });
-
-    if (cart.items.length !== originalLength) isChanged = true;
-
     cart.items.forEach(item => {
         const product = item.product;
-
-        if (item.quantity > product.stock) {
+        // Check if product exists (it should due to populate, but safety first)
+        if (product && item.quantity > product.stock) {
             item.quantity = product.stock;
             isChanged = true;
         }
-    })
+    });
 
-    if(isChanged) {
+    if (isChanged) {
         await cart.save();
     }
 
@@ -79,7 +70,7 @@ const getUserCart = asyncHandler(async (req, res) => {
         _id: cart._id,
         items,
         total_price,
-        is_synced: isChanged,
+        message: isChanged ? "รายการสินค้าบางรายการถูกปรับจำนวนลงเนื่องจากสินค้าคงเหลือไม่เพียงพอ" : undefined
     });
 });
 
@@ -87,7 +78,7 @@ const getUserCart = asyncHandler(async (req, res) => {
 // @route   POST /api/cart
 // @access  Private
 const addToCart = asyncHandler(async (req, res) => {
-    const { productId , quantity } = req.body;
+    const { productId, quantity } = req.body;
     const user = req.user._id;
 
     let cart = await Cart.findOne({ user });
@@ -111,14 +102,14 @@ const addToCart = asyncHandler(async (req, res) => {
     await checkProductStock(productId, totalRequiredQuantity);
 
     if (!cart) {
-        cart = await Cart.create({user: user, items: [{product: productId, quantity: quantity}]})
-    }else {
+        cart = await Cart.create({ user: user, items: [{ product: productId, quantity: quantity }] })
+    } else {
         const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
 
         if (itemIndex !== -1) {
             cart.items[itemIndex].quantity += quantity;
-        }else {
-            cart.items.push({product: productId, quantity: quantity})
+        } else {
+            cart.items.push({ product: productId, quantity: quantity })
         }
     }
 
@@ -151,7 +142,21 @@ const updateCart = asyncHandler(async (req, res) => {
         throw new Error("จำนวนสินค้าต้องมีอย่างน้อย 1 ชิ้น")
     }
 
-    await checkProductStock(productId, quantity);
+    // Check stock but cap instead of error if requested > stock
+    const productToCheck = await Product.findById(productId);
+    if (!productToCheck) {
+        res.status(404);
+        throw new Error("ไม่พบสินค้านี้");
+    }
+
+    let finalQuantity = quantity;
+    if (quantity > productToCheck.stock) {
+        finalQuantity = productToCheck.stock;
+        // Optionally warn user? But backend just returns json. 
+        // The frontend will receive the updated cart with the capped quantity.
+    }
+
+    // await checkProductStock(productId, quantity); // Removed throwing check
 
     const cart = await Cart.findOne({ user });
     if (!cart) {
@@ -162,8 +167,8 @@ const updateCart = asyncHandler(async (req, res) => {
     const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
 
     if (itemIndex !== -1) {
-        
-        cart.items[itemIndex].quantity = quantity;
+
+        cart.items[itemIndex].quantity = finalQuantity;
         await cart.save();
 
         await cart.populate({
@@ -172,13 +177,14 @@ const updateCart = asyncHandler(async (req, res) => {
         });
 
         const { items, total_price } = calculateTotalPrice(cart);
-        
+
         res.json({
             _id: cart._id,
             items,
             total_price,
+            message: finalQuantity < quantity ? `จำนวนสินค้าไม่เพียงพอ` : undefined
         });
-    }else {
+    } else {
         res.status(404)
         throw new Error("ไม่พบสินค้านี้ในตะกร้าของคุณ")
     }

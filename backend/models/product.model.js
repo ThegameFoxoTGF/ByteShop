@@ -1,75 +1,75 @@
 import mongoose from "mongoose";
 
-const ProductSchema = new mongoose.Schema({
+const ProductSchema = new mongoose.Schema(
+  {
     is_active: { type: Boolean, default: true },
 
     sku: { type: String, unique: true, required: true, trim: true },
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, trim: true },
-    
-    category_id: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Category", 
-        required: true 
+
+    category_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
     },
     brand_id: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Brand", 
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
+      required: true,
     },
-    model_number: { type: String, trim: true },
-    series: { type: String, trim: true },
 
     description: { type: String },
-    main_image: { url: String , public_id: String },
-    image: [{ url: String , public_id: String }],
+    main_image: { url: String, public_id: String },
+    image: [{ url: String, public_id: String }],
 
     original_price: { type: Number, required: true },
     selling_price: { type: Number },
     discount: { type: Number, default: 0 },
 
     stock: { type: Number, default: 0 },
-    reserved_stock: { type: Number, default: 0 },
     weight_g: { type: Number },
-    dimensions: { 
-        length: { type: String },
-        width: { type: String },
-        height: { type: String },
-        unit: { type: String },
+    dimensions: {
+      length: { type: String },
+      width: { type: String },
+      height: { type: String },
+      unit: { type: String },
     },
 
     warranty_period: { type: Number },
     warranty_provider: { type: String },
 
     search_keywords: [{ type: String }],
-    filters: [{ 
+    filters: [
+      {
         key: { type: String },
         label: { type: String },
         value: { type: String },
-    }],
-    specifications: [{ 
+      },
+    ],
+    specifications: [
+      {
         key: { type: String },
         label: { type: String },
         value: { type: String },
-        unit: { type: String }
-    }],
-},{
+        unit: { type: String },
+      },
+    ],
+  },
+  {
     timestamps: true,
-    versionKey: false
-})
+    versionKey: false,
+  }
+);
 
 ProductSchema.pre("save", function (next) {
-    if (this.isModified('original_price') || this.isModified('discount')) {
-        this.selling_price = this.original_price - (this.discount || 0);
+  if (this.isModified("original_price") || this.isModified("discount")) {
+    this.selling_price = this.original_price - (this.discount || 0);
 
-        if (this.selling_price < 0) this.selling_price = this.original_price;
-    }
-    next();
-})
-
-ProductSchema.virtual('available_stock').get(function () {
-    return this.stock - this.reserved_stock;
-})
+    if (this.selling_price < 0) this.selling_price = this.original_price;
+  }
+  next();
+});
 
 const Product = mongoose.model("Product", ProductSchema);
 

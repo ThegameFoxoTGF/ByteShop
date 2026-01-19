@@ -157,7 +157,7 @@ const getByOrderId = asyncHandler(async (req, res) => {
 
 // @desc    Approve order
 // @route   PUT /api/order/:id/approve
-// @access  Private
+// @access  Private/admin
 const approveOrder = asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id);
     if (!order) {
@@ -206,7 +206,7 @@ const approveOrder = asyncHandler(async (req, res) => {
 // @route   PUT /api/order/:id/pay
 // @access  Private
 const updateOrdertoPaid = asyncHandler(async (req, res) => {
-    const { slip_url } = req.body;
+    const { url, public_id } = req.body;
     const order = await Order.findById(req.params.id);
     if (!order) {
         res.status(404);
@@ -218,14 +218,14 @@ const updateOrdertoPaid = asyncHandler(async (req, res) => {
         throw new Error("คุณไม่มีสิทธิ์แก้ไขออเดอร์นี้");
     }
 
-    if (!slip_url) {
+    if (!url || !public_id) {
         res.status(400);
         throw new Error("ไม่พบ URL ของสลิป");
     }
 
     order.payment_info = {
         payment_status: 'paid',
-        slip_url: slip_url,
+        slip_url: { url, public_id },
         payment_date: new Date(),
     }
 

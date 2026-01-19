@@ -15,28 +15,19 @@ const protect = asyncHandler(async (req, res, next) => {
             res.status(401);
             throw new Error("ไม่ได้รับอนุญาต โทเค็นไม่ถูกต้อง");
         }
-    }else{
+    } else {
         res.status(401);
         throw new Error("ไม่ได้รับอนุญาต ไม่มีโทเค็น");
     }
 })
 
-const employee = (req, res, next) => {
-    if (req.user && (req.user.role === "staff" || req.user.role === "admin")) {
-        next();
-    }else{
-        res.status(401);
-        throw new Error("ไม่ได้รับอนุญาต ไม่มีสิทธิ์")
-    }
-}
-
 const admin = (req, res, next) => {
-    if (req.user && (req.user.role === "admin")) {
+    if (req.user.is_admin) {
         next();
-    }else{
+    } else {
         res.status(401);
-        throw new Error("ไม่ได้รับอนุญาต ไม่มีสิทธิ์")
+        throw new Error("ไม่ได้รับอนุญาต ไม่มีสิทธิ์");
     }
 }
 
-export { protect, employee, admin };
+export { protect, admin };

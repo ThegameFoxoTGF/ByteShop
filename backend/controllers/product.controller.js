@@ -16,7 +16,7 @@ const generateRandomSku = () => {
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
     const { keyword, category, brand, minPrice, maxPrice, sort, limit, page } = req.query;
-    
+
     let query = {};
 
     if (keyword) {
@@ -29,20 +29,20 @@ const getProducts = asyncHandler(async (req, res) => {
 
     if (category) query.category_id = category;
     if (brand) query.brand_id = brand;
-    
+
     if (minPrice || maxPrice) {
         query.selling_price = {};
         if (minPrice) query.selling_price.$gte = Number(minPrice);
         if (maxPrice) query.selling_price.$lte = Number(maxPrice);
     }
 
-    if (req.user && req.user.role === "admin") {
+    if (req.user && req.user.isAdmin === true) {
         query.is_active = { $in: [true, false] };
     } else {
         query.is_active = true;
     }
 
-    let sortOption = { createdAt: -1 };
+    let sortOption = { stock: -1, createdAt: -1 };
     if (sort === "price_asc") sortOption = { selling_price: 1 };
     if (sort === "price_desc") sortOption = { selling_price: -1 };
     if (sort === "name_asc") sortOption = { name: 1 };
@@ -54,6 +54,7 @@ const getProducts = asyncHandler(async (req, res) => {
     const products = await Product.find(query)
         .populate("category_id", "name slug")
         .populate("brand_id", "name")
+        .select("name sku original_price discount selling_price stock main_image is_active category_id brand_id")
         .sort(sortOption)
         .limit(pageSize)
         .skip(pageSize * (pageNumber - 1));
@@ -146,8 +147,8 @@ const createProduct = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 const updateProduct = asyncHandler(async (req, res) => {
     const {
-        name, original_price, discount, 
-        sku, category_id, brand_id, 
+        name, original_price, discount,
+        sku, category_id, brand_id,
         is_active, stock, weight_g, dimensions,
         warranty_period, warranty_provider,
         search_keywords, filters, specifications,
@@ -160,11 +161,11 @@ const updateProduct = asyncHandler(async (req, res) => {
             product.name = name;
             product.slug = slugify(name, { lower: true, strict: true });
         }
-        
+
         product.sku = sku || product.sku;
         product.category_id = category_id || product.category_id;
         product.brand_id = brand_id || product.brand_id;
-        
+
         product.is_active = is_active !== undefined ? is_active : product.is_active;
         product.stock = stock !== undefined ? stock : product.stock;
 

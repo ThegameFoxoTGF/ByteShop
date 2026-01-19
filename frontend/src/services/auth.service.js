@@ -11,9 +11,8 @@ const authService = {
   },
 
   // Register user
-  register: async (username, email, password) => {
+  register: async (email, password) => {
     const response = await axiosClient.post("/user/register", {
-      username,
       email,
       password,
     });
@@ -58,5 +57,3 @@ const authService = {
 };
 
 export default authService;
-
-

@@ -40,7 +40,7 @@ const OrderSchema = new mongoose.Schema({
     payment_method: { type: String, enum: ['cod', 'bank_transfer'], required: true },
     payment_info: {
         payment_status: { type: String, enum: ['pending', 'paid', 'failed', 'cancelled'], default: 'pending' },
-        slip_url: { type: String },
+        slip_url: { url: String, public_id: String },
         payment_date: { type: Date },
     },
 

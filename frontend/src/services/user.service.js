@@ -47,24 +47,6 @@ const userService = {
         return response.data;
     },
 
-    // Tax Address
-    getTaxAddress: async () => {
-        const response = await axiosClient.get("/user/address/tax");
-        return response.data;
-    },
-    addTaxAddress: async (addressData) => {
-        const response = await axiosClient.post("/user/address/tax", addressData);
-        return response.data;
-    },
-    updateTaxAddress: async (id, addressData) => {
-        const response = await axiosClient.put(`/user/address/tax/${id}`, addressData);
-        return response.data;
-    },
-    deleteTaxAddress: async (id) => {
-        const response = await axiosClient.delete(`/user/address/tax/${id}`);
-        return response.data;
-    },
-
     // Wishlist
     getWishlist: async () => {
         const response = await axiosClient.get("/user/wishlist");

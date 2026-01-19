@@ -46,7 +46,6 @@ const deleteImage = asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error("กรุณาให้ public_id")
     }
-
     const result = await cloudinary.uploader.destroy(public_id);
     res.json({
         message: "ลบรูปภาพสำเร็จ",

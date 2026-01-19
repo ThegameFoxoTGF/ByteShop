@@ -39,7 +39,7 @@ const sendOtp = asyncHandler(async (req, res) => {
 
         await user.save();
         res.json({ message: "ขอ OTP เรียบร้อย", sentTo: email });
-    }else{
+    } else {
         res.status(400);
         throw new Error("ไม่พบผู้ใช้");
     }
@@ -53,27 +53,13 @@ const authUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email });
     if (user && (await user.matchPassword(password))) {
 
-        if(!user.is_verified){
-
-            const otp = await processOtp(user.email);
-
-            user.otp = {
-                otp_code: otp,
-                otp_expires: Date.now() + 5 * 60 * 1000,
-            };
-
-            await user.save();
-
-            res.status(401);
-            throw new Error("อีเมลยังไม่ถูกยืนยัน กรุณาตรวจสอบอีเมลของคุณ");
-        }
-
         generateToken(res, user._id);
         res.status(200).json({
             _id: user._id,
             first_name: user.profile.first_name,
             last_name: user.profile.last_name,
             email: user.email,
+            is_admin: user.is_admin,
         });
     } else {
         res.status(401);
@@ -86,7 +72,7 @@ const authUser = asyncHandler(async (req, res) => {
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
         res.status(400);
         throw new Error("ข้อมูลไม่ครบถ้วน");
@@ -99,16 +85,9 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("อีเมลนี้ถูกใช้แล้ว");
     }
 
-    const otp = await processOtp(email);
-
     const user = await User.create({
         email,
         password,
-        otp: {
-            otp_code: otp,
-            otp_expires: Date.now() + 5 * 60 * 1000,
-        },
-        is_verified: false,
     });
 
     if (user) {
@@ -116,8 +95,6 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(201).json({
             _id: user._id,
             email: user.email,
-            is_verified: user.is_verified,
-            type: "register",
         });
     } else {
         res.status(400);
@@ -144,6 +121,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
             _id: user._id,
             email: user.email,
             profile: user.profile,
+            is_admin: user.is_admin,
         });
     } else {
         res.status(404);
@@ -193,8 +171,8 @@ const forgotPassword = asyncHandler(async (req, res) => {
         };
 
         await user.save();
-        res.json({ message: "ขอ OTP เรียบร้อย", sentTo: email , type: "forgot" });
-    }else{
+        res.json({ message: "ขอ OTP เรียบร้อย", sentTo: email, type: "forgot" });
+    } else {
         res.status(400);
         throw new Error("ไม่พบผู้ใช้");
     }
@@ -204,7 +182,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 // @route   POST /api/user/verify
 // @access  Public
 const verifyOtp = asyncHandler(async (req, res) => {
-    const { email, otp , type} = req.body;
+    const { email, otp, type } = req.body;
     let responseData = {};
     const user = await User.findOne({ email });
     if (user) {
@@ -217,19 +195,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
             throw new Error("OTP หมดอายุ กรุณาขอ OTP อีกครั้ง");
         }
 
-        if(type === "register"){
-            user.is_verified = true;
-
-            generateToken(res, user._id);
-            responseData = {
-                _id: user._id,
-                profile: user.profile,
-                email: user.email,
-                is_verified: true,
-            };
-        }
-
-        if(type === "forgot"){
+        if (type === "forgot") {
             const passwordToken = generatePasswordToken();
             user.passwordToken = passwordToken;
             user.passwordTokenExpires = Date.now() + 5 * 60 * 1000;
@@ -242,7 +208,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
         };
         await user.save();
         res.json({ message: "ยืนยัน OTP เรียบร้อย", responseData });
-    }else{
+    } else {
         res.status(400);
         throw new Error("ไม่พบผู้ใช้");
     }
@@ -295,9 +261,9 @@ const deleteUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (user) {
-        if (user.role === "admin" || user.role === "staff") {
+        if (user.is_admin) {
             res.status(400);
-            throw new Error("ไม่สามารถลบผู้ใช้ประเภท admin หรือ staff ได้");
+            throw new Error("ไม่สามารถลบผู้ใช้ที่เป็น admin ได้");
         }
         await User.deleteOne({ _id: user._id });
         res.json({ message: "ลบผู้ใช้เรียบร้อย" });
@@ -317,7 +283,7 @@ const updateUser = asyncHandler(async (req, res) => {
         user.profile.first_name = req.body.first_name || user.profile.first_name;
         user.profile.last_name = req.body.last_name || user.profile.last_name;
         user.email = req.body.email || user.email;
-        user.role = req.body.role || user.role;
+        user.is_admin = req.body.is_admin !== undefined ? req.body.is_admin : user.is_admin;
 
         if (req.body.password) {
             user.password = req.body.password;
@@ -328,7 +294,7 @@ const updateUser = asyncHandler(async (req, res) => {
             first_name: updatedUser.profile.first_name,
             last_name: updatedUser.profile.last_name,
             email: updatedUser.email,
-            role: updatedUser.role,
+            is_admin: updatedUser.is_admin,
         });
 
     } else {

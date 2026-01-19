@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sea-white: #F8FAFC;
+  --color-sea-light: #EAF6F9;
+  --color-sea-primary: #0EA5E9;
+  --color-sea-primary-hover: #0284C7;
+  --color-sea-deep: #075985;
+  --color-sea-teal: #14B8A6;
+  --color-sea-soft-teal: #5EEAD4;
+  --color-sea-text: #0F172A;
+  --color-sea-subtext: #475569;
+  --color-sea-muted: #94A3B8;
+
+
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+  --animate-blob: blob 7s infinite;
+}
