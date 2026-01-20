@@ -3,6 +3,7 @@ import Product from "../models/product.model.js";
 import Category from "../models/category.model.js";
 import slugify from "slugify";
 import cloudinary from "../config/cloudinary.js";
+import mongoose from "mongoose";
 
 const generateRandomSku = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -38,21 +39,38 @@ const getProducts = asyncHandler(async (req, res) => {
         if (maxPrice) query.selling_price.$lte = Number(maxPrice);
     }
 
-    if (req.user && req.user.isAdmin === true) {
+    if (req.user && req.user.is_admin === true) {
         query.is_active = { $in: [true, false] };
     } else {
         query.is_active = true;
     }
 
     // Dynamic Attribute Filters
-    if (filters && typeof filters === 'object') {
-        const filterKeys = Object.keys(filters);
+    let filterParams = filters;
+    if (typeof filters === 'string') {
+        try {
+            filterParams = JSON.parse(filters);
+        } catch (error) {
+            filterParams = {};
+        }
+    }
+
+    if (filterParams && typeof filterParams === 'object') {
+        const filterKeys = Object.keys(filterParams);
         if (filterKeys.length > 0) {
             if (!query.$and) query.$and = [];
 
             filterKeys.forEach(key => {
-                const value = filters[key];
-                if (value) {
+                let value = filterParams[key];
+
+                // Support array values (multi-select)
+                if (Array.isArray(value)) {
+                    query.$and.push({
+                        filters: {
+                            $elemMatch: { key: key, value: { $in: value } }
+                        }
+                    });
+                } else if (value) {
                     query.$and.push({
                         filters: {
                             $elemMatch: { key: key, value: value }
@@ -113,46 +131,40 @@ const getProducts = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Get Available Filters for a Category based on Products
+// @desc    Get Available Filters for a Category based on Products (Faceted Search)
 // @route   GET /api/products/filters/:categoryId
 // @access  Public
 const getCategoryFilters = asyncHandler(async (req, res) => {
     const { categoryId } = req.params;
 
-    const category = await Category.findById(categoryId);
-    if (!category) {
-        res.status(404);
-        throw new Error("Category not found");
-    }
-
-    const filterResults = [];
-
-    if (category.filters && category.filters.length > 0) {
-        for (const filterDef of category.filters) {
-            // Get values actually used by products
-            const distinctValues = await Product.distinct("filters.value", {
-                category_id: categoryId,
-                "filters.key": filterDef.key,
-                is_active: true
-            });
-
-            // Merge with pre-defined options from Category settings
-            const availableOptions = [...new Set([
-                ...(filterDef.options || []),
-                ...distinctValues
-            ])].sort();
-
-            if (availableOptions.length > 0) {
-                filterResults.push({
-                    key: filterDef.key,
-                    label: filterDef.label,
-                    options: availableOptions
-                });
+    // ใช้ Aggregation เพื่อดึงค่า Key และ Value ที่ไม่ซ้ำกันออกมาพร้อมกัน
+    const filters = await Product.aggregate([
+        { $match: { category_id: new mongoose.Types.ObjectId(categoryId), is_active: true } },
+        { $unwind: "$filters" },
+        {
+            $group: {
+                _id: "$filters.key",
+                options: { $addToSet: "$filters.value" }
             }
-        }
-    }
+        },
+        {
+            $project: {
+                _id: 0,
+                key: "$_id",
+                label: "$_id", // ใช้ Key เป็น Label ไปก่อน
+                options: 1
+            }
+        },
+        { $sort: { key: 1 } }
+    ]);
 
-    res.json(filterResults);
+    // Sort options alphabetically to prevent random swapping in UI
+    const filtersSorted = filters.map(f => ({
+        ...f,
+        options: f.options.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    }));
+
+    res.json(filtersSorted); // ส่งออกไปเป็น [ {key: "RAM", label: "RAM", options: ["8GB", "16GB"]}, ... ]
 });
 
 // @desc    Fetch single product by ID

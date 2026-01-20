@@ -15,8 +15,7 @@ const brandSchema = new mongoose.Schema({
         type: String,
     },
     logo: {
-        url: String,
-        public_id: String
+        type: String,
     }
 }, {
     timestamps: true,

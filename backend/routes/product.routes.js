@@ -15,6 +15,8 @@ const router = express.Router();
 
 router.route("/").get(getProducts).post(protect, admin, createProduct);
 
+router.get("/all", protect, admin, getProducts);
+
 router.get("/filters/:categoryId", getCategoryFilters);
 
 router

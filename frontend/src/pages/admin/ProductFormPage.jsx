@@ -89,6 +89,14 @@ function ProductFormPage() {
             // Actually, let's check standard. usually: price (regular), sale_price (discounted).
             // Let's map: original_price -> price, selling_price -> selling_price
 
+            // Transform filters array to object for form state
+            const filtersObj = {};
+            if (data.filters && Array.isArray(data.filters)) {
+                data.filters.forEach(f => {
+                    if (f.key) filtersObj[f.key] = f.value;
+                });
+            }
+
             setFormData({
                 name: data.name || '',
                 slug: data.slug || '',
@@ -103,7 +111,7 @@ function ProductFormPage() {
                 images: data.image || [],
                 is_active: data.is_active ?? true,
                 is_featured: data.is_featured ?? false,
-                filters: data.filters || {},
+                filters: filtersObj,
                 specifications: data.specifications || [],
                 warranty_period: data.warranty_period || '',
                 warranty_provider: data.warranty_provider || '',

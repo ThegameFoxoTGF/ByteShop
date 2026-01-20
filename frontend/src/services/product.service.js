@@ -17,8 +17,13 @@ const productService = {
         const response = await axiosClient.get(`/product/${sku}`);
         return response.data;
     },
-    getCategoryFilters: async (categoryId) => {
-        const response = await axiosClient.get(`/product/filters/${categoryId}`);
+    getCategoryFilters: async (categoryId, params = {}) => {
+        const response = await axiosClient.get(`/product/filters/${categoryId}`, { params });
+        return response.data;
+    },
+
+    getAllProducts: async (params) => {
+        const response = await axiosClient.get("/product/all", { params });
         return response.data;
     },
 

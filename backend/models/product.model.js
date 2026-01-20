@@ -1,5 +1,14 @@
 import mongoose from "mongoose";
 
+const fieldTemplate = new mongoose.Schema({
+  key: { type: String },
+  label: { type: String },
+  value: { type: String },
+  type: { type: String },
+  unit: { type: String },
+  options: [String]
+}, { _id: false })
+
 const ProductSchema = new mongoose.Schema(
   {
     is_active: { type: Boolean, default: true },
@@ -40,21 +49,8 @@ const ProductSchema = new mongoose.Schema(
     warranty_provider: { type: String },
 
     search_keywords: [{ type: String }],
-    filters: [
-      {
-        key: { type: String },
-        label: { type: String },
-        value: { type: String },
-      },
-    ],
-    specifications: [
-      {
-        key: { type: String },
-        label: { type: String },
-        value: { type: String },
-        unit: { type: String },
-      },
-    ],
+    filters: [fieldTemplate],
+    specifications: [fieldTemplate],
   },
   {
     timestamps: true,

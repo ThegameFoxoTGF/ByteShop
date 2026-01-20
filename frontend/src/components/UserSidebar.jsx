@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 import { useAuth } from '../contexts/AuthContext';
 
 function UserSidebar() {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
 
     const activeClassName = "w-full text-left px-6 py-4 flex items-center gap-3 transition-colors bg-sea-primary/5 text-sea-primary border-l-4 border-sea-primary";
     const inactiveClassName = "w-full text-left px-6 py-4 flex items-center gap-3 transition-colors text-slate-600 hover:bg-slate-50 border-l-4 border-transparent";
@@ -41,12 +41,7 @@ function UserSidebar() {
                 >
                     <Icon icon="ic:round-location-on" width="20" /> ที่อยู่ของฉัน
                 </NavLink>
-                <button
-                    onClick={logout}
-                    className="w-full text-left px-6 py-4 flex items-center gap-3 text-red-500 hover:bg-red-50 transition-colors border-l-4 border-transparent"
-                >
-                    <Icon icon="ic:round-logout" width="20" /> ออกจากระบบ
-                </button>
+
             </div>
         </div>
     );

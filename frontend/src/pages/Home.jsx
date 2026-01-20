@@ -78,25 +78,30 @@ function Home() {
     fetchData();
   }, []);
 
-  // Fetch Category Specific Filters (Dynamic)
+  // แก้ไข useEffect สำหรับโหลด Dynamic Filters
   useEffect(() => {
     const fetchDynamicFilters = async () => {
       if (selectedCategory) {
         try {
-          const filters = await productService.getCategoryFilters(selectedCategory);
-          setDynamicFilters(filters);
-          // Reset active dynamic filters when category changes
-          setActiveDynamicFilters({});
+          // 1. Logic: Fetch available unique option keys/values for the selected category
+          // Returns: [{ key: "Series", label: "Series", options: ["12th Gen", "14th Gen"] }]
+          const data = await productService.getCategoryFilters(selectedCategory);
+          setDynamicFilters(data);
         } catch (error) {
           console.error('Error fetching category filters:', error);
           setDynamicFilters([]);
         }
       } else {
         setDynamicFilters([]);
-        setActiveDynamicFilters({});
+        setActiveDynamicFilters({}); // ล้างค่าที่เลือกไว้เมื่อเปลี่ยนหมวดหมู่
       }
     };
     fetchDynamicFilters();
+  }, [selectedCategory]); // รันเฉพาะเมื่อเปลี่ยนหมวดหมู่
+
+  // Reset active dynamic filters ONLY when category changes
+  useEffect(() => {
+    setActiveDynamicFilters({});
   }, [selectedCategory]);
 
   // Fetch products
@@ -107,11 +112,12 @@ function Home() {
         const params = {
           page,
           limit,
-          keyword: keyword, // Use keyword from URL
+          keyword: keyword,
           sort,
           is_active: true
         };
 
+        // 3. Logic: Send all current filters (Category, Brand, Price, Dynamic) to Backend
         if (selectedCategory) params.category = selectedCategory;
         if (selectedBrand) params.brand = selectedBrand;
         if (appliedPriceRange.min) params.minPrice = appliedPriceRange.min;
@@ -119,7 +125,7 @@ function Home() {
 
         // Add dynamic filters to params
         if (Object.keys(activeDynamicFilters).length > 0) {
-          params.filters = activeDynamicFilters;
+          params.filters = JSON.stringify(activeDynamicFilters);
         }
 
         const response = await productService.getProducts(params);
@@ -156,17 +162,51 @@ function Home() {
     // Note: Keyword clearing is handled by navigation in real app, staying simple here
   };
 
+  // Fetch Category Specific Filters (Dynamic)
+  useEffect(() => {
+    const fetchDynamicFilters = async () => {
+      if (selectedCategory) {
+        try {
+          const params = {};
+          if (keyword) params.keyword = keyword;
+          if (selectedBrand) params.brand = selectedBrand;
+          if (appliedPriceRange.min) params.minPrice = appliedPriceRange.min;
+          if (appliedPriceRange.max) params.maxPrice = appliedPriceRange.max;
+
+          if (Object.keys(activeDynamicFilters).length > 0) {
+            params.filters = JSON.stringify(activeDynamicFilters);
+          }
+
+          const filters = await productService.getCategoryFilters(selectedCategory, params);
+          setDynamicFilters(filters);
+        } catch (error) {
+          console.error('Error fetching category filters:', error);
+          setDynamicFilters([]);
+        }
+      } else {
+        setDynamicFilters([]);
+      }
+    };
+    fetchDynamicFilters();
+  }, [selectedCategory, selectedBrand, appliedPriceRange, keyword, activeDynamicFilters]);
+
+  // Reset active dynamic filters ONLY when category changes
+  useEffect(() => {
+    setActiveDynamicFilters({});
+  }, [selectedCategory]);
+
   const toggleDynamicFilter = (key, value) => {
     setActiveDynamicFilters(prev => {
       const newState = { ...prev };
       if (newState[key] === value) {
         delete newState[key]; // Deselect if already selected
       } else {
-        newState[key] = value; // Select new value (radio-like behavior for now, can be array if needed)
+        newState[key] = value; // Select new value (replace existing)
       }
       return newState;
     });
   };
+
 
   return (
     <div className='min-h-screen bg-slate-50'>
@@ -278,21 +318,26 @@ function Home() {
             {/* Dynamic Filters */}
             {selectedCategory && dynamicFilters.length > 0 && dynamicFilters.map(filter => (
               <FilterSection key={filter.key} title={filter.label} defaultOpen={true} isDynamic>
+
+
                 <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                  {filter.options.map((option, idx) => (
-                    <label key={idx} className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors ${activeDynamicFilters[filter.key] === option ? 'text-sea-primary font-bold bg-sea-primary/5' : 'hover:text-sea-deep text-slate-600'} `}>
-                      <div className={`w-4 h-4 rounded border flex items-center justify-center ${activeDynamicFilters[filter.key] === option ? 'border-sea-primary bg-sea-primary' : 'border-slate-300'} `}>
-                        {activeDynamicFilters[filter.key] === option && <Icon icon="ic:round-check" className="text-white text-[10px]" />}
-                      </div>
-                      <input
-                        type="checkbox"
-                        className="hidden"
-                        checked={activeDynamicFilters[filter.key] === option}
-                        onChange={() => toggleDynamicFilter(filter.key, option)}
-                      />
-                      <span className="text-sm">{option}</span>
-                    </label>
-                  ))}
+                  {filter.options.map((option, idx) => {
+                    const isChecked = activeDynamicFilters[filter.key] === option;
+                    return (
+                      <label key={idx} className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg transition-colors ${isChecked ? 'text-sea-primary font-bold bg-sea-primary/5' : 'hover:text-sea-deep text-slate-600'} `}>
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${isChecked ? 'border-sea-primary bg-sea-primary' : 'border-slate-300'} `}>
+                          {isChecked && <Icon icon="ic:round-check" className="text-white text-[10px]" />}
+                        </div>
+                        <input
+                          type="checkbox"
+                          className="hidden"
+                          checked={isChecked}
+                          onChange={() => toggleDynamicFilter(filter.key, option)}
+                        />
+                        <span className="text-sm">{option}</span>
+                      </label>
+                    );
+                  })}
                 </div>
               </FilterSection>
             ))}
