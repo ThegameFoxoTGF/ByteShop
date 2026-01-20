@@ -129,17 +129,24 @@ const getCategoryFilters = asyncHandler(async (req, res) => {
 
     if (category.filters && category.filters.length > 0) {
         for (const filterDef of category.filters) {
+            // Get values actually used by products
             const distinctValues = await Product.distinct("filters.value", {
                 category_id: categoryId,
                 "filters.key": filterDef.key,
                 is_active: true
             });
 
-            if (distinctValues.length > 0) {
+            // Merge with pre-defined options from Category settings
+            const availableOptions = [...new Set([
+                ...(filterDef.options || []),
+                ...distinctValues
+            ])].sort();
+
+            if (availableOptions.length > 0) {
                 filterResults.push({
                     key: filterDef.key,
                     label: filterDef.label,
-                    options: distinctValues.sort()
+                    options: availableOptions
                 });
             }
         }
