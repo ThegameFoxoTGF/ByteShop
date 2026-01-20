@@ -1,10 +1,10 @@
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middleware/asynchandler.js";
 import User from "../models/user.model.js";
 
 const getUserWishlist = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id)
         .select("wishlist")
-        .populate({path: "wishlist", select: "name selling_price main_image"});
+        .populate({ path: "wishlist", select: "name selling_price main_image" });
 
     if (user) {
         res.json({

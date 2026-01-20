@@ -1,5 +1,5 @@
 import cloudinary from "../config/cloudinary.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middleware/asynchandler.js";
 
 // @desc    Upload image
 // @route   POST /api/upload

@@ -1,4 +1,4 @@
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middleware/asynchandler.js";
 import Coupon from "../models/coupon.model.js";
 import Order from "../models/order.model.js";
 

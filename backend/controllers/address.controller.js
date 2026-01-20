@@ -1,4 +1,4 @@
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middleware/asynchandler.js";
 import User from "../models/user.model.js";
 
 // @desc    Add Address

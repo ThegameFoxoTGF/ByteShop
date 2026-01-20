@@ -1,4 +1,4 @@
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middleware/asynchandler.js";
 import generateToken from "../utils/generatetoken.js";
 import User from "../models/user.model.js";
 import { generateOtp, generatePasswordToken, otpTemplate } from "../utils/generateotp.js";

@@ -1,4 +1,4 @@
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middleware/asynchandler.js";
 import Product from "../models/product.model.js";
 import Category from "../models/category.model.js";
 import slugify from "slugify";
