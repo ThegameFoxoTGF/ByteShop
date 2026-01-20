@@ -5,20 +5,28 @@ const orderService = {
         const response = await axiosClient.post("/order", orderData);
         return response.data;
     },
-    getAllOrders: async () => {
-        const response = await axiosClient.get("/order");
+    getAllOrders: async (params = {}) => {
+        const response = await axiosClient.get("/order", { params });
         return response.data;
     },
     getByOrderId: async (id) => {
         const response = await axiosClient.get(`/order/${id}`);
         return response.data;
     },
-    approveOrder: async (id) => {
-        const response = await axiosClient.put(`/order/${id}/approve`);
+    updateOrderToPaid: async (id, data) => {
+        const response = await axiosClient.put(`/order/${id}/pay`, data);
         return response.data;
     },
-    updateOrderToPaid: async (id) => {
-        const response = await axiosClient.put(`/order/${id}/pay`);
+    updateOrderAddress: async (id, address) => {
+        const response = await axiosClient.put(`/order/${id}/address`, { shipping_address: address });
+        return response.data;
+    },
+    cancelOrder: async (id) => {
+        const response = await axiosClient.put(`/order/${id}/cancel`);
+        return response.data;
+    },
+    updateOrderStatus: async (id, status, extraData = {}) => {
+        const response = await axiosClient.put(`/order/${id}/status`, { status, ...extraData });
         return response.data;
     },
 };

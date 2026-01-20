@@ -58,6 +58,8 @@ const authUser = asyncHandler(async (req, res) => {
             _id: user._id,
             first_name: user.profile.first_name,
             last_name: user.profile.last_name,
+            phone_number: user.profile.phone_number,
+            birthday: user.profile.birthday,
             email: user.email,
             is_admin: user.is_admin,
         });
@@ -138,7 +140,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     if (user) {
         user.profile.first_name = req.body.first_name || user.profile.first_name;
         user.profile.last_name = req.body.last_name || user.profile.last_name;
-        user.profile.phone = req.body.phone || user.profile.phone;
+        user.profile.phone_number = req.body.phone_number || user.profile.phone_number;
         user.profile.birthday = req.body.birthday || user.profile.birthday;
         user.email = req.body.email || user.email;
 
@@ -236,8 +238,35 @@ const resetPassword = asyncHandler(async (req, res) => {
 // @route   GET /api/user
 // @access  Private/Admin
 const getUsers = asyncHandler(async (req, res) => {
-    const users = await User.find({}).sort({ name: 1 });
-    res.json(users);
+    const { page, limit, keyword } = req.query;
+
+    const pageSize = Number(limit) || 10;
+    const pageNumber = Number(page) || 1;
+
+    let query = {};
+
+    if (keyword) {
+        query.$or = [
+            { email: { $regex: keyword, $options: "i" } },
+            { "profile.first_name": { $regex: keyword, $options: "i" } },
+            { "profile.last_name": { $regex: keyword, $options: "i" } },
+            { "profile.phone_number": { $regex: keyword, $options: "i" } }
+        ];
+    }
+
+    const count = await User.countDocuments(query);
+
+    const users = await User.find(query)
+        .sort({ is_admin: -1, createdAt: -1 }) // Admin first, then newest
+        .limit(pageSize)
+        .skip(pageSize * (pageNumber - 1));
+
+    res.json({
+        users,
+        page: pageNumber,
+        pages: Math.ceil(count / pageSize),
+        total: count
+    });
 });
 
 // @desc    Get user by ID
@@ -293,6 +322,8 @@ const updateUser = asyncHandler(async (req, res) => {
             _id: updatedUser._id,
             first_name: updatedUser.profile.first_name,
             last_name: updatedUser.profile.last_name,
+            phone_number: updatedUser.profile.phone_number,
+            birthday: updatedUser.profile.birthday,
             email: updatedUser.email,
             is_admin: updatedUser.is_admin,
         });
@@ -303,12 +334,42 @@ const updateUser = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Update user password with OTP
+// @route   PUT /api/user/password
+// @access  Private
+const updateUserPassword = asyncHandler(async (req, res) => {
+    const { otp, newPassword } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+        res.status(404);
+        throw new Error("ไม่พบผู้ใช้");
+    }
+
+    if (!user.otp || user.otp.otp_code !== otp) {
+        res.status(400);
+        throw new Error("OTP ไม่ถูกต้อง");
+    }
+
+    if (user.otp.otp_expires < Date.now()) {
+        res.status(400);
+        throw new Error("OTP หมดอายุ");
+    }
+
+    user.password = newPassword;
+    user.otp = { otp_code: null, otp_expires: null };
+    await user.save();
+
+    res.json({ message: "เปลี่ยนรหัสผ่านเรียบร้อย" });
+});
+
 export {
     authUser,
     registerUser,
     logoutUser,
     getUserProfile,
     updateUserProfile,
+    updateUserPassword,
     getUsers,
     deleteUser,
     getUserById,

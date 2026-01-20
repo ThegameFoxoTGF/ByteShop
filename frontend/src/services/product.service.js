@@ -10,11 +10,15 @@ const productService = {
         return response.data;
     },
     getProductBySlug: async (slug) => {
-        const response = await axiosClient.get(`/product/${slug}`);
+        const response = await axiosClient.get(`/product/slug/${slug}`);
         return response.data;
     },
     getProductBySku: async (sku) => {
         const response = await axiosClient.get(`/product/${sku}`);
+        return response.data;
+    },
+    getCategoryFilters: async (categoryId) => {
+        const response = await axiosClient.get(`/product/filters/${categoryId}`);
         return response.data;
     },
 

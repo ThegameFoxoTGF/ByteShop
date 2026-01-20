@@ -37,7 +37,7 @@ function CardProduct({ product }) {
                         </span>
                     )}
                     {discountPercentage > 0 && (
-                        <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-red-500/20">
+                        <span className="bg-red-500 text-white w-fit text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-red-500/20">
                             -{discountPercentage}%
                         </span>
                     )}
@@ -54,13 +54,8 @@ function CardProduct({ product }) {
 
             {/* Content */}
             <div className="p-4 flex flex-col grow">
-                {/* Category */}
-                <p className="text-xs font-medium text-sea-subtext mb-1 uppercase tracking-wide">
-                    {product.category?.name || product.category_id?.name || 'Accessories'}
-                </p>
-
                 {/* Title */}
-                <h3 className="text-sea-text font-bold text-base leading-snug mb-2 line-clamp-2 group-hover:text-sea-primary transition-colors min-h-10">
+                <h3 className="text-sea-text font-bold text-base leading-snug mb-2 group-hover:text-sea-primary transition-colors wrap-break-word">
                     {product.name}
                 </h3>
 

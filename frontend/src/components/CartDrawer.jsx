@@ -144,9 +144,9 @@ function CartDrawer({ isOpen, onClose }) {
                                     <div key={item._id || index} className="group relative bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-sea-primary/20 transition-all duration-200 flex gap-4">
                                         {/* Product Image */}
                                         <div className="w-20 h-20 bg-slate-100 rounded-lg shrink-0 overflow-hidden relative">
-                                            {item.product?.imageUrl ? (
+                                            {item.product?.main_image ? (
                                                 <img
-                                                    src={item.product.imageUrl}
+                                                    src={item.product.main_image.url}
                                                     alt={item.product.name}
                                                     className="w-full h-full object-cover"
                                                 />
@@ -167,6 +167,9 @@ function CartDrawer({ isOpen, onClose }) {
                                             <div className="flex items-center justify-between mt-2">
                                                 <div className="flex items-center gap-1 font-semibold text-sea-primary">
                                                     <span>฿{(item.product?.selling_price || item.product?.original_price || 0).toLocaleString()}</span>
+                                                    <span className="text-sm text-sea-muted">x {item.quantity}</span>
+                                                    <span className="text-sm text-sea-muted">฿{((item.product?.selling_price || item.product?.original_price || 0) * item.quantity).toLocaleString()}</span>
+
                                                 </div>
 
                                                 {/* Quantity Controls */}

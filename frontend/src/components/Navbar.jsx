@@ -20,6 +20,17 @@ function Navbar() {
     setOpen(false);
   };
 
+  const [search, setSearch] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (search.trim()) {
+      navigate(`/?keyword=${encodeURIComponent(search.trim())}`);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b border-sea-light transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,16 +51,18 @@ function Navbar() {
           </Link>
 
           {/* Search Section */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-8 relative">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-lg mx-8 relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Icon icon="ic:round-search" className="h-5 w-5 text-sea-muted" />
             </div>
             <input
               type="text"
-              placeholder="Search for products..."
+              placeholder="ค้นหาสินค้าที่ต้องการ..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="block w-full pl-10 pr-4 py-2.5 bg-sea-light/50 border border-transparent rounded-full text-sm text-sea-text placeholder-sea-muted focus:outline-none focus:bg-white focus:border-sea-primary/30 focus:ring-4 focus:ring-sea-primary/10 transition-all duration-300"
             />
-          </div>
+          </form>
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
@@ -89,7 +102,7 @@ function Navbar() {
                 {open && (
                   <div className="absolute right-0 mt-5 w-56 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 py-2 overflow-hidden transform origin-top-right transition-all animate-in fade-in slide-in-from-top-2">
                     <div className="px-4 py-3 border-b border-slate-50 mb-1">
-                      <p className="text-xs text-sea-muted uppercase font-semibold">Account</p>
+                      <p className="text-xs text-sea-muted uppercase font-semibold">บัญชีผู้ใช้</p>
                       <p className="text-sm font-medium text-sea-text truncate">{user.email || 'user@example.com'}</p>
                     </div>
 
@@ -98,21 +111,21 @@ function Navbar() {
                         <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
                           <Icon icon="ic:round-person-outline" width="18" height="18" />
                         </div>
-                        Profile
+                        โปรไฟล์ของฉัน
                       </button>
-                      <button onClick={() => { navigate("/order"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
+                      {/* <button onClick={() => { navigate("/order"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
                         <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
                           <Icon icon="ic:round-receipt-long" width="18" height="18" />
                         </div>
-                        My Orders
-                      </button>
+                        คำสั่งซื้อของฉัน
+                      </button> */}
                     </div>
 
                     {is_admin && (
                       <div className="my-2 border-t border-slate-50 pt-2 px-2">
                         <button onClick={() => { navigate("/admin"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors text-left cursor-pointer">
                           <Icon icon="ic:round-admin-panel-settings" width="18" height="18" />
-                          Admin Dashboard
+                          ระบบจัดการหลังร้าน
                         </button>
                       </div>
                     )}
@@ -120,7 +133,7 @@ function Navbar() {
                     <div className="mt-1 border-t border-slate-50 pt-1 px-2 pb-1">
                       <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-500 hover:bg-red-50 rounded-xl transition-colors text-left font-medium cursor-pointer">
                         <Icon icon="ic:round-log-out" width="18" height="18" />
-                        Sign Out
+                        ออกจากระบบ
                       </button>
                     </div>
                   </div>
@@ -128,7 +141,7 @@ function Navbar() {
               </div>
             ) : (
               <Link to="/login" className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-sea-primary text-white font-medium text-sm hover:bg-sea-primary-hover shadow-lg shadow-sea-primary/30 transition-all hover:shadow-sea-primary/50 hover:-translate-y-0.5">
-                <span>Sign In</span>
+                <span>เข้าสู่ระบบ</span>
                 <Icon icon="ic:round-arrow-forward" />
               </Link>
             )}

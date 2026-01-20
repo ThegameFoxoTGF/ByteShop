@@ -10,10 +10,14 @@ const userService = {
         const response = await axiosClient.put("/user/profile", userData);
         return response.data;
     },
+    updatePassword: async (data) => {
+        const response = await axiosClient.put("/user/profile/password", data);
+        return response.data;
+    },
 
     // Admin: Users Management
-    getUsers: async () => {
-        const response = await axiosClient.get("/user");
+    getUsers: async (params = {}) => {
+        const response = await axiosClient.get("/user", { params });
         return response.data;
     },
     getUserById: async (id) => {

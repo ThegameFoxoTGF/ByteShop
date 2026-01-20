@@ -1,25 +1,28 @@
 import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema({
-    user_id: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User", 
-        required: true 
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
     },
     order_id: { type: String, required: true },
-    status: { type: String, enum: [
-        "pending", //รอการชำระเงิน
-        "processing", //COD ยืนยันแล้ว
-        "paid", //โอนและตรวจสอบแล้ว
-        "shipped", //ส่งแล้ว
-        "completed", //สั่งซื้อสำเร็จ
-        "cancelled", //ยกเลิก
-    ], 
-        default: "pending" },
+    status: {
+        type: String, enum: [
+            "pending", //รอการชำระเงิน
+            "processing", //COD ยืนยันแล้ว
+            "waiting_verification", //รอการตรวจสอบ
+            "paid", //โอนและตรวจสอบแล้ว
+            "shipped", //ส่งแล้ว
+            "completed", //สั่งซื้อสำเร็จ
+            "cancelled", //ยกเลิก
+        ],
+        default: "pending"
+    },
     items: [{
-        product_id: { 
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: "Product", 
+        product_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Product",
             required: true
         },
         name: { type: String, required: true },
@@ -29,9 +32,9 @@ const OrderSchema = new mongoose.Schema({
     }],
 
     coupon_info: {
-        coupon_id: { 
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: "Coupon" 
+        coupon_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Coupon"
         },
         coupon_code: { type: String },
         coupon_discount_type: { type: String, enum: ["fixed", "percentage"], default: "fixed" },
@@ -39,12 +42,13 @@ const OrderSchema = new mongoose.Schema({
 
     payment_method: { type: String, enum: ['cod', 'bank_transfer'], required: true },
     payment_info: {
-        payment_status: { type: String, enum: ['pending', 'paid', 'failed', 'cancelled'], default: 'pending' },
+        payment_status: { type: String, enum: ['pending', 'paid', 'failed', 'cancelled', 'refunded'], default: 'pending' },
         slip_url: { url: String, public_id: String },
         payment_date: { type: Date },
     },
 
     shipping_address: {
+        name: { type: String, trim: true },
         phone_number: { type: String, trim: true },
         address_line: { type: String, trim: true },
         sub_district: { type: String, trim: true },
@@ -70,7 +74,7 @@ const OrderSchema = new mongoose.Schema({
         total_price: { type: Number, default: 0 }, //รวม
     },
 
-},{
+}, {
     timestamps: true,
     versionKey: false
 })

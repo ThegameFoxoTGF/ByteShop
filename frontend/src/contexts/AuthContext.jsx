@@ -56,12 +56,21 @@ export const AuthProvider = ({ children }) => {
     // Helper to check if user is authenticated
     const isAuthenticated = !!user;
 
+    const updateUser = (userData) => {
+        setUser(prev => {
+            const updated = { ...prev, ...userData };
+            localStorage.setItem('user', JSON.stringify(updated));
+            return updated;
+        });
+    };
+
     const value = {
         user,
         loading,
         login,
         register,
         logout,
+        updateUser,
         isAuthenticated,
         is_admin
     };

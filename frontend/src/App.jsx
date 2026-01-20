@@ -13,9 +13,12 @@ import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Profile from "./pages/Profile";
-import OTP from "./pages/auth/OTP";
+import ProfileLayout from "./layouts/ProfileLayout";
+import OrderHistory from "./pages/OrderHistory";
+import AddressList from "./pages/AddressList";
 import Order from "./pages/Order";
-import Checkout from "./pages/checkout";
+import Checkout from "./pages/Checkout";
+import ProductDetail from "./pages/ProductDetail";
 
 import Dashboard from "./pages/admin/Dashboard";
 import Forgot from "./pages/auth/Forgot";
@@ -32,8 +35,6 @@ import OrderFormPage from "./pages/admin/OrderFormPage";
 import BrandListPage from "./pages/admin/BrandListPage";
 import BrandFormPage from "./pages/admin/BrandFormPage";
 
-
-
 function App() {
   return (
     <Router>
@@ -42,7 +43,7 @@ function App() {
         <Route element={<MainLayout />}>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
-          <Route path="otp" element={<OTP />} />
+          <Route path="product/:id" element={<ProductDetail />} />
 
           <Route element={<GuestRoute />}>
             <Route path="login" element={<Login />} />
@@ -53,8 +54,12 @@ function App() {
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="checkout" element={<Checkout />} />
-            <Route path="order" element={<Order />} />
-            <Route path="profile" element={<Profile />} />
+            <Route path="order/:id" element={<Order />} />
+            <Route path="profile" element={<ProfileLayout />}>
+              <Route index element={<Profile />} />
+              <Route path="orders" element={<OrderHistory />} />
+              <Route path="address" element={<AddressList />} />
+            </Route>
           </Route>
         </Route>
 
@@ -73,7 +78,6 @@ function App() {
             <Route path="orders/:id" element={<OrderFormPage />} />
             <Route path="brands" element={<BrandListPage />} />
             <Route path="brands/:id" element={<BrandFormPage />} />
-
           </Route>
         </Route>
 

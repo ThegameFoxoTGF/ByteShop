@@ -7,8 +7,28 @@ import slugify from "slugify";
 //@route   GET /api/brands
 //@access  Public
 const getBrands = asyncHandler(async (req, res) => {
-    const brands = await Brand.find({}).sort({ name: 1 });
-    res.json(brands);
+    const { page, limit, keyword } = req.query;
+
+    const pageSize = Number(limit) || 12;
+    const pageNumber = Number(page) || 1;
+
+    let query = {};
+    if (keyword) {
+        query.name = { $regex: keyword, $options: "i" };
+    }
+
+    const count = await Brand.countDocuments(query);
+    const brands = await Brand.find(query)
+        .sort({ name: 1 })
+        .limit(pageSize)
+        .skip(pageSize * (pageNumber - 1));
+
+    res.json({
+        brands,
+        page: pageNumber,
+        pages: Math.ceil(count / pageSize),
+        total: count
+    });
 });
 
 //@desc    Fetch single brand by ID
@@ -34,6 +54,14 @@ const createBrand = asyncHandler(async (req, res) => {
     if (brandExists) {
         res.status(400);
         throw new Error("ชื่อแบรนด์นี้มีอยู่ในระบบแล้ว");
+    }
+
+    if (slug) {
+        const slugExists = await Brand.findOne({ slug });
+        if (slugExists) {
+            res.status(400);
+            throw new Error("URL Slug นี้มีอยู่ในระบบแล้ว");
+        }
     }
 
     const brandSlug = slug || slugify(name, { lower: true, strict: true });
@@ -65,7 +93,7 @@ const updateBrand = asyncHandler(async (req, res) => {
             brand.slug = slugify(req.body.name, { lower: true, strict: true });
         }
 
-        if (req.body.slug){
+        if (req.body.slug) {
             brand.slug = req.body.slug;
         }
 
@@ -95,7 +123,7 @@ const deleteBrand = asyncHandler(async (req, res) => {
             throw new Error(`ไม่สามารถลบแบรนด์ได้ เนื่องจากมี ${productCount} สินค้าอยู่ในแบรนด์นี้`);
         }
 
-        await brand.deleteOne({_id: brand._id});
+        await brand.deleteOne({ _id: brand._id });
         res.json({ message: "แบรนด์ถูกลบเรียบร้อย" });
     } else {
         res.status(404);

@@ -2,21 +2,6 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import Cart from "../models/cart.model.js";
 import Product from "../models/product.model.js";
 
-//Helper function
-const checkProductStock = async (productId, requiredQuantity) => {
-    const product = await Product.findById(productId);
-
-    if (!product) {
-        throw new Error("ไม่พบสินค้านี้")
-    }
-
-    if (requiredQuantity > product.stock) {
-        throw new Error("จำนวนสินค้าไม่เพียงพอ")
-    }
-
-    return product;
-};
-
 const calculateTotalPrice = (cart) => {
     let total_price = 0;
 
@@ -81,35 +66,50 @@ const addToCart = asyncHandler(async (req, res) => {
     const { productId, quantity } = req.body;
     const user = req.user._id;
 
-    let cart = await Cart.findOne({ user });
-    let currentQuantity = 0;
-
     if (!quantity || quantity < 1) {
         res.status(400)
         throw new Error("จำนวนสินค้าต้องมากกว่า 0")
     }
 
+    const product = await Product.findById(productId);
+    if (!product) {
+        res.status(404);
+        throw new Error("ไม่พบสินค้านี้");
+    }
+
+    let cart = await Cart.findOne({ user });
+    let currentQuantity = 0;
+
     if (cart) {
         const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
-
         if (itemIndex !== -1) {
             currentQuantity = cart.items[itemIndex].quantity;
         }
     }
 
-    const totalRequiredQuantity = currentQuantity + quantity;
+    let quantityToAdd = quantity;
+    let message = undefined;
 
-    await checkProductStock(productId, totalRequiredQuantity);
+    if (currentQuantity + quantity > product.stock) {
+        quantityToAdd = product.stock - currentQuantity;
+
+        if (quantityToAdd <= 0) {
+            res.status(400);
+            throw new Error("ขออภัย สินค้าไม่เพียงพอ");
+        }
+
+        message = `เพิ่มสินค้าได้เพียง ${quantityToAdd} ชิ้น เนื่องจากสินค้ามีจำกัด`;
+    }
 
     if (!cart) {
-        cart = await Cart.create({ user: user, items: [{ product: productId, quantity: quantity }] })
+        cart = await Cart.create({ user: user, items: [{ product: productId, quantity: quantityToAdd }] })
     } else {
         const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
 
         if (itemIndex !== -1) {
-            cart.items[itemIndex].quantity += quantity;
+            cart.items[itemIndex].quantity += quantityToAdd;
         } else {
-            cart.items.push({ product: productId, quantity: quantity })
+            cart.items.push({ product: productId, quantity: quantityToAdd })
         }
     }
 
@@ -126,6 +126,7 @@ const addToCart = asyncHandler(async (req, res) => {
         _id: cart._id,
         items,
         total_price,
+        message
     })
 });
 

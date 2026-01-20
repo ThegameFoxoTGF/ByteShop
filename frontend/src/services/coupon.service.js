@@ -6,8 +6,8 @@ const couponService = {
         return response.data;
     },
     // Admin
-    getCoupons: async () => {
-        const response = await axiosClient.get("/coupon");
+    getCoupons: async (params = {}) => {
+        const response = await axiosClient.get("/coupon", { params });
         return response.data;
     },
     getCouponById: async (id) => {

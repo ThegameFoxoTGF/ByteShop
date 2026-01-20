@@ -46,8 +46,8 @@ function Login() {
                         <Link to="/" className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br from-sea-primary to-sea-deep text-white shadow-lg shadow-sea-primary/30 mb-6 transform hover:scale-105 transition-transform duration-300">
                             <span className="text-2xl font-bold">B</span>
                         </Link>
-                        <h2 className="text-3xl font-bold text-sea-text mb-2">Welcome Back</h2>
-                        <p className="text-sea-subtext">Sign in to continue to ByteShop</p>
+                        <h2 className="text-3xl font-bold text-sea-text mb-2">ยินดีต้อนรับ</h2>
+                        <p className="text-sea-subtext">เข้าสู่ระบบเพื่อใช้งาน ByteShop</p>
                     </div>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -74,7 +74,7 @@ function Login() {
                                         Password
                                     </label>
                                     <Link to="/forgot" className="text-sm font-medium text-sea-primary hover:text-sea-deep transition-colors">
-                                        Forgot password?
+                                        ลืมรหัสผ่าน?
                                     </Link>
                                 </div>
                                 <div className="relative">
@@ -108,19 +108,19 @@ function Login() {
                             {loading ? (
                                 <>
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    <span>Signing in...</span>
+                                    <span>กำลังเข้าสู่ระบบ...</span>
                                 </>
                             ) : (
-                                <span>Sign In</span>
+                                <span>เข้าสู่ระบบ</span>
                             )}
                         </button>
                     </form>
 
                     <div className="mt-8 pt-6 border-t border-slate-100 text-center">
                         <p className="text-sea-subtext">
-                            Don't have an account?{' '}
+                            ยังไม่มีบัญชี?{' '}
                             <Link to="/register" className="font-bold text-sea-primary hover:text-sea-deep transition-colors">
-                                Create Account
+                                สมัครสมาชิก
                             </Link>
                         </p>
                     </div>

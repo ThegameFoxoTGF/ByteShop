@@ -1,6 +1,8 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Product from "../models/product.model.js";
+import Category from "../models/category.model.js";
 import slugify from "slugify";
+import cloudinary from "../config/cloudinary.js";
 
 const generateRandomSku = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -15,7 +17,7 @@ const generateRandomSku = () => {
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-    const { keyword, category, brand, minPrice, maxPrice, sort, limit, page } = req.query;
+    const { keyword, category, brand, minPrice, maxPrice, sort, limit, page, filters } = req.query;
 
     let query = {};
 
@@ -42,22 +44,66 @@ const getProducts = asyncHandler(async (req, res) => {
         query.is_active = true;
     }
 
-    let sortOption = { stock: -1, createdAt: -1 };
-    if (sort === "price_asc") sortOption = { selling_price: 1 };
-    if (sort === "price_desc") sortOption = { selling_price: -1 };
-    if (sort === "name_asc") sortOption = { name: 1 };
+    // Dynamic Attribute Filters
+    if (filters && typeof filters === 'object') {
+        const filterKeys = Object.keys(filters);
+        if (filterKeys.length > 0) {
+            if (!query.$and) query.$and = [];
+
+            filterKeys.forEach(key => {
+                const value = filters[key];
+                if (value) {
+                    query.$and.push({
+                        filters: {
+                            $elemMatch: { key: key, value: value }
+                        }
+                    });
+                }
+            });
+        }
+    }
 
     const pageSize = Number(limit) || 12;
     const pageNumber = Number(page) || 1;
     const count = await Product.countDocuments(query);
 
-    const products = await Product.find(query)
-        .populate("category_id", "name slug")
-        .populate("brand_id", "name")
-        .select("name sku original_price discount selling_price stock main_image is_active category_id brand_id")
-        .sort(sortOption)
-        .limit(pageSize)
-        .skip(pageSize * (pageNumber - 1));
+    let products = [];
+
+    if (!sort) {
+        const aggregatePipeline = [
+            { $match: query },
+            { $addFields: { hasStock: { $gt: ["$stock", 0] } } },
+            { $sort: { hasStock: -1, createdAt: -1 } },
+            { $skip: pageSize * (pageNumber - 1) },
+            { $limit: pageSize },
+            { $project: { _id: 1 } }
+        ];
+
+        const aggregatedIds = await Product.aggregate(aggregatePipeline);
+        const ids = aggregatedIds.map(item => item._id);
+
+        const productsUnsorted = await Product.find({ _id: { $in: ids } })
+            .populate("category_id", "name slug")
+            .populate("brand_id", "name")
+            .select("name sku original_price discount selling_price stock main_image is_active category_id brand_id filters");
+
+        products = ids.map(id => productsUnsorted.find(p => p._id.toString() === id.toString())).filter(Boolean);
+
+    } else {
+        let sortOption = {};
+        if (sort === "price_asc") sortOption = { selling_price: 1 };
+        else if (sort === "price_desc") sortOption = { selling_price: -1 };
+        else if (sort === "name_asc") sortOption = { name: 1 };
+        else sortOption = { stock: -1, createdAt: -1 };
+
+        products = await Product.find(query)
+            .populate("category_id", "name slug")
+            .populate("brand_id", "name")
+            .select("name sku original_price discount selling_price stock main_image is_active category_id brand_id filters")
+            .sort(sortOption)
+            .limit(pageSize)
+            .skip(pageSize * (pageNumber - 1));
+    }
 
     res.json({
         products,
@@ -65,6 +111,41 @@ const getProducts = asyncHandler(async (req, res) => {
         pages: Math.ceil(count / pageSize),
         total: count
     });
+});
+
+// @desc    Get Available Filters for a Category based on Products
+// @route   GET /api/products/filters/:categoryId
+// @access  Public
+const getCategoryFilters = asyncHandler(async (req, res) => {
+    const { categoryId } = req.params;
+
+    const category = await Category.findById(categoryId);
+    if (!category) {
+        res.status(404);
+        throw new Error("Category not found");
+    }
+
+    const filterResults = [];
+
+    if (category.filters && category.filters.length > 0) {
+        for (const filterDef of category.filters) {
+            const distinctValues = await Product.distinct("filters.value", {
+                category_id: categoryId,
+                "filters.key": filterDef.key,
+                is_active: true
+            });
+
+            if (distinctValues.length > 0) {
+                filterResults.push({
+                    key: filterDef.key,
+                    label: filterDef.label,
+                    options: distinctValues.sort()
+                });
+            }
+        }
+    }
+
+    res.json(filterResults);
 });
 
 // @desc    Fetch single product by ID
@@ -157,6 +238,15 @@ const updateProduct = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (product) {
+        // Image Cleanup Logic
+        if (main_image && product.main_image && product.main_image.public_id && main_image.public_id !== product.main_image.public_id) {
+            try {
+                await cloudinary.uploader.destroy(product.main_image.public_id);
+            } catch (err) {
+                console.error("Failed to delete old main image:", err);
+            }
+        }
+
         if (name && name != product.name) {
             product.name = name;
             product.slug = slugify(name, { lower: true, strict: true });
@@ -198,8 +288,20 @@ const deleteProduct = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (product) {
+        // Delete images from Cloudinary
+        if (product.main_image && product.main_image.public_id) {
+            await cloudinary.uploader.destroy(product.main_image.public_id);
+        }
+        if (product.image && product.image.length > 0) {
+            for (const img of product.image) {
+                if (img.public_id) {
+                    await cloudinary.uploader.destroy(img.public_id);
+                }
+            }
+        }
+
         await Product.deleteOne({ _id: product._id });
-        res.json({ message: "ลบสินค้าเรียบร้อยแล้ว" });
+        res.json({ message: "ลบสินค้าและรูปภาพเรียบร้อยแล้ว" });
     } else {
         res.status(404);
         throw new Error("ไม่พบสินค้านี้");
@@ -208,6 +310,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 export {
     getProducts,
+    getCategoryFilters,
     getProductById,
     getProductBySlug,
     getProductBySku,

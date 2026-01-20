@@ -1,11 +1,12 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import { connectDB } from "./config/db.js"
+import startCron from "./utils/cron.js";
+
 
 //{ Routes Import }---------------------------------------------------
 import userRoutes from "./routes/user.routes.js";
@@ -16,6 +17,7 @@ import cartRoutes from "./routes/cart.routes.js";
 import productRoutes from "./routes/product.routes.js"
 import orderRoutes from "./routes/order.routes.js";
 import couponRoutes from "./routes/coupon.routes.js"
+import adminRoutes from "./routes/admin.routes.js"
 
 //{ Middleware }------------------------------------------------------
 import { notFound, errorHandler } from "./middleware/error.middleware.js";
@@ -23,10 +25,11 @@ import { notFound, errorHandler } from "./middleware/error.middleware.js";
 const PORT = process.env.PORT || 5000;
 
 connectDB();
+startCron();
 
 const app = express();
 
-app.use(cors({origin: "http://localhost:5173", credentials: true}));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -39,6 +42,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/coupon", couponRoutes);
+app.use("/api/admin", adminRoutes);
 
 //{ Middleware }------------------------------------------------------
 app.use(notFound);

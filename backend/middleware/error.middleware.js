@@ -9,6 +9,8 @@ const errorHandler = (err, req, res, next) => {
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
     let message = err.message;
 
+    console.log(err);
+
     if (err.name === 'CastError' && err.kind === 'ObjectId') {
         statusCode = 404;
         message = 'ไม่พบข้อมูล: รูปแบบ ID ไม่ถูกต้อง';

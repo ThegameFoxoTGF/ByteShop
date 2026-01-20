@@ -62,14 +62,14 @@ function ProductListPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-sea-text">Products</h1>
-                    <p className="text-sea-subtext mt-1">Manage your product inventory</p>
+                    <p className="text-sea-subtext mt-1">จัดการสินค้าของคุณ</p>
                 </div>
                 <Link
                     to="/admin/products/new"
                     className="inline-flex items-center justify-center gap-2 bg-linear-to-r from-sea-primary to-sea-deep text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-sea-primary/20 hover:shadow-sea-primary/40 transition-all hover:-translate-y-0.5"
                 >
                     <Icon icon="ic:round-add" width="20" />
-                    Add Product
+                    เพิ่มสินค้า
                 </Link>
             </div>
 
@@ -79,7 +79,7 @@ function ProductListPage() {
                     <Icon icon="ic:round-search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="20" />
                     <input
                         type="text"
-                        placeholder="Search products..."
+                        placeholder="ค้นหาสินค้า..."
                         value={keyword}
                         onChange={handleSearch}
                         className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all text-sea-text placeholder-slate-400"
@@ -93,28 +93,28 @@ function ProductListPage() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <div className="w-10 h-10 border-4 border-sea-light border-t-sea-primary rounded-full animate-spin"></div>
-                        <p className="mt-4 text-sea-muted">Loading products...</p>
+                        <p className="mt-4 text-sea-muted">กำลังโหลดผลิตภัณฑ์...</p>
                     </div>
                 ) : products.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
                         <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                             <Icon icon="ic:outline-inventory-2" className="text-slate-300 w-10 h-10" />
                         </div>
-                        <h3 className="text-lg font-semibold text-sea-text">No products found</h3>
-                        <p className="text-sea-subtext mt-1">Try adjusting your search or add a new product.</p>
+                        <h3 className="text-lg font-semibold text-sea-text">ไม่พบผลิตภัณฑ์</h3>
+                        <p className="text-sea-subtext mt-1">ลองปรับการค้นหาหรือเพิ่มผลิตภัณฑ์ใหม่</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider text-sea-muted font-semibold">
-                                    <th className="px-6 py-4 rounded-tl-2xl">Product</th>
-                                    <th className="px-6 py-4">Category</th>
-                                    <th className="px-6 py-4">Brand</th>
-                                    <th className="px-6 py-4">Price</th>
-                                    <th className="px-6 py-4">Discount</th>
-                                    <th className="px-6 py-4">Stock</th>
-                                    <th className="px-6 py-4 rounded-tr-2xl text-right">Actions</th>
+                                    <th className="px-6 py-4 rounded-tl-2xl">ผลิตภัณฑ์</th>
+                                    <th className="px-6 py-4">ประเภท</th>
+                                    <th className="px-6 py-4">แบรนด์</th>
+                                    <th className="px-6 py-4">ราคา</th>
+                                    <th className="px-6 py-4">ส่วนลด</th>
+                                    <th className="px-6 py-4">สต็อก</th>
+                                    <th className="px-6 py-4 rounded-tr-2xl text-right">การดำเนินการ</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
@@ -209,7 +209,7 @@ function ProductListPage() {
                 {!loading && products.length > 0 && (
                     <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
                         <p className="text-sm text-sea-subtext">
-                            Showing <span className="font-medium text-sea-text">{(page - 1) * limit + 1}</span> to <span className="font-medium text-sea-text">{Math.min(page * limit, total)}</span> of <span className="font-medium text-sea-text">{total}</span> results
+                            แสดงผล <span className="font-medium text-sea-text">{(page - 1) * limit + 1}</span> ถึง <span className="font-medium text-sea-text">{Math.min(page * limit, total)}</span> จาก <span className="font-medium text-sea-text">{total}</span> ผล
                         </p>
                         <div className="flex items-center gap-2">
                             <button

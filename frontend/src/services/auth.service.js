@@ -35,8 +35,8 @@ const authService = {
   },
 
   // Verify OTP
-  verifyOtp: async (email, otp) => {
-    const response = await axiosClient.post("/user/verify", { email, otp });
+  verifyOtp: async (email, otp, type = "register") => {
+    const response = await axiosClient.post("/user/verify", { email, otp, type });
     return response.data;
   },
 
@@ -47,10 +47,11 @@ const authService = {
   },
 
   // Reset Password
-  resetPassword: async (token, password) => {
+  resetPassword: async (email, passwordToken, newPassword) => {
     const response = await axiosClient.put("/user/forget-reset", {
-      token,
-      password,
+      email,
+      passwordToken,
+      newPassword,
     });
     return response.data;
   },

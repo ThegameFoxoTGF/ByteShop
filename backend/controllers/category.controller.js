@@ -7,8 +7,28 @@ import slugify from "slugify";
 //@route   GET /api/categories
 //@access  Public
 const getCategories = asyncHandler(async (req, res) => {
-    const categories = await Category.find({}).sort({ name: 1 });
-    res.json(categories);
+    const { page, limit, keyword } = req.query;
+
+    const pageSize = Number(limit) || 12;
+    const pageNumber = Number(page) || 1;
+
+    let query = {};
+    if (keyword) {
+        query.name = { $regex: keyword, $options: "i" };
+    }
+
+    const count = await Category.countDocuments(query);
+    const categories = await Category.find(query)
+        .sort({ name: 1 })
+        .limit(pageSize)
+        .skip(pageSize * (pageNumber - 1));
+
+    res.json({
+        categories,
+        page: pageNumber,
+        pages: Math.ceil(count / pageSize),
+        total: count
+    });
 });
 
 //@desc    Fetch single category by ID
@@ -30,7 +50,7 @@ const getCategoryById = asyncHandler(async (req, res) => {
 const createCategory = asyncHandler(async (req, res) => {
     const { name, label, slug, filters, specifications } = req.body;
 
-    if(!name) {
+    if (!name) {
         res.status(400);
         throw new Error('กรุณากรอกชื่อหมวดหมู่');
     }
@@ -43,15 +63,15 @@ const createCategory = asyncHandler(async (req, res) => {
 
     const categorySlug = slug || slugify(name, { lower: true, strict: true });
 
-    const category = await Category.create({ 
+    const category = await Category.create({
         name,
         label,
         slug: categorySlug,
         filters,
         specifications
     });
-    
-    if (category){
+
+    if (category) {
         res.json({
             message: 'หมวดหมู่ถูกสร้างเรียบร้อยแล้ว',
             category
@@ -74,7 +94,7 @@ const updateCategory = asyncHandler(async (req, res) => {
             category.slug = slugify(req.body.name, { lower: true, strict: true });
         }
 
-        if (req.body.slug ) {
+        if (req.body.slug) {
             category.slug = req.body.slug;
         }
 
@@ -116,7 +136,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
             throw new Error(`ไม่สามารถลบหมวดหมู่ได้ เนื่องจากมี ${productCount} สินค้าอยู่ในหมวดหมู่นี้`);
         }
 
-        await category.deleteOne({_id: category._id});
+        await category.deleteOne({ _id: category._id });
         res.json({
             message: 'หมวดหมู่ถูกลบเรียบร้อยแล้ว'
         });

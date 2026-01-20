@@ -1,8 +1,8 @@
 import axiosClient from "../api/axiosClient";
 
 const categoryService = {
-    getCategories: async () => {
-        const response = await axiosClient.get("/category");
+    getCategories: async (params = {}) => {
+        const response = await axiosClient.get("/category", { params });
         return response.data;
     },
     getCategoryById: async (id) => {

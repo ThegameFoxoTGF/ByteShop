@@ -49,8 +49,8 @@ function Register() {
                         <Link to="/" className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br from-sea-primary to-sea-deep text-white shadow-lg shadow-sea-primary/30 mb-6 transform hover:scale-105 transition-transform duration-300">
                             <span className="text-2xl font-bold">B</span>
                         </Link>
-                        <h2 className="text-3xl font-bold text-sea-text mb-2">Create Account</h2>
-                        <p className="text-sea-subtext">Join ByteShop to start shopping</p>
+                        <h2 className="text-3xl font-bold text-sea-text mb-2">สมัครสมาชิก</h2>
+                        <p className="text-sea-subtext">สมัครสมาชิกเพื่อใช้งาน ByteShop</p>
                     </div>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -82,7 +82,7 @@ function Register() {
                                         type={showPassword ? "text" : "password"}
                                         required
                                         className="block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sea-text placeholder-slate-400 focus:outline-none focus:border-sea-primary focus:ring-4 focus:ring-sea-primary/10 transition-all duration-300 pr-10"
-                                        placeholder="Create a strong password"
+                                        placeholder="สร้างรหัสผ่านที่คาดเดายาก"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                     />
@@ -106,7 +106,7 @@ function Register() {
                                         type={showConfirmPassword ? "text" : "password"}
                                         required
                                         className="block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sea-text placeholder-slate-400 focus:outline-none focus:border-sea-primary focus:ring-4 focus:ring-sea-primary/10 transition-all duration-300 pr-10"
-                                        placeholder="Repeat your password"
+                                        placeholder="ยืนยันรหัสผ่าน"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                     />
@@ -129,19 +129,19 @@ function Register() {
                             {loading ? (
                                 <>
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    <span>Creating Account...</span>
+                                    <span>กำลังสร้างบัญชี...</span>
                                 </>
                             ) : (
-                                <span>Register</span>
+                                <span>สมัครสมาชิก</span>
                             )}
                         </button>
                     </form>
 
                     <div className="mt-8 pt-6 border-t border-slate-100 text-center">
                         <p className="text-sea-subtext">
-                            Already have an account?{' '}
+                            มีบัญชีอยู่แล้ว?{' '}
                             <Link to="/login" className="font-bold text-sea-primary hover:text-sea-deep transition-colors">
-                                Sign In
+                                เข้าสู่ระบบ
                             </Link>
                         </p>
                     </div>

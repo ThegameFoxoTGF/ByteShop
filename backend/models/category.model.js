@@ -5,7 +5,7 @@ const fieldTemplate = new mongoose.Schema({
     label: { type: String },
     type: { type: String },
     unit: { type: String },
-    options: [{ type: String }]
+    options: [String]
 }, { _id: false })
 
 const CategorySchema = new mongoose.Schema({
@@ -16,7 +16,7 @@ const CategorySchema = new mongoose.Schema({
     filters: [fieldTemplate],
     specifications: [fieldTemplate],
 
-},{
+}, {
     timestamps: true,
     versionKey: false
 })

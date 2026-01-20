@@ -6,23 +6,39 @@ import Order from "../models/order.model.js";
 // @route   POST /api/coupon/check
 // @access  Public
 const checkCoupon = asyncHandler(async (req, res) => {
-  const { coupon_code, subtotal } = req.body;
+  const { code, subtotal } = req.body;
+
+  if (!code) {
+    res.status(400);
+    throw new Error("กรุณาระบุรหัสคูปอง");
+  }
 
   const coupon = await Coupon.findOne({
-    code: coupon_code,
+    code: code.toUpperCase(),
     is_active: true,
-    start_date: { $lte: Date.now() },
-    end_date: { $gte: Date.now() },
   });
 
   if (!coupon) {
+    console.log(coupon);
     res.status(404);
-    throw new Error("คูปองไม่ถูกต้องหรือหมดอายุ");
+    throw new Error("คูปองไม่ถูกต้อง");
+  }
+
+  // Check Expiry
+  const now = new Date();
+  if (coupon.start_date && now < new Date(coupon.start_date)) {
+    res.status(400);
+    throw new Error("คูปองยังไม่ถึงเวลาเริ่มใช้งาน");
+  }
+
+  if (coupon.end_date && now > new Date(coupon.end_date)) {
+    res.status(400);
+    throw new Error("คูปองหมดอายุแล้ว");
   }
 
   const userUsedCount = await Order.countDocuments({
     user_id: req.user._id,
-    "coupon_info.coupon_code": coupon_code,
+    "coupon_info.coupon_code": code,
     status: { $ne: "cancelled" },
   });
 
@@ -62,9 +78,10 @@ const checkCoupon = asyncHandler(async (req, res) => {
 // @desc    Create coupon
 // @route   POST /api/coupon
 // @access  Private/Admin
-const createCoupon = await asyncHandler(async (req, res) => {
+const createCoupon = asyncHandler(async (req, res) => {
   const {
     code,
+    description,
     discount_type,
     discount_value,
     max_discount_amount,
@@ -89,8 +106,8 @@ const createCoupon = await asyncHandler(async (req, res) => {
     min_order_value,
     usage_limit,
     used_count: 0,
-    start_date,
-    end_date,
+    start_date: start_date || Date.now(),
+    end_date: end_date || null,
     is_active: true,
   });
 
@@ -101,8 +118,28 @@ const createCoupon = await asyncHandler(async (req, res) => {
 // @route   Get /api/coupon
 // @access  Private/Admin
 const getCoupons = asyncHandler(async (req, res) => {
-  const coupons = await Coupon.find({}).sort({ createdAt: -1 });
-  res.json(coupons);
+  const { page, limit, keyword } = req.query;
+
+  const pageSize = Number(limit) || 12;
+  const pageNumber = Number(page) || 1;
+
+  let query = {};
+  if (keyword) {
+    query.code = { $regex: keyword, $options: "i" };
+  }
+
+  const count = await Coupon.countDocuments(query);
+  const coupons = await Coupon.find(query)
+    .sort({ createdAt: -1 })
+    .limit(pageSize)
+    .skip(pageSize * (pageNumber - 1));
+
+  res.json({
+    coupons,
+    page: pageNumber,
+    pages: Math.ceil(count / pageSize),
+    total: count
+  });
 });
 
 // @desc    Get coupon by ID

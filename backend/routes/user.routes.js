@@ -13,6 +13,7 @@ import {
   forgotPassword,
   verifyOtp,
   resetPassword,
+  updateUserPassword
 } from "../controllers/user.controller.js";
 
 import {
@@ -42,6 +43,8 @@ router
   .route("/profile")
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
+
+router.route("/profile/password").put(protect, updateUserPassword);
 
 router.route("/verify").post(verifyOtp);
 

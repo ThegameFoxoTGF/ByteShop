@@ -1,8 +1,8 @@
 import axiosClient from "../api/axiosClient";
 
 const brandService = {
-    getBrands: async () => {
-        const response = await axiosClient.get("/brand");
+    getBrands: async (params = {}) => {
+        const response = await axiosClient.get("/brand", { params });
         return response.data;
     },
     getBrandById: async (id) => {

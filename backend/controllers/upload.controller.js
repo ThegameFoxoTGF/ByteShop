@@ -15,22 +15,28 @@ const uploadImage = asyncHandler(async (req, res) => {
         const filebase64 = req.file.buffer.toString("base64");
         const dataUri = `data:${req.file.mimetype};base64,${filebase64}`;
 
-        const result = await cloudinary.uploader.upload(dataUri, {
-            folder: "ByteShop",
-            format: "webp",
-            quality: "auto",
-            width: 800,
-            height: 800,
-            crop: "limit",
-            secure: true
-        });
-        
-        res.json({
-            message: "อัปโหลดรูปภาพสำเร็จ",
-            public_id: result.public_id,
-            url: result.url
-        })
-        
+        try {
+            const result = await cloudinary.uploader.upload(dataUri, {
+                folder: "ByteShop",
+                format: "webp",
+                quality: "auto",
+                width: 800,
+                height: 800,
+                crop: "limit",
+                secure: true
+            });
+
+            res.json({
+                message: "อัปโหลดรูปภาพสำเร็จ",
+                public_id: result.public_id,
+                url: result.url
+            });
+        } catch (error) {
+            console.error("Cloudinary Upload Error:", error);
+            res.status(500);
+            throw new Error(`Cloudinary Error: ${error.message}`);
+        }
+
     } else {
         res.status(500)
         throw new Error("อัปโหลดรูปภาพไม่สำเร็จ")
