@@ -96,7 +96,12 @@ const registerUser = asyncHandler(async (req, res) => {
         generateToken(res, user._id);
         res.status(201).json({
             _id: user._id,
+            first_name: user.profile.first_name,
+            last_name: user.profile.last_name,
+            phone_number: user.profile.phone_number,
+            birthday: user.profile.birthday,
             email: user.email,
+            is_admin: user.is_admin,
         });
     } else {
         res.status(400);
@@ -121,8 +126,11 @@ const getUserProfile = asyncHandler(async (req, res) => {
     if (user) {
         res.json({
             _id: user._id,
+            first_name: user.profile.first_name,
+            last_name: user.profile.last_name,
+            phone_number: user.profile.phone_number,
+            birthday: user.profile.birthday,
             email: user.email,
-            profile: user.profile,
             is_admin: user.is_admin,
         });
     } else {
@@ -147,8 +155,12 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         const updatedUser = await user.save();
         res.json({
             _id: updatedUser._id,
-            profile: updatedUser.profile,
+            first_name: updatedUser.profile.first_name,
+            last_name: updatedUser.profile.last_name,
+            phone_number: updatedUser.profile.phone_number,
+            birthday: updatedUser.profile.birthday,
             email: updatedUser.email,
+            is_admin: updatedUser.is_admin,
         });
 
     } else {

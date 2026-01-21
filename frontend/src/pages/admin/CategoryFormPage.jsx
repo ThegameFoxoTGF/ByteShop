@@ -166,20 +166,56 @@ function CategoryFormPage() {
         });
     };
 
+    const moveField = (setList, index, direction) => {
+        setList(prev => {
+            const newList = [...prev];
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= newList.length) return prev;
+
+            [newList[index], newList[newIndex]] = [newList[newIndex], newList[index]];
+            return newList;
+        });
+    };
+
     // --- Render Component for a Field Item ---
-    const renderFieldEditor = (item, index, listType, setList) => {
+    const renderFieldEditor = (item, index, list, setList) => {
         const isOptionsType = ['select', 'multiselect'].includes(item.type);
 
         return (
             <div key={index} className="p-4 bg-slate-50 border border-slate-200 rounded-xl mb-4 relative group transition-all hover:border-sea-primary/50">
-                <button
-                    type="button"
-                    onClick={() => removeField(setList, index)}
-                    className="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                    title="ลบฟิลด์"
-                >
-                    <Icon icon="ic:round-close" width="20" />
-                </button>
+                <div className="absolute -top-3 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center">
+                    <div className="flex gap-1">
+                        {index > 0 && (
+                            <button
+                                type="button"
+                                onClick={() => moveField(setList, index, -1)}
+                                className="p-1.5 bg-white text-slate-400 hover:text-sea-primary hover:shadow-md border border-slate-100 rounded-full transition-all"
+                                title="เลื่อนขึ้น"
+                            >
+                                <Icon icon="ic:round-keyboard-arrow-up" width="18" />
+                            </button>
+                        )}
+                        {index < list.length - 1 && (
+                            <button
+                                type="button"
+                                onClick={() => moveField(setList, index, 1)}
+                                className="p-1.5 bg-white text-slate-400 hover:text-sea-primary hover:shadow-md border border-slate-100 rounded-full transition-all"
+                                title="เลื่อนลง"
+                            >
+                                <Icon icon="ic:round-keyboard-arrow-down" width="18" />
+                            </button>
+                        )}
+                        <span className="w-px h-4 bg-slate-200 mx-1 self-center"></span>
+                        <button
+                            type="button"
+                            onClick={() => removeField(setList, index)}
+                            className="p-1.5 bg-white text-slate-400 hover:text-red-500 hover:shadow-md border border-slate-100 rounded-full transition-all"
+                            title="ลบฟิลด์"
+                        >
+                            <Icon icon="ic:round-close" width="18" />
+                        </button>
+                    </div>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
                     {/* Label & Key */}
@@ -237,27 +273,31 @@ function CategoryFormPage() {
                     {/* Options (Conditional) */}
                     <div className="md:col-span-5">
                         {isOptionsType ? (
-                            <div className="bg-white p-3 border border-slate-200 rounded-lg h-full">
-                                <label className="block text-xs font-semibold text-sea-subtext mb-2">ตัวเลือก</label>
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                    {item.options?.map((opt, optIdx) => (
-                                        <span key={optIdx} className="inline-flex items-center px-2 py-1 bg-sea-light/20 text-sea-primary text-xs rounded">
-                                            {opt}
-                                            <button
-                                                type="button"
-                                                onClick={() => removeOption(setList, index, optIdx)}
-                                                className="ml-1 text-sea-primary/60 hover:text-red-500"
-                                            >
-                                                <Icon icon="ic:round-close" width="14" />
-                                            </button>
-                                        </span>
-                                    ))}
+                            <div className="bg-white p-4 border border-slate-200 rounded-xl h-full shadow-xs">
+                                <label className="block text-xs font-bold text-sea-subtext uppercase tracking-wider mb-2">ตัวเลือก</label>
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {item.options?.length > 0 ? (
+                                        item.options.map((opt, optIdx) => (
+                                            <span key={optIdx} className="inline-flex items-center px-2.5 py-1 bg-sea-light/10 text-sea-primary text-xs font-medium rounded-lg border border-sea-light/20">
+                                                {opt}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeOption(setList, index, optIdx)}
+                                                    className="ml-1.5 text-sea-primary/60 hover:text-red-500 transition-colors"
+                                                >
+                                                    <Icon icon="ic:round-close" width="14" />
+                                                </button>
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-xs text-slate-400 italic">ยังไม่ได้ระบุตัวเลือก</span>
+                                    )}
                                 </div>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
-                                        placeholder="เพิ่มตัวเลือกแล้วกด Enter"
-                                        className="flex-1 px-2 py-1.5 text-sm border border-slate-200 rounded focus:outline-none focus:border-sea-primary"
+                                        placeholder="พิมพ์ตัวเลือก..."
+                                        className="flex-1 px-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary focus:bg-white transition-all"
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
                                                 e.preventDefault();
@@ -268,9 +308,9 @@ function CategoryFormPage() {
                                     />
                                     <button
                                         type="button"
-                                        className="px-3 bg-sea-light/20 text-sea-primary hover:bg-sea-light/40 rounded transition-colors"
+                                        className="px-4 py-1.5 bg-sea-primary text-white text-xs font-semibold rounded-lg hover:bg-sea-deep transition-all shadow-sm active:scale-95"
                                         onClick={(e) => {
-                                            const input = e.target.previousSibling;
+                                            const input = e.currentTarget.previousSibling;
                                             addOption(setList, index, input.value);
                                             input.value = '';
                                         }}
@@ -280,7 +320,8 @@ function CategoryFormPage() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="h-full flex items-center justify-center border border-dashed border-slate-200 rounded-lg bg-slate-50 text-slate-400 text-xs text-center p-4">
+                            <div className="h-full flex flex-col items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/50 text-slate-400 text-xs text-center p-4">
+                                <Icon icon="ic:round-info" className="mb-1 opacity-50" width="20" />
                                 ประเภทนี้ไม่มีตัวเลือกที่กำหนดไว้ล่วงหน้า
                             </div>
                         )}
@@ -360,58 +401,96 @@ function CategoryFormPage() {
                     </div>
                 </div>
 
-                {/* Filters Section */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-sea-text flex items-center gap-2">
-                            <Icon icon="ic:round-filter-alt" className="text-sea-primary" /> ตัวกรองสินค้า
+                <div className="bg-white p-8 rounded-3xl shadow-xs border border-slate-100 space-y-8">
+                    <div className="flex flex-col gap-1">
+                        <h2 className="text-xl font-bold text-sea-text flex items-center gap-2.5">
+                            <div className="p-2 bg-sea-light/10 rounded-xl">
+                                <Icon icon="ic:round-filter-alt" className="text-sea-primary" width="24" />
+                            </div>
+                            ตัวกรองสินค้า (Filters)
                         </h2>
-                        <button
-                            type="button"
-                            onClick={() => addField(setFilters)}
-                            className="text-sm font-medium text-sea-primary hover:text-sea-deep flex items-center gap-1 px-3 py-1.5 bg-sea-light/10 hover:bg-sea-light/20 rounded-lg transition-colors"
-                        >
-                            <Icon icon="ic:round-add" /> เพิ่มตัวกรอง
-                        </button>
+                        <p className="text-sm text-sea-subtext">กำหนดคุณลักษณะต่างๆ ที่ลูกค้าสามารถใช้กรองสินค้าในหมวดหมู่นี้</p>
                     </div>
-                    <p className="text-sm text-sea-subtext -mt-4">กำหนดคุณลักษณะต่างๆ ที่ลูกค้าสามารถใช้กรองสินค้าในหมวดหมู่นี้</p>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         {filters.length === 0 ? (
-                            <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                                <p className="text-slate-400 text-sm">ยังไม่มีการกำหนดตัวกรอง</p>
-                                <button type="button" onClick={() => addField(setFilters)} className="mt-2 text-sea-primary text-sm font-medium">เพิ่มรายการใหม่</button>
+                            <div className="group text-center py-12 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-sea-primary/30 transition-all">
+                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
+                                    <Icon icon="ic:round-filter-list-off" className="text-slate-300" width="32" />
+                                </div>
+                                <h3 className="text-slate-600 font-medium mb-1">ยังไม่มีการกำหนดตัวกรอง</h3>
+                                <p className="text-slate-400 text-xs mb-4">เพิ่มตัวกรองเพื่อให้ลูกค้าค้นหาสินค้าได้ง่ายขึ้น</p>
+                                <button
+                                    type="button"
+                                    onClick={() => addField(setFilters)}
+                                    className="px-6 py-2 bg-white text-sea-primary text-sm font-bold rounded-xl border border-slate-200 hover:border-sea-primary hover:shadow-sm transition-all shadow-xs"
+                                >
+                                    เพิ่มตัวกรองแรกของคุณ
+                                </button>
                             </div>
                         ) : (
-                            filters.map((item, index) => renderFieldEditor(item, index, 'filters', setFilters))
+                            <>
+                                <div className="space-y-0">
+                                    {filters.map((item, index) => renderFieldEditor(item, index, filters, setFilters))}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => addField(setFilters)}
+                                    className="w-full group flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 hover:text-sea-primary hover:border-sea-primary hover:bg-sea-light/5 transition-all outline-none"
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-sea-light/10 flex items-center justify-center transition-colors">
+                                        <Icon icon="ic:round-add" width="24" />
+                                    </div>
+                                    <span className="font-bold tracking-wide">เพิ่มตัวกรองใหม่</span>
+                                </button>
+                            </>
                         )}
                     </div>
                 </div>
 
-                {/* Specifications Section */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-sea-text flex items-center gap-2">
-                            <Icon icon="ic:round-list" className="text-sea-primary" /> ข้อมูลทางเทคนิค (Specifications)
+                <div className="bg-white p-8 rounded-3xl shadow-xs border border-slate-100 space-y-8">
+                    <div className="flex flex-col gap-1">
+                        <h2 className="text-xl font-bold text-sea-text flex items-center gap-2.5">
+                            <div className="p-2 bg-sea-light/10 rounded-xl">
+                                <Icon icon="ic:round-list" className="text-sea-primary" width="24" />
+                            </div>
+                            ข้อมูลทางเทคนิค (Specifications)
                         </h2>
-                        <button
-                            type="button"
-                            onClick={() => addField(setSpecifications)}
-                            className="text-sm font-medium text-sea-primary hover:text-sea-deep flex items-center gap-1 px-3 py-1.5 bg-sea-light/10 hover:bg-sea-light/20 rounded-lg transition-colors"
-                        >
-                            <Icon icon="ic:round-add" /> เพิ่มสเปค
-                        </button>
+                        <p className="text-sm text-sea-subtext">กำหนดหัวข้อรายละเอียดทางเทคนิคที่จะแสดงในหน้าข้อมูลสินค้า</p>
                     </div>
-                    <p className="text-sm text-sea-subtext -mt-4">กำหนดหัวข้อรายละเอียดทางเทคนิคที่จะแสดงในหน้าข้อมูลสินค้า</p>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         {specifications.length === 0 ? (
-                            <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                                <p className="text-slate-400 text-sm">ยังไม่มีการกำหนดหัวข้อสเปค</p>
-                                <button type="button" onClick={() => addField(setSpecifications)} className="mt-2 text-sea-primary text-sm font-medium">เพิ่มรายการใหม่</button>
+                            <div className="group text-center py-12 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-sea-primary/30 transition-all">
+                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
+                                    <Icon icon="ic:round-assignment" className="text-slate-300" width="32" />
+                                </div>
+                                <h3 className="text-slate-600 font-medium mb-1">ยังไม่มีการกำหนดหัวข้อสเปค</h3>
+                                <p className="text-slate-400 text-xs mb-4">กำหนดสเปคเพื่อแสดงรายละเอียดที่ชัดเจนให้กับลูกค้า</p>
+                                <button
+                                    type="button"
+                                    onClick={() => addField(setSpecifications)}
+                                    className="px-6 py-2 bg-white text-sea-primary text-sm font-bold rounded-xl border border-slate-200 hover:border-sea-primary hover:shadow-sm transition-all shadow-xs"
+                                >
+                                    เพิ่มสเปคแรกของคุณ
+                                </button>
                             </div>
                         ) : (
-                            specifications.map((item, index) => renderFieldEditor(item, index, 'specs', setSpecifications))
+                            <>
+                                <div className="space-y-0">
+                                    {specifications.map((item, index) => renderFieldEditor(item, index, specifications, setSpecifications))}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => addField(setSpecifications)}
+                                    className="w-full group flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 hover:text-sea-primary hover:border-sea-primary hover:bg-sea-light/5 transition-all outline-none"
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-sea-light/10 flex items-center justify-center transition-colors">
+                                        <Icon icon="ic:round-add" width="24" />
+                                    </div>
+                                    <span className="font-bold tracking-wide">เพิ่มข้อมูลทางเทคนิคใหม่</span>
+                                </button>
+                            </>
                         )}
                     </div>
                 </div>

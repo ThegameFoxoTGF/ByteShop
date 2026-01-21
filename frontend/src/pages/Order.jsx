@@ -56,7 +56,7 @@ function Order() {
         formData.append('image', file);
 
         try {
-            const uploadRes = await uploadService.uploadImage(formData);
+            const uploadRes = await uploadService.uploadSlip(formData);
             await orderService.updateOrderToPaid(id, {
                 url: uploadRes.url,
                 public_id: uploadRes.public_id

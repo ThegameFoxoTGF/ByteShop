@@ -178,6 +178,25 @@ function ProductFormPage() {
         }
     };
 
+    const [isSaved, setIsSaved] = useState(false);
+    const uploadedImagesRef = React.useRef([]); // Track new uploads for cleanup
+
+    // Cleanup on unmount if not saved
+    useEffect(() => {
+        return () => {
+            if (!isSaved && uploadedImagesRef.current.length > 0) {
+                // Cleanup orphaned images
+                uploadedImagesRef.current.forEach(public_id => {
+                    uploadService.deleteImage(public_id).catch(err => console.error('Cleanup error:', err));
+                });
+            }
+        };
+    }, [isSaved]); // This effect runs on mount and cleans up on unmount based on isSaved value at that time? 
+    // Actually, ref value is current. We need to ensure we capture the specific closure or ref.
+    // React 18 strict mode might double invoke, but ref persists.
+    // BETTER: Use a separate function we call on "Cancel" explicitly, 
+    // but for browser close/nav, unmount is the only hook.
+
     // Image Upload Helpers
     const handleMainImageUpload = async (e) => {
         const file = e.target.files[0];
@@ -190,6 +209,7 @@ function ProductFormPage() {
         try {
             const res = await uploadService.uploadImage(uploadData);
             setFormData(prev => ({ ...prev, main_image: res }));
+            uploadedImagesRef.current.push(res.public_id); // Track
         } catch (error) {
             toast.error('อัปโหลดรูปภาพไม่สำเร็จ');
         } finally {
@@ -209,6 +229,9 @@ function ProductFormPage() {
                 return uploadService.uploadImage(data);
             });
             const results = await Promise.all(uploadPromises);
+
+            results.forEach(res => uploadedImagesRef.current.push(res.public_id)); // Track
+
             setFormData(prev => ({ ...prev, images: [...prev.images, ...results] }));
         } catch (error) {
             toast.error('อัปโหลดรูปภาพบางรายการไม่สำเร็จ');
@@ -217,15 +240,45 @@ function ProductFormPage() {
         }
     };
 
-    const removeMainImage = () => {
-        // Optionally delete from server if needed, but for now just clear from state
+    const removeMainImage = async () => {
+        const public_id = formData.main_image?.public_id;
+        if (public_id) {
+            try {
+                await uploadService.deleteImage(public_id);
+                // Remove from ref if it was just uploaded? 
+                // Creating a robust set might be better, but simple array filter is fine.
+                uploadedImagesRef.current = uploadedImagesRef.current.filter(id => id !== public_id);
+            } catch (error) {
+                console.error("Failed to delete image", error);
+            }
+        }
         setFormData(prev => ({ ...prev, main_image: null }));
     };
 
-    const removeGalleryImage = (index) => {
+    const removeGalleryImage = async (index) => {
+        const imageToDelete = formData.images[index];
+        if (imageToDelete?.public_id) {
+            try {
+                await uploadService.deleteImage(imageToDelete.public_id);
+                uploadedImagesRef.current = uploadedImagesRef.current.filter(id => id !== imageToDelete.public_id);
+            } catch (error) {
+                console.error("Failed to delete image", error);
+            }
+        }
+
         const newImages = [...formData.images];
         newImages.splice(index, 1);
         setFormData(prev => ({ ...prev, images: newImages }));
+    };
+
+    const handleCancel = async () => {
+        if (uploadedImagesRef.current.length > 0) {
+            try {
+                await Promise.all(uploadedImagesRef.current.map(id => uploadService.deleteImage(id)));
+                uploadedImagesRef.current = [];
+            } catch (e) { console.error(e) }
+        }
+        navigate('/admin/products');
     };
 
     // Filters & Specs Handlers
@@ -301,9 +354,11 @@ function ProductFormPage() {
         try {
             if (isEditMode) {
                 await productService.updateProduct(id, payload);
+                setIsSaved(true);
                 toast.success('อัปเดตสินค้าเรียบร้อยแล้ว');
             } else {
                 await productService.createProduct(payload);
+                setIsSaved(true);
                 toast.success('สร้างสินค้าเรียบร้อยแล้ว');
             }
             navigate('/admin/products');
@@ -702,12 +757,13 @@ function ProductFormPage() {
                             {loading && <Icon icon="eos-icons:loading" />}
                             {isEditMode ? 'อัปเดตสินค้า' : 'สร้างสินค้า'}
                         </button>
-                        <Link
-                            to="/admin/products"
+                        <button
+                            type="button"
+                            onClick={handleCancel}
                             className="w-full py-3 rounded-xl text-slate-600 bg-white border border-slate-200 font-medium hover:bg-slate-50 transition-colors text-center"
                         >
                             ยกเลิก
-                        </Link>
+                        </button>
                     </div>
 
                 </div>

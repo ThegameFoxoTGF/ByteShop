@@ -62,6 +62,8 @@ function Home() {
   const [activeDynamicFilters, setActiveDynamicFilters] = useState({}); // { key: value }
 
   // Fetch initial data (Categories & Brands)
+  const [initialBrands, setInitialBrands] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -70,7 +72,9 @@ function Home() {
           brandService.getBrands()
         ]);
         setCategories(cats.categories || (Array.isArray(cats) ? cats : []));
-        setBrands(brds.brands || (Array.isArray(brds) ? brds : []));
+        const allBrands = brds.brands || (Array.isArray(brds) ? brds : []);
+        setBrands(allBrands);
+        setInitialBrands(allBrands);
       } catch (error) {
         console.error('Error fetching filter data:', error);
       }
@@ -78,26 +82,39 @@ function Home() {
     fetchData();
   }, []);
 
-  // แก้ไข useEffect สำหรับโหลด Dynamic Filters
+  // Update Dynamic Filters AND Brands when Category changes
   useEffect(() => {
-    const fetchDynamicFilters = async () => {
+    const fetchCategoryData = async () => {
       if (selectedCategory) {
         try {
-          // 1. Logic: Fetch available unique option keys/values for the selected category
-          // Returns: [{ key: "Series", label: "Series", options: ["12th Gen", "14th Gen"] }]
-          const data = await productService.getCategoryFilters(selectedCategory);
-          setDynamicFilters(data);
+          // Fetch dynamic specs
+          const filtersData = await productService.getCategoryFilters(selectedCategory);
+          setDynamicFilters(filtersData);
+
+          // Fetch relevant brands
+          const brandsData = await productService.getCategoryBrands(selectedCategory);
+          setBrands(brandsData);
+
+          // Clear selected brand if it's not in the new list
+          // logic: if(selectedBrand && !brandsData.find(b=>b._id === selectedBrand)) setSelectedBrand('');
+          // But `selectedBrand` state update inside async might be tricky if checked before setBrands propagation.
+          // Effectively, if the old brand isn't in new list, it just filters to 0 products (correct behavior) or we force clear it.
+          // Let's force clear it IF it's not valid, but getting state synchronously is hard here.
+          // A separate useEffect for validation could work, or just let the user see 0 results.
+
         } catch (error) {
-          console.error('Error fetching category filters:', error);
+          console.error('Error fetching category data:', error);
           setDynamicFilters([]);
+          setBrands(initialBrands); // Fallback? Or empty? Better fallback to all? No, if error, maybe empty.
         }
       } else {
         setDynamicFilters([]);
-        setActiveDynamicFilters({}); // ล้างค่าที่เลือกไว้เมื่อเปลี่ยนหมวดหมู่
+        setActiveDynamicFilters({});
+        setBrands(initialBrands); // Reset to all brands
       }
     };
-    fetchDynamicFilters();
-  }, [selectedCategory]); // รันเฉพาะเมื่อเปลี่ยนหมวดหมู่
+    fetchCategoryData();
+  }, [selectedCategory, initialBrands]); // Add initialBrands dep
 
   // Reset active dynamic filters ONLY when category changes
   useEffect(() => {

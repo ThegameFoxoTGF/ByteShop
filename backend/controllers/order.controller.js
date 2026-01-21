@@ -1,4 +1,5 @@
 import asyncHandler from "../middleware/asynchandler.js";
+import mongoose from "mongoose";
 import Order from "../models/order.model.js";
 import Cart from "../models/cart.model.js";
 import Product from "../models/product.model.js";
@@ -155,22 +156,60 @@ const createOrder = asyncHandler(async (req, res) => {
 // @access  Private
 const getAllOrders = asyncHandler(async (req, res) => {
     const { page, limit, status, keyword } = req.query;
+    const pageSize = Number(limit) || 10;
+    const pageNumber = Number(page) || 1;
 
     let query = {};
-    if (req.user && !req.user.isAdmin) {
+
+    // 1. Role-based filter
+    if (req.user && !req.user.is_admin) {
         query.user_id = req.user._id;
     }
 
+    // 2. Status filter
     if (status) {
         query.status = status;
     }
 
+    // 3. Keyword Search (Order ID, Name, Email, Phone)
     if (keyword) {
-        query.order_id = { $regex: keyword, $options: 'i' };
+        // Need to find users first to search by email/name on User model
+        // Although shipping_address has name/phone, email is only on User.
+        const users = await mongoose.model("User").find({
+            $or: [
+                { email: { $regex: keyword, $options: 'i' } },
+                { "profile.first_name": { $regex: keyword, $options: 'i' } },
+                { "profile.last_name": { $regex: keyword, $options: 'i' } }
+            ]
+        }).select('_id');
+
+        const userIds = users.map(u => u._id);
+
+        const searchConditions = [
+            { order_id: { $regex: keyword, $options: 'i' } },
+            { "shipping_address.name": { $regex: keyword, $options: 'i' } },
+            { "shipping_address.phone_number": { $regex: keyword, $options: 'i' } },
+            { user_id: { $in: userIds } } // Match orders belonging to found users
+        ];
+
+        // If filtering by specific user (non-admin), we must ensure we only search within their orders
+        // MongoDB $and implicitly used for top-level query object keys.
+        // If we add $or for search, we need to make sure it doesn't override the user_id filter above.
+
+        if (query.$or) {
+            // If there was already an $or (unlikely here but safe coding), merge? 
+            // Actually, we should just assign to $or if it's new.
+            query.$or = searchConditions;
+        } else {
+            // Combine with existing filters using $and is safer if we want to be explicit, 
+            // but here "query" object keys act as AND. 
+            // EXCEPT: if query.user_id exists, and we have { user_id: { $in: userIds } } in $or, 
+            // it means "Match (Order ID OR Name OR Email) AND (My User ID)".
+            // This structure: { user_id: myID, $or: [...] } works perfectly.
+            query.$or = searchConditions;
+        }
     }
 
-    const pageSize = Number(limit) || 10;
-    const pageNumber = Number(page) || 1;
     const count = await Order.countDocuments(query);
 
     const orders = await Order.find(query)

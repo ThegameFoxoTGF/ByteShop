@@ -4,43 +4,60 @@ import asyncHandler from "../middleware/asynchandler.js";
 // @desc    Upload image
 // @route   POST /api/upload
 // @access  Public
-const uploadImage = asyncHandler(async (req, res) => {
+const uploadToCloudinary = async (file, folder, width, height, crop) => {
+    if (!file) throw new Error("กรุณาอัปโหลดรูปภาพ");
 
-    if (!req.file) {
-        res.status(400)
-        throw new Error("กรุณาอัปโหลดรูปภาพ")
-    }
+    const filebase64 = file.buffer.toString("base64");
+    const dataUri = `data:${file.mimetype};base64,${filebase64}`;
 
-    if (req.file) {
-        const filebase64 = req.file.buffer.toString("base64");
-        const dataUri = `data:${req.file.mimetype};base64,${filebase64}`;
+    try {
 
-        try {
-            const result = await cloudinary.uploader.upload(dataUri, {
-                folder: "ByteShop",
-                format: "webp",
-                quality: "auto",
-                width: 800,
-                height: 800,
-                crop: "limit",
-                secure: true
-            });
+        const options = {
+            folder: folder,
+            format: "webp",
+            quality: "auto",
+            secure: true,
+            crop: crop,
+            width: width,
+            ...(height && { height: height })
+        };
 
-            res.json({
-                message: "อัปโหลดรูปภาพสำเร็จ",
-                public_id: result.public_id,
-                url: result.url
-            });
-        } catch (error) {
-            console.error("Cloudinary Upload Error:", error);
-            res.status(500);
-            throw new Error(`Cloudinary Error: ${error.message}`);
+        if (crop === "fill") {
+            options.gravity = "auto";
         }
 
-    } else {
-        res.status(500)
-        throw new Error("อัปโหลดรูปภาพไม่สำเร็จ")
+
+        return await cloudinary.uploader.upload(dataUri, options);
+    } catch (error) {
+        console.error("Cloudinary Upload Error:", error);
+        throw new Error(`Cloudinary Error: ${error.message}`);
     }
+};
+
+// @desc    Upload image or slip
+// @route   POST /api/upload OR /api/upload/slip
+// @access  Public
+const uploadImage = asyncHandler(async (req, res) => {
+    if (!req.file) {
+        res.status(400);
+        throw new Error("กรุณาอัปโหลดรูปภาพ");
+    }
+
+    //Check /slip
+    const isSlip = req.path.includes("slip") || req.baseUrl.includes("slip");
+
+    const folder = isSlip ? "ByteShop/slip" : "ByteShop/images";
+    const width = isSlip ? 500 : 800;
+    const height = isSlip ? undefined : 800;
+    const crop = isSlip ? "limit" : "fill";
+
+    const result = await uploadToCloudinary(req.file, folder, width, height, crop);
+
+    res.json({
+        message: "อัปโหลดรูปภาพสำเร็จ",
+        public_id: result.public_id,
+        url: result.secure_url
+    });
 });
 
 // @desc    Delete image

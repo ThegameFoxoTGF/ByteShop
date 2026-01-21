@@ -144,6 +144,7 @@ const getCategoryFilters = asyncHandler(async (req, res) => {
         {
             $group: {
                 _id: "$filters.key",
+                label: { $first: "$filters.label" },
                 options: { $addToSet: "$filters.value" }
             }
         },
@@ -151,7 +152,7 @@ const getCategoryFilters = asyncHandler(async (req, res) => {
             $project: {
                 _id: 0,
                 key: "$_id",
-                label: "$_id", // ใช้ Key เป็น Label ไปก่อน
+                label: 1,
                 options: 1
             }
         },
@@ -167,12 +168,41 @@ const getCategoryFilters = asyncHandler(async (req, res) => {
     res.json(filtersSorted); // ส่งออกไปเป็น [ {key: "RAM", label: "RAM", options: ["8GB", "16GB"]}, ... ]
 });
 
+// @desc    Get Brands for a Category based on Products
+// @route   GET /api/products/brands/:categoryId
+// @access  Public
+const getCategoryBrands = asyncHandler(async (req, res) => {
+    const { categoryId } = req.params;
+
+    const brands = await Product.aggregate([
+        { $match: { category_id: new mongoose.Types.ObjectId(categoryId), is_active: true } },
+        {
+            $lookup: {
+                from: "brands",
+                localField: "brand_id",
+                foreignField: "_id",
+                as: "brand"
+            }
+        },
+        { $unwind: "$brand" },
+        {
+            $group: {
+                _id: "$brand._id",
+                name: { $first: "$brand.name" }
+            }
+        },
+        { $sort: { name: 1 } }
+    ]);
+
+    res.json(brands);
+});
+
 // @desc    Fetch single product by ID
 // @route   GET /api/products/:id
 // @access  Public
 const getProductById = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id)
-        .populate("category_id", "name")
+        .populate("category_id", "name specifications")
         .populate("brand_id", "name");
 
     if (product) {
@@ -188,7 +218,7 @@ const getProductById = asyncHandler(async (req, res) => {
 // @access  Public
 const getProductBySlug = asyncHandler(async (req, res) => {
     const product = await Product.findOne({ slug: req.params.slug })
-        .populate("category_id", "name")
+        .populate("category_id", "name specifications")
         .populate("brand_id", "name");
 
     if (product) {
@@ -204,7 +234,7 @@ const getProductBySlug = asyncHandler(async (req, res) => {
 // @access  Public
 const getProductBySku = asyncHandler(async (req, res) => {
     const product = await Product.findOne({ sku: req.params.sku })
-        .populate("category_id", "name")
+        .populate("category_id", "name specifications")
         .populate("brand_id", "name");
 
     if (product) {
@@ -330,6 +360,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 export {
     getProducts,
     getCategoryFilters,
+    getCategoryBrands,
     getProductById,
     getProductBySlug,
     getProductBySku,

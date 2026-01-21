@@ -8,15 +8,27 @@ import Product from "../models/product.model.js";
 // @access  Private/Admin
 const getDashboardStats = asyncHandler(async (req, res) => {
     // 1. Total Sales (Revenue) - from paid/completed orders
-    const salesResult = await Order.aggregate([
-        {
-            $match: {
+    // Condition: 
+    // - If non-COD: status in [paid, processing, shipped, completed]
+    // - If COD: status MUST be 'completed'
+    const salesCondition = {
+        $or: [
+            {
+                payment_method: { $ne: 'cod' },
                 status: { $in: ['paid', 'processing', 'shipped', 'completed'] }
+            },
+            {
+                payment_method: 'cod',
+                status: 'completed'
             }
-        },
+        ]
+    };
+
+    const salesResult = await Order.aggregate([
+        { $match: salesCondition },
         {
             $group: {
-                _id: null,
+                _id: null, // Group all matches together
                 totalSales: { $sum: "$pricing_info.total_price" }
             }
         }
@@ -46,20 +58,24 @@ const getDashboardStats = asyncHandler(async (req, res) => {
     // 6. Sales Chart Data (Last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0); // Start from beginning of the day
 
-    // Aggregate daily sales
-    // Note: This matches based on 'createdAt' or 'payment_info.payment_date'. Let's use createdAt for simplicity or payment_date for accuracy.
-    // Using createdAt covers all orders.
     const salesChart = await Order.aggregate([
         {
             $match: {
                 createdAt: { $gte: sevenDaysAgo },
-                status: { $in: ['paid', 'processing', 'shipped', 'completed'] }
+                ...salesCondition
             }
         },
         {
             $group: {
-                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                _id: {
+                    $dateToString: {
+                        format: "%Y-%m-%d",
+                        date: "$createdAt",
+                        timezone: "+07:00"
+                    }
+                },
                 total: { $sum: "$pricing_info.total_price" }
             }
         },

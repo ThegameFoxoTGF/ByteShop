@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import authService from '../services/auth.service';
+import userService from '../services/user.service';
 
 const AuthContext = createContext(null);
 
@@ -12,19 +13,27 @@ export const AuthProvider = ({ children }) => {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
                 try {
-                    // Start with stored user data to show something immediately if needed
-                    // But preferably validate or fetch fresh profile if token exists
-                    // Assuming storedUser has token or similar. 
-                    // authService.login stores the whole response in 'user' key.
-
                     const parsedUser = JSON.parse(storedUser);
                     setUser(parsedUser);
 
-                    // Optional: Verify token validity or fetch fresh profile
-                    // const profile = await userService.getProfile();
-                    // setUser(prev => ({ ...prev, ...profile })); 
+                    // Fetch fresh profile in background to ensure data is up-to-date
+                    try {
+                        const profile = await userService.getProfile();
+                        // Merge profile with existing data (or just use profile as it's the source of truth)
+                        // Note: Backend now returns flattened structure matching authUser
+                        const updatedUser = { ...parsedUser, ...profile };
+                        setUser(updatedUser);
+                        localStorage.setItem('user', JSON.stringify(updatedUser)); // Update cache
+                    } catch (err) {
+                        console.error('Background profile fetch failed:', err);
+                        // If token is invalid (401), logout
+                        if (err.response && err.response.status === 401) {
+                            localStorage.removeItem('user');
+                            setUser(null);
+                        }
+                    }
                 } catch (error) {
-                    console.error("Failed to parse stored user or fetch profile", error);
+                    console.error("Failed to parse stored user", error);
                     localStorage.removeItem('user');
                 }
             }

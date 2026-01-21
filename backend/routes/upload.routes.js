@@ -1,6 +1,6 @@
 import multer from "multer";
 import express from "express";
-import { uploadImage , deleteImage} from "../controllers/upload.controller.js";
+import { uploadImage, deleteImage } from "../controllers/upload.controller.js";
 import { protect, admin } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -24,6 +24,7 @@ const uploadMiddleware = (req, res, next) => {
 };
 
 router.route("/").post(protect, uploadMiddleware, uploadImage);
+router.route("/slip").post(protect, uploadMiddleware, uploadImage);
 router.route("/delete").post(protect, admin, deleteImage);
 
 export default router;

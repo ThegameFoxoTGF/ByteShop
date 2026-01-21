@@ -222,7 +222,7 @@ function Checkout() {
                                             }`}
                                     >
                                         <div className="flex justify-between items-start mb-2">
-                                            <span className="font-bold text-sm text-slate-800 flex items-center gap-1">
+                                            <span className="font-bold text-sm text-sea-text flex items-center gap-1">
                                                 <Icon icon="ic:round-person" className="text-slate-400" /> {addr.name}
                                             </span>
                                             {addr.label && (
@@ -231,7 +231,7 @@ function Checkout() {
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed h-8">
+                                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
                                             {addr.address_line}, {addr.sub_district}, {addr.district}, {addr.province} {addr.zip_code}
                                         </p>
                                         <div className="mt-2 flex items-center justify-between">

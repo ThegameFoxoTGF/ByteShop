@@ -144,14 +144,23 @@ function CustomerListPage() {
                                                 })}
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <button
-                                                    onClick={() => handleDelete(user._id)}
-                                                    disabled={user.is_admin}
-                                                    className="text-slate-400 hover:text-red-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                                    title={user.is_admin ? "ไม่สามารถลบ Admin ได้" : "ลบข้อมูล"}
-                                                >
-                                                    <Icon icon="ic:round-delete" width="20" />
-                                                </button>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Link
+                                                        to={`/admin/orders?keyword=${user.email}`}
+                                                        className="text-slate-400 hover:text-sea-primary transition-colors"
+                                                        title="ดูประวัติการสั่งซื้อ"
+                                                    >
+                                                        <Icon icon="ic:round-receipt-long" width="20" />
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => handleDelete(user._id)}
+                                                        disabled={user.is_admin}
+                                                        className="text-slate-400 hover:text-red-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                                        title={user.is_admin ? "ไม่สามารถลบ Admin ได้" : "ลบข้อมูล"}
+                                                    >
+                                                        <Icon icon="ic:round-delete" width="20" />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}

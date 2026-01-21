@@ -104,8 +104,8 @@ function CartDrawer({ isOpen, onClose }) {
                     <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/50 backdrop-blur-xl">
                         <h2 className="text-xl font-bold text-sea-text flex items-center gap-2">
                             <Icon icon="ic:round-shopping-bag" className="text-sea-primary" />
-                            Shopping Cart
-                            <span className="text-sm font-normal text-sea-muted ml-2">({cartItems.length} items)</span>
+                            ตะกร้าสินค้า
+                            <span className="text-sm font-normal text-sea-muted ml-2">({cartItems.length} รายการ)</span>
                         </h2>
                         <button
                             onClick={onClose}
@@ -128,14 +128,14 @@ function CartDrawer({ isOpen, onClose }) {
                                     <Icon icon="ic:outline-remove-shopping-cart" className="w-12 h-12 text-sea-primary/40" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold text-sea-text">Your cart is empty</h3>
-                                    <p className="text-sea-muted text-sm mt-1 max-w-xs mx-auto">Looks like you haven't added anything to your cart yet.</p>
+                                    <h3 className="text-lg font-semibold text-sea-text">ตะกร้าสินค้าของคุณว่าง</h3>
+                                    <p className="text-sea-muted text-sm mt-1 max-w-xs mx-auto">ไม่พบสินค้าในตะกร้าของคุณ</p>
                                 </div>
                                 <button
                                     onClick={onClose}
                                     className="px-6 py-2 bg-sea-primary text-white rounded-full font-medium hover:bg-sea-primary-hover shadow-lg shadow-sea-primary/20 transition-all hover:shadow-sea-primary/40 hover:-translate-y-0.5"
                                 >
-                                    Start Shopping
+                                    ไปสู่หน้าสินค้า
                                 </button>
                             </div>
                         ) : (
@@ -211,12 +211,9 @@ function CartDrawer({ isOpen, onClose }) {
                     {cartItems.length > 0 && (
                         <div className="border-t border-slate-100 p-6 bg-white space-y-4 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
                             <div className="space-y-2">
-                                <div className="flex items-center justify-between text-sea-subtext text-sm">
-                                    <span>Subtotal</span>
-                                    <span>฿{total.toLocaleString()}</span>
-                                </div>
+
                                 <div className="flex items-center justify-between text-xl font-bold text-sea-text">
-                                    <span>Total</span>
+                                    <span>รวม</span>
                                     <span className="text-sea-primary">฿{total.toLocaleString()}</span>
                                 </div>
                             </div>
@@ -229,11 +226,11 @@ function CartDrawer({ isOpen, onClose }) {
                                 className="w-full py-3.5 bg-linear-to-r from-sea-primary to-sea-deep text-white rounded-xl font-bold shadow-lg shadow-sea-primary/30 flex items-center justify-center gap-2 hover:shadow-sea-primary/50 hover:scale-[1.02] transition-all duration-300"
                             >
                                 <Icon icon="ic:round-lock" width="20" />
-                                Checkout Securely
+                                ชำระเงิน
                             </button>
 
                             <p className="text-center text-xs text-sea-muted">
-                                Free shipping on orders over ฿5,000
+                                ค่าส่งฟรีสำหรับการสั่งซื้อที่มีราคาสูงกว่า ฿5,000
                             </p>
                         </div>
                     )}

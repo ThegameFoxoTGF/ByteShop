@@ -104,7 +104,7 @@ function AddressModal({ isOpen, onClose, onSuccess, addressToEdit = null }) {
                             <input
                                 name="phone_number"
                                 required
-                                value={formData.phone_number}
+                                value={formData.phone_number.replace(/\D/g, '')}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all text-sm"
                                 placeholder="08X-XXX-XXXX"

@@ -21,6 +21,10 @@ const productService = {
         const response = await axiosClient.get(`/product/filters/${categoryId}`, { params });
         return response.data;
     },
+    getCategoryBrands: async (categoryId) => {
+        const response = await axiosClient.get(`/product/brands/${categoryId}`);
+        return response.data;
+    },
 
     getAllProducts: async (params) => {
         const response = await axiosClient.get("/product/all", { params });

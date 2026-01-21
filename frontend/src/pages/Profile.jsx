@@ -363,13 +363,10 @@ function Profile() {
         <div className="space-y-6">
           <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-sea-primary text-2xl font-bold border border-slate-100 shadow-sm">
-              {user?.first_name?.[0]}{user?.last_name?.[0]}
+              {user?.first_name?.[0].toUpperCase()}
             </div>
             <div>
               <h3 className="font-bold text-lg text-slate-800">{user?.first_name} {user?.last_name}</h3>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 border border-green-200">
-                <Icon icon="ic:round-check-circle" /> ยืนยันแล้ว
-              </span>
             </div>
           </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { toast } from 'react-toastify';
 import couponService from '../../services/coupon.service';
@@ -104,13 +104,10 @@ function CouponFormPage() {
     return (
         <div className="p-6 max-w-3xl mx-auto space-y-6">
             {/* Header */}
-            <div>
-                <button
-                    onClick={() => navigate('/admin/coupons')}
-                    className="flex items-center gap-2 text-slate-500 hover:text-sea-primary transition-colors mb-4"
-                >
-                    <Icon icon="ic:round-arrow-back" /> Back to Coupons
-                </button>
+            <div className="flex items-center gap-4">
+                <Link to="/admin/coupons" className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors">
+                    <Icon icon="ic:round-arrow-back" width="24" />
+                </Link>
                 <h1 className="text-2xl font-bold text-sea-text">
                     {isEditMode ? 'แก้ไขคูปอง' : 'สร้างคูปองใหม่'}
                 </h1>

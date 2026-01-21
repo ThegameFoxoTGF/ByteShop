@@ -127,7 +127,10 @@ function ProductDetail() {
                             ))}
                         </div>
                     )}
+
                 </div>
+
+
 
                 {/* Product Info */}
                 <div className="space-y-6">
@@ -156,7 +159,7 @@ function ProductDetail() {
                     </div>
 
                     <div className="prose prose-sm text-slate-600 max-w-none whitespace-pre-line">
-                        {product.description || "ไม่มีรายละเอียดสินค้า"}
+                        {product.description || null}
                     </div>
 
                     <div className="border-t border-slate-100 pt-6 space-y-6">
@@ -191,6 +194,8 @@ function ProductDetail() {
                             <span className="text-xs text-slate-400">มีสินค้าเหลือ {product.stock} ชิ้น</span>
                         </div>
 
+
+
                         {/* Actions */}
                         <div className="flex gap-4">
                             <button
@@ -208,19 +213,45 @@ function ProductDetail() {
                     </div>
 
                     {/* Specifications */}
-                    {product.specifications && product.specifications.length > 0 && (
-                        <div className="mt-8 bg-slate-50 rounded-xl p-6">
-                            <h3 className="font-semibold text-sea-text mb-4">ข้อมูลจำเพาะ</h3>
-                            <div className="grid grid-cols-1 gap-y-2 text-sm">
-                                {product.specifications.map((spec, idx) => (
-                                    <div key={idx} className="grid grid-cols-3 border-b border-slate-200 pb-2 last:border-0 last:pb-0">
-                                        <span className="text-slate-500 font-medium">{spec.label || spec.key}</span>
-                                        <span className="col-span-2 text-slate-700">{spec.value} {spec.unit}</span>
-                                    </div>
-                                ))}
+                    {(() => {
+                        // Logic to sort specs based on Category configuration
+                        let displayedSpecs = product.specifications || [];
+
+                        if (product.category_id && Array.isArray(product.category_id.specifications) && product.category_id.specifications.length > 0) {
+                            const productSpecMap = new Map(product.specifications.map(s => [s.key, s]));
+
+                            displayedSpecs = product.category_id.specifications
+                                .map(catSpec => {
+                                    const productSpec = productSpecMap.get(catSpec.key);
+                                    if (productSpec && productSpec.value) {
+                                        return {
+                                            label: catSpec.label, // Use latest label from category
+                                            value: productSpec.value,
+                                            unit: catSpec.unit || productSpec.unit,
+                                            key: catSpec.key
+                                        };
+                                    }
+                                    return null;
+                                })
+                                .filter(Boolean);
+                        }
+
+                        if (displayedSpecs.length === 0) return null;
+
+                        return (
+                            <div className="mt-8 bg-slate-50 rounded-xl p-6">
+                                <h3 className="font-semibold text-sea-text mb-4">คุณสมบัติสินค้า</h3>
+                                <div className="grid grid-cols-1 gap-y-2 text-sm">
+                                    {displayedSpecs.map((spec, idx) => (
+                                        <div key={idx} className="grid grid-cols-3 border-b border-slate-200 pb-2 last:border-0 last:pb-0">
+                                            <span className="text-slate-500 font-medium">{spec.label || spec.key}</span>
+                                            <span className="col-span-2 text-slate-700">{spec.value} {spec.unit}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
                 </div>
             </div>
         </div>

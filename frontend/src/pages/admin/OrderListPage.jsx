@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { toast } from 'react-toastify';
 import orderService from '../../services/order.service';
 
 function OrderListPage() {
+    const [searchParams] = useSearchParams();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [pages, setPages] = useState(0);
     const [total, setTotal] = useState(0);
     const [limit, setLimit] = useState(10);
-    const [keyword, setKeyword] = useState('');
+    const [keyword, setKeyword] = useState(searchParams.get('keyword') || '');
     const [statusFilter, setStatusFilter] = useState('');
 
     const fetchOrders = async () => {
@@ -123,7 +124,7 @@ function OrderListPage() {
                     <Icon icon="ic:round-search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="20" />
                     <input
                         type="text"
-                        placeholder="ค้นหาเลขคำสั่งซื้อ..."
+                        placeholder="ค้นหาสั่งซื้อ..."
                         value={keyword}
                         onChange={handleSearch}
                         className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all text-sea-text placeholder-slate-400"

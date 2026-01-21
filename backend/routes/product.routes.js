@@ -2,6 +2,7 @@ import express from "express";
 import {
   getProducts,
   getCategoryFilters,
+  getCategoryBrands,
   getProductById,
   getProductBySlug,
   getProductBySku,
@@ -18,6 +19,7 @@ router.route("/").get(getProducts).post(protect, admin, createProduct);
 router.get("/all", protect, admin, getProducts);
 
 router.get("/filters/:categoryId", getCategoryFilters);
+router.get("/brands/:categoryId", getCategoryBrands);
 
 router
   .route("/:id")
