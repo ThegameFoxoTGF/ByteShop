@@ -155,14 +155,15 @@ const createOrder = asyncHandler(async (req, res) => {
 // @route   GET /api/order
 // @access  Private
 const getAllOrders = asyncHandler(async (req, res) => {
-    const { page, limit, status, keyword } = req.query;
+    const { page, limit, status, keyword, view } = req.query;
     const pageSize = Number(limit) || 10;
     const pageNumber = Number(page) || 1;
 
     let query = {};
 
     // 1. Role-based filter
-    if (req.user && !req.user.is_admin) {
+    // If user is NOT admin OR specifically requesting their own orders (view='my_orders')
+    if ((req.user && !req.user.is_admin) || view === 'my_orders') {
         query.user_id = req.user._id;
     }
 

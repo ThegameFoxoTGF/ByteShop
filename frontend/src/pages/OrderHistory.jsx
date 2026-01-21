@@ -19,7 +19,7 @@ function OrderHistory() {
     const fetchOrders = async () => {
         setLoadingOrders(true);
         try {
-            const res = await orderService.getAllOrders({ page, limit });
+            const res = await orderService.getAllOrders({ page, limit, view: 'my_orders' });
             setOrders(Array.isArray(res) ? res : (res.orders || []));
             setTotalPages(res.pages || 1);
             setTotal(res.total || 0);
