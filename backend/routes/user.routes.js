@@ -53,11 +53,6 @@ router.route("/otp").post(sendOtp);
 router.post("/forget", forgotPassword);
 router.put("/forget-reset", resetPassword);
 
-router
-  .route("/:id")
-  .delete(protect, admin, deleteUser)
-  .get(protect, admin, getUserById)
-  .put(protect, admin, updateUser);
 
 router
   .route("/address/shipping")
@@ -75,5 +70,11 @@ router
   .route("/wishlist/:productId")
   .post(protect, addToWishlist)
   .delete(protect, removeFromWishlist);
+
+router
+  .route("/:id")
+  .delete(protect, admin, deleteUser)
+  .get(protect, admin, getUserById)
+  .put(protect, admin, updateUser);
 
 export default router;

@@ -1,10 +1,30 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 function CardProduct({ product }) {
+    const { user, toggleWishlist } = useAuth();
+
     // Default empty state handling
     if (!product) return null;
+
+    const isWishlisted = user?.wishlist?.includes(product._id);
+
+    const handleWishlist = async (e) => {
+        e.preventDefault(); // Prevent navigation
+        if (!user) {
+            toast.info("กรุณาเข้าสู่ระบบเพื่อบันทึกรายการโปรด");
+            return;
+        }
+        try {
+            await toggleWishlist(product._id);
+            toast.success(isWishlisted ? "ลบออกจากรายการโปรดแล้ว" : "เพิ่มลงรายการโปรดเรียบร้อย");
+        } catch (error) {
+            toast.error("เกิดข้อผิดพลาด");
+        }
+    };
 
     const discountPercentage = product.original_price > product.selling_price
         ? Math.round(((product.original_price - product.selling_price) / product.original_price) * 100)
@@ -21,7 +41,7 @@ function CardProduct({ product }) {
                     <img
                         src={product.main_image?.url || product.imageUrl}
                         alt={product.name}
-                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-500"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-300">
@@ -30,7 +50,7 @@ function CardProduct({ product }) {
                 )}
 
                 {/* Badges */}
-                <div className="absolute top-3 left-3 flex flex-col gap-2">
+                <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
                     {product.stock <= 0 && (
                         <span className="bg-slate-700 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
                             Out of Stock
@@ -41,8 +61,20 @@ function CardProduct({ product }) {
                             -{discountPercentage}%
                         </span>
                     )}
-
                 </div>
+
+                {/* Wishlist Button */}
+                <button
+                    onClick={handleWishlist}
+                    className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-white transition-all transform hover:scale-110"
+                    title={isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด"}
+                >
+                    <Icon
+                        icon={isWishlisted ? "ic:round-favorite" : "ic:round-favorite-border"}
+                        className={isWishlisted ? "text-red-500" : ""}
+                        width="20"
+                    />
+                </button>
 
                 {/* Quick Action Overlay (Mobile hidden, Desktop show on hover) */}
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center">

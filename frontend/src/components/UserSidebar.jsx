@@ -41,6 +41,12 @@ function UserSidebar() {
                 >
                     <Icon icon="ic:round-location-on" width="20" /> ที่อยู่ของฉัน
                 </NavLink>
+                <NavLink
+                    to="/profile/wishlist"
+                    className={({ isActive }) => isActive ? activeClassName : inactiveClassName}
+                >
+                    <Icon icon="ic:round-favorite" width="20" /> สิ่งที่อยากได้
+                </NavLink>
 
             </div>
         </div>

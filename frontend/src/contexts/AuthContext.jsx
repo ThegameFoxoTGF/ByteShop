@@ -73,6 +73,30 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const toggleWishlist = async (productId) => {
+        if (!user) return;
+
+        const currentWishlist = user.wishlist || [];
+        const isWished = currentWishlist.includes(productId);
+
+        try {
+            let res;
+            if (isWished) {
+                res = await userService.removeFromWishlist(productId);
+            } else {
+                res = await userService.addToWishlist(productId);
+            }
+
+            // Update local user state with new wishlist from backend
+            if (res.wishlist) {
+                updateUser({ wishlist: res.wishlist });
+            }
+        } catch (error) {
+            console.error("Wishlist toggle error", error);
+            throw error;
+        }
+    };
+
     const value = {
         user,
         loading,
@@ -80,6 +104,7 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         updateUser,
+        toggleWishlist,
         isAuthenticated,
         is_admin
     };

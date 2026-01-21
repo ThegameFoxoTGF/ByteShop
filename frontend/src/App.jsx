@@ -19,6 +19,7 @@ import AddressList from "./pages/AddressList";
 import Order from "./pages/Order";
 import Checkout from "./pages/Checkout";
 import ProductDetail from "./pages/ProductDetail";
+import WishlistPage from "./pages/WishlistPage";
 
 import Dashboard from "./pages/admin/Dashboard";
 import Forgot from "./pages/auth/Forgot";
@@ -59,6 +60,7 @@ function App() {
               <Route index element={<Profile />} />
               <Route path="orders" element={<OrderHistory />} />
               <Route path="address" element={<AddressList />} />
+              <Route path="wishlist" element={<WishlistPage />} />
             </Route>
           </Route>
         </Route>

@@ -4,17 +4,35 @@ import { Icon } from '@iconify/react';
 import { toast } from 'react-toastify';
 import productService from '../services/product.service';
 import cartService from '../services/cart.service';
+import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 
 function ProductDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { fetchCartCount } = useCart();
+    const { user, toggleWishlist } = useAuth();
+
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(null);
     const [addingToCart, setAddingToCart] = useState(false);
+
+    const isWishlisted = user?.wishlist?.includes(product?._id);
+
+    const handleWishlist = async () => {
+        if (!user) {
+            toast.info("กรุณาเข้าสู่ระบบเพื่อบันทึกรายการโปรด");
+            return;
+        }
+        try {
+            await toggleWishlist(product._id);
+            toast.success(isWishlisted ? "ลบออกจากรายการโปรดแล้ว" : "เพิ่มลงรายการโปรดเรียบร้อย");
+        } catch (error) {
+            toast.error("เกิดข้อผิดพลาด");
+        }
+    };
 
     useEffect(() => {
         fetchProduct();
@@ -206,9 +224,13 @@ function ProductDetail() {
                                 {addingToCart ? <Icon icon="eos-icons:loading" /> : <Icon icon="ic:round-add-shopping-cart" />}
                                 เพิ่มลงตะกร้า
                             </button>
-                            {/* <button className="w-12 h-12 flex items-center justify-center border border-slate-200 rounded-xl text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors">
-                                <Icon icon="ic:round-favorite-border" width="24" />
-                            </button> */}
+                            <button
+                                onClick={handleWishlist}
+                                className={`w-14 h-14 flex items-center justify-center border rounded-xl transition-all transform active:scale-95 ${isWishlisted ? 'border-red-500 bg-red-50 text-red-500 hover:shadow-lg hover:shadow-red-200' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-slate-50'}`}
+                                title={isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด"}
+                            >
+                                <Icon icon={isWishlisted ? "ic:round-favorite" : "ic:round-favorite-border"} width="28" />
+                            </button>
                         </div>
                     </div>
 

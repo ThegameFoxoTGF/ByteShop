@@ -7,16 +7,22 @@ import { Link } from 'react-router-dom';
 function OrderHistory() {
     const [orders, setOrders] = useState([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
+    const limit = 8;
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [page]);
 
     const fetchOrders = async () => {
         setLoadingOrders(true);
         try {
-            const res = await orderService.getAllOrders();
+            const res = await orderService.getAllOrders({ page, limit });
             setOrders(Array.isArray(res) ? res : (res.orders || []));
+            setTotalPages(res.pages || 1);
+            setTotal(res.total || 0);
         } catch (error) {
             console.error(error);
             toast.error('โหลดประวัติการสั่งซื้อไม่สำเร็จ');
@@ -53,7 +59,7 @@ function OrderHistory() {
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-            <h2 className="text-xl font-bold text-sea-text">ประวัติคำสั่งซื้อ</h2>
+            <h2 className="text-xl font-bold text-sea-text">ประวัติคำสั่งซื้อ ({total})</h2>
 
             {loadingOrders ? (
                 <div className="flex justify-center p-12"><Icon icon="eos-icons:loading" width="32" className="text-sea-primary" /></div>
@@ -64,47 +70,71 @@ function OrderHistory() {
                     <Link to="/" className="px-6 py-2 bg-sea-primary text-white rounded-lg hover:bg-sea-deep transition-colors">เลือกซื้อสินค้า</Link>
                 </div>
             ) : (
-                <div className="space-y-3">
-                    {orders.map(order => (
-                        <div key={order._id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-50">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-1">
-                                        <span className="font-mono font-bold text-sea-text text-lg">#{order.order_id}</span>
-                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                                            {getStatusText(order.status)}
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-slate-400">
-                                        {new Date(order.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                </div>
-                                <Link to={`/order/${order._id}`} className="px-4 py-2 text-sm font-medium text-sea-primary bg-sea-primary/5 hover:bg-sea-primary/10 rounded-lg transition-colors text-center">
-                                    ดูรายละเอียด
-                                </Link>
-
-                            </div>
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
-                                <div className="flex items-center gap-2">
-                                    {order.shipping_info?.tracking_number ? (
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm text-slate-500">เลขพัสดุ:</span>
-                                            <span className="font-mono font-bold text-sea-text bg-slate-50 px-2 py-1 rounded border border-slate-100 text-xs uppercase tracking-wider">
-                                                {order.shipping_info.tracking_number}
+                <>
+                    <div className="space-y-3">
+                        {orders.map(order => (
+                            <div key={order._id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-50 pb-3 mb-2">
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-1">
+                                            <span className="font-mono font-bold text-sea-text text-lg">#{order.order_id}</span>
+                                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
+                                                {getStatusText(order.status)}
                                             </span>
                                         </div>
-                                    ) : (
-                                        <span className="text-sm text-slate-400 italic">ยังไม่มีเลขพัสดุ</span>
-                                    )}
+                                        <p className="text-xs text-slate-400">
+                                            {new Date(order.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                    </div>
+                                    <Link to={`/order/${order._id}`} className="px-4 py-2 text-sm font-medium text-sea-primary bg-sea-primary/5 hover:bg-sea-primary/10 rounded-lg transition-colors text-center whitespace-nowrap">
+                                        ดูรายละเอียด
+                                    </Link>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-sm text-slate-500">ยอดสุทธิ</span>
-                                    <span className="text-xl font-bold text-sea-primary">฿{order.pricing_info?.total_price?.toLocaleString()}</span>
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div className="flex items-center gap-2">
+                                        {order.shipping_info?.tracking_number ? (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-slate-500">เลขพัสดุ:</span>
+                                                <span className="font-mono font-bold text-sea-text bg-slate-50 px-2 py-1 rounded border border-slate-100 text-xs uppercase tracking-wider">
+                                                    {order.shipping_info.tracking_number}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-sm text-slate-400 italic">ยังไม่มีเลขพัสดุ</span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm text-slate-500">ยอดสุทธิ</span>
+                                        <span className="text-xl font-bold text-sea-primary">฿{order.pricing_info?.total_price?.toLocaleString()}</span>
+                                    </div>
                                 </div>
                             </div>
+                        ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center mt-8 gap-2">
+                            <button
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-sea-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <Icon icon="ic:round-chevron-left" width="24" />
+                            </button>
+                            <div className="flex items-center gap-1 font-medium text-slate-600 bg-white px-4 border border-slate-200 rounded-lg">
+                                <span>{page}</span> <span className="text-slate-400">/</span> <span className="text-slate-400">{totalPages}</span>
+                            </div>
+                            <button
+                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                disabled={page === totalPages}
+                                className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-sea-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <Icon icon="ic:round-chevron-right" width="24" />
+                            </button>
                         </div>
-                    ))}
-                </div>
+                    )}
+                </>
             )}
         </div>
     );
