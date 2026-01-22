@@ -49,15 +49,16 @@ function CustomerListPage() {
         setPage(1); // Reset to first page
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("คุณแน่ใจหรือไม่ที่จะลบลูกค้ารายนี้?")) {
+    const handleToggleStatus = async (user) => {
+        const action = user.is_active ? "ระงับการใช้งาน" : "เปิดการใช้งาน";
+        if (window.confirm(`คุณแน่ใจหรือไม่ที่จะ${action}ผู้ใช้รายนี้?`)) {
             try {
-                await userService.deleteUser(id);
-                toast.success("ลบลูกค้าเรียบร้อยแล้ว");
+                await userService.toggleUserActive(user._id);
+                toast.success(`${action}ลูกค้าเรียบร้อยแล้ว`);
                 fetchUsers();
             } catch (error) {
                 console.error(error);
-                toast.error(error.response?.data?.message || "ลบลูกค้าไม่สำเร็จ");
+                toast.error(error.response?.data?.message || `${action}ลูกค้าไม่สำเร็จ`);
             }
         }
     };
@@ -126,15 +127,26 @@ function CustomerListPage() {
                                             <td className="px-6 py-4 text-sm text-slate-600">{user.email}</td>
                                             <td className="px-6 py-4 text-sm text-slate-600">{user.profile?.phone_number || '-'}</td>
                                             <td className="px-6 py-4">
-                                                {user.is_admin ? (
-                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
-                                                        <Icon icon="ic:round-admin-panel-settings" /> Admin
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
-                                                        <Icon icon="ic:round-person" /> User
-                                                    </span>
-                                                )}
+                                                <div className="flex flex-col items-start gap-1">
+                                                    {user.is_admin ? (
+                                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                                                            <Icon icon="ic:round-admin-panel-settings" /> Admin
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">
+                                                            <Icon icon="ic:round-person" /> User
+                                                        </span>
+                                                    )}
+                                                    {user.is_active ? (
+                                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
+                                                            <Icon icon="ic:round-check-circle" /> Active
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">
+                                                            <Icon icon="ic:round-cancel" /> Disabled
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-slate-500">
                                                 {new Date(user.createdAt).toLocaleDateString('th-TH', {
@@ -153,12 +165,12 @@ function CustomerListPage() {
                                                         <Icon icon="ic:round-receipt-long" width="20" />
                                                     </Link>
                                                     <button
-                                                        onClick={() => handleDelete(user._id)}
+                                                        onClick={() => handleToggleStatus(user)}
                                                         disabled={user.is_admin}
-                                                        className="text-slate-400 hover:text-red-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                                        title={user.is_admin ? "ไม่สามารถลบ Admin ได้" : "ลบข้อมูล"}
+                                                        className={`transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${user.is_active ? 'text-slate-400 hover:text-red-500' : 'text-slate-400 hover:text-green-500'}`}
+                                                        title={user.is_admin ? "ไม่สามารถจัดการ Admin ได้" : (user.is_active ? "ระงับการใช้งาน" : "เปิดการใช้งาน")}
                                                     >
-                                                        <Icon icon="ic:round-delete" width="20" />
+                                                        <Icon icon={user.is_active ? "ic:round-block" : "ic:round-check-circle"} width="20" />
                                                     </button>
                                                 </div>
                                             </td>

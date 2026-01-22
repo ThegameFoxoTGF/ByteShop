@@ -52,6 +52,10 @@ const authUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (user && (await user.matchPassword(password))) {
+        if (!user.is_active) {
+            res.status(401);
+            throw new Error("บัญชีของคุณถูกระงับการใช้งาน");
+        }
 
         generateToken(res, user._id);
         res.status(200).json({
@@ -353,19 +357,23 @@ const getUserById = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Delete user
-// @route   DELETE /api/user/:id
+// @desc    Toggle user active status
+// @route   PATCH /api/user/:id/active
 // @access  Private/Admin
-const deleteUser = asyncHandler(async (req, res) => {
+const toggleUserActive = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (user) {
         if (user.is_admin) {
             res.status(400);
-            throw new Error("ไม่สามารถลบผู้ใช้ที่เป็น admin ได้");
+            throw new Error("ไม่สามารถปิดการใช้งานผู้ใช้ที่เป็น admin ได้");
         }
-        await User.deleteOne({ _id: user._id });
-        res.json({ message: "ลบผู้ใช้เรียบร้อย" });
+        user.is_active = !user.is_active;
+        await user.save();
+        res.json({
+            message: user.is_active ? "เปิดการใช้งานผู้ใช้เรียบร้อย" : "ปิดการใช้งานผู้ใช้เรียบร้อย",
+            is_active: user.is_active
+        });
     } else {
         res.status(404);
         throw new Error("ไม่พบผู้ใช้");
@@ -441,7 +449,7 @@ export {
     updateUserProfile,
     updateUserPassword,
     getUsers,
-    deleteUser,
+    toggleUserActive,
     getUserById,
     updateUser,
     sendOtp,

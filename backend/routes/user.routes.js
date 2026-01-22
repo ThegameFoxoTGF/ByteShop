@@ -6,7 +6,7 @@ import {
   getUserProfile,
   updateUserProfile,
   getUsers,
-  deleteUser,
+  toggleUserActive,
   getUserById,
   updateUser,
   sendOtp,
@@ -73,7 +73,7 @@ router
 
 router
   .route("/:id")
-  .delete(protect, admin, deleteUser)
+  .patch(protect, admin, toggleUserActive)
   .get(protect, admin, getUserById)
   .put(protect, admin, updateUser);
 

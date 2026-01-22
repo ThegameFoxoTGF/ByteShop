@@ -28,8 +28,8 @@ const userService = {
         const response = await axiosClient.put(`/user/${id}`, userData);
         return response.data;
     },
-    deleteUser: async (id) => {
-        const response = await axiosClient.delete(`/user/${id}`);
+    toggleUserActive: async (id) => {
+        const response = await axiosClient.patch(`/user/${id}`);
         return response.data;
     },
 
