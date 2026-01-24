@@ -103,7 +103,7 @@ const getProducts = asyncHandler(async (req, res) => {
         const productsUnsorted = await Product.find({ _id: { $in: ids } })
             .populate("category_id", "name slug")
             .populate("brand_id", "name")
-            .select("name sku original_price discount selling_price stock main_image is_active category_id brand_id filters");
+            .select("name sku slug original_price discount selling_price stock main_image is_active category_id brand_id filters");
 
         products = ids.map(id => productsUnsorted.find(p => p._id.toString() === id.toString())).filter(Boolean);
 
@@ -117,7 +117,7 @@ const getProducts = asyncHandler(async (req, res) => {
         products = await Product.find(query)
             .populate("category_id", "name slug")
             .populate("brand_id", "name")
-            .select("name sku original_price discount selling_price stock main_image is_active category_id brand_id filters")
+            .select("name sku slug original_price discount selling_price stock main_image is_active category_id brand_id filters")
             .sort(sortOption)
             .limit(pageSize)
             .skip(pageSize * (pageNumber - 1));
