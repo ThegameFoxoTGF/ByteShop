@@ -178,24 +178,21 @@ function ProductFormPage() {
         }
     };
 
-    const [isSaved, setIsSaved] = useState(false);
+    const isSavedRef = React.useRef(false); // Track save status with ref to avoid closure staleness in cleanup
     const uploadedImagesRef = React.useRef([]); // Track new uploads for cleanup
 
     // Cleanup on unmount if not saved
     useEffect(() => {
         return () => {
-            if (!isSaved && uploadedImagesRef.current.length > 0) {
-                // Cleanup orphaned images
+            // Only cleanup if NOT saved and there are uploaded images
+            if (!isSavedRef.current && uploadedImagesRef.current.length > 0) {
+                console.log('Cleaning up orphaned images:', uploadedImagesRef.current);
                 uploadedImagesRef.current.forEach(public_id => {
                     uploadService.deleteImage(public_id).catch(err => console.error('Cleanup error:', err));
                 });
             }
         };
-    }, [isSaved]); // This effect runs on mount and cleans up on unmount based on isSaved value at that time? 
-    // Actually, ref value is current. We need to ensure we capture the specific closure or ref.
-    // React 18 strict mode might double invoke, but ref persists.
-    // BETTER: Use a separate function we call on "Cancel" explicitly, 
-    // but for browser close/nav, unmount is the only hook.
+    }, []);
 
     // Image Upload Helpers
     const handleMainImageUpload = async (e) => {
@@ -245,8 +242,7 @@ function ProductFormPage() {
         if (public_id) {
             try {
                 await uploadService.deleteImage(public_id);
-                // Remove from ref if it was just uploaded? 
-                // Creating a robust set might be better, but simple array filter is fine.
+                // Remove from ref if it was just uploaded
                 uploadedImagesRef.current = uploadedImagesRef.current.filter(id => id !== public_id);
             } catch (error) {
                 console.error("Failed to delete image", error);
@@ -354,11 +350,11 @@ function ProductFormPage() {
         try {
             if (isEditMode) {
                 await productService.updateProduct(id, payload);
-                setIsSaved(true);
+                isSavedRef.current = true;
                 toast.success('อัปเดตสินค้าเรียบร้อยแล้ว');
             } else {
                 await productService.createProduct(payload);
-                setIsSaved(true);
+                isSavedRef.current = true;
                 toast.success('สร้างสินค้าเรียบร้อยแล้ว');
             }
             navigate('/admin/products');
