@@ -10,7 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 function CartDrawer({ isOpen, onClose }) {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { fetchCartCount } = useCart();
+    const { fetchCartCount, updateCartCount } = useCart();
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [total, setTotal] = useState(0);
@@ -33,6 +33,7 @@ function CartDrawer({ isOpen, onClose }) {
 
             const items = response.items || [];
             setCartItems(items);
+            updateCartCount(items.length); // Sync global badge immediately without refetch
 
             if (response.total_price !== undefined) {
                 setTotal(response.total_price);
@@ -70,6 +71,12 @@ function CartDrawer({ isOpen, onClose }) {
 
     const handleUpdateQuantity = async (productId, newQuantity) => {
         if (newQuantity < 1) return;
+
+        const currentItem = cartItems.find(item => item.product._id === productId);
+        if (currentItem && newQuantity > currentItem.product.stock) {
+            toast.warning("ขออภัย จำนวนสินค้าไม่เพียงพอ");
+            return;
+        }
 
         // Optimistic UI Update
         const oldItems = [...cartItems];

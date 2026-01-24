@@ -34,8 +34,13 @@ export const CartProvider = ({ children }) => {
     fetchCartCount();
   }, [user]);
 
+  // Allow manual update of cart count (e.g. from CartDrawer after it fetches/updates)
+  const updateCartCount = (count) => {
+    setCartCount(count);
+  };
+
   return (
-    <CartContext.Provider value={{ cartCount, fetchCartCount }}>
+    <CartContext.Provider value={{ cartCount, fetchCartCount, updateCartCount }}>
       {children}
     </CartContext.Provider>
   );

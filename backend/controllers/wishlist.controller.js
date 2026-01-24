@@ -14,9 +14,15 @@ const getUserWishlist = asyncHandler(async (req, res) => {
         throw new Error("ไม่พบผู้ใช้");
     }
 
-    const count = await Product.countDocuments({ _id: { $in: user.wishlist } });
+    const count = await Product.countDocuments({
+        _id: { $in: user.wishlist },
+        is_active: true
+    });
 
-    const wishlist = await Product.find({ _id: { $in: user.wishlist } })
+    const wishlist = await Product.find({
+        _id: { $in: user.wishlist },
+        is_active: true
+    })
         .select("name selling_price original_price discount slug main_image stock")
         .limit(pageSize)
         .skip(pageSize * (pageNumber - 1));

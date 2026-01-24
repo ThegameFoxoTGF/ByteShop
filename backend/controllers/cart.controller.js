@@ -25,7 +25,7 @@ const getUserCart = asyncHandler(async (req, res) => {
     const cart = await Cart.findOne({ user: req.user._id })
         .populate({
             path: "items.product",
-            select: "name original_price selling_price discount main_image stock"
+            select: "name original_price selling_price discount main_image stock is_active"
         });
 
     if (!cart) {
@@ -35,6 +35,14 @@ const getUserCart = asyncHandler(async (req, res) => {
     }
 
     let isChanged = false;
+
+    // Filter out inactive products or nulls
+    const originalCount = cart.items.length;
+    cart.items = cart.items.filter(item => item.product && item.product.is_active);
+
+    if (cart.items.length !== originalCount) {
+        isChanged = true;
+    }
 
     cart.items.forEach(item => {
         const product = item.product;
@@ -55,7 +63,7 @@ const getUserCart = asyncHandler(async (req, res) => {
         _id: cart._id,
         items,
         total_price,
-        message: isChanged ? "รายการสินค้าบางรายการถูกปรับจำนวนลงเนื่องจากสินค้าคงเหลือไม่เพียงพอ" : undefined
+        message: isChanged ? "รายการสินค้าบางรายการถูกเปลี่ยนแปลงหรือนำออกเนื่องจากสถานะสินค้าเปลี่ยนไป" : undefined
     });
 });
 
