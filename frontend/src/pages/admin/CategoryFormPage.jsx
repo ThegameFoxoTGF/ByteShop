@@ -137,9 +137,15 @@ function CategoryFormPage() {
             const newList = [...prev];
             newList[index] = { ...newList[index], [field]: value };
 
-            // Auto-generate key from label for convenience if key is empty
-            if (field === 'label' && !newList[index].key) {
-                newList[index].key = simpleSlugify(value, '_');
+            if (field === 'label') {
+                const oldLabel = prev[index].label || '';
+                const oldKey = prev[index].key || '';
+
+                // Smart auto-generate: Update key if it was empty OR if it matched the previous label's slug
+                // This allows the key to "follow" the label until the user manually changes the key.
+                if (!oldKey || oldKey === simpleSlugify(oldLabel, '_')) {
+                    newList[index].key = simpleSlugify(value, '_');
+                }
             }
 
             return newList;
