@@ -2,58 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import adminService from '../../services/admin.service';
-
-const SalesChart = ({ data }) => {
-    // 1. Prepare last 7 days array
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (6 - i));
-        return d.toISOString().split('T')[0];
-    });
-
-    // 2. Map data to days
-    const chartData = last7Days.map(date => {
-        const found = data.find(item => item._id === date);
-        return {
-            date,
-            value: found ? found.total : 0,
-            label: new Date(date).toLocaleDateString('th-TH', { weekday: 'short' })
-        };
-    });
-
-    const maxValue = Math.max(...chartData.map(d => d.value), 1000); // Min max 1000 to avoid huge bars for small data
-
-    return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-full">
-            <h2 className="text-lg font-bold text-sea-text mb-6 flex items-center gap-2">
-                <Icon icon="ic:round-bar-chart" className="text-sea-primary" />
-                ยอดขาย 7 วันล่าสุด
-            </h2>
-            <div className="flex items-end justify-between gap-2 h-64 pb-2">
-                {chartData.map((item, index) => {
-                    const heightPercent = (item.value / maxValue) * 100;
-                    return (
-                        <div key={index} className="flex-1 flex flex-col items-center gap-2 group relative">
-                            {/* Tooltip */}
-                            <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-xs px-2 py-1 rounded pointer-events-none whitespace-nowrap z-10">
-                                ฿{item.value.toLocaleString()}
-                            </div>
-
-                            {/* Bar */}
-                            <div
-                                className="w-full max-w-[40px] bg-linear-to-t from-sea-primary/60 to-sea-primary rounded-t-lg transition-all duration-500 hover:from-sea-primary hover:to-sea-deep relative min-h-[4px]"
-                                style={{ height: `${heightPercent}%` }}
-                            ></div>
-
-                            {/* Label */}
-                            <span className="text-xs text-slate-400 font-medium">{item.label}</span>
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
-    );
-};
+import SalesChart from '../../components/admin/SalesChart';
 
 function Dashboard() {
     const [stats, setStats] = useState(null);
@@ -90,7 +39,7 @@ function Dashboard() {
             title: "ยอดขายรวม",
             value: `฿${stats.totalSales.toLocaleString()}`,
             icon: "ic:round-monetization-on",
-            className: "bg-linear-to-br from-green-500 to-emerald-600 text-white shadow-green-500/20",
+            className: "bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-green-500/20",
             desc: "รายได้ทั้งหมดที่ชำระแล้ว",
             iconColor: "text-white/80"
         },
@@ -209,7 +158,7 @@ function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left: Sales Chart (Takes up 2 cols) */}
                 <div className="lg:col-span-2">
-                    <SalesChart data={stats.salesChart || []} />
+                    <SalesChart initialData={stats.salesChart} />
                 </div>
 
                 {/* Right: Quick Actions / Low Stock (Takes up 1 col) */}

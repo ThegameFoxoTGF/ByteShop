@@ -158,7 +158,7 @@ function OrderFormPage() {
                         </span>
                     </h1>
                     <p className="text-sea-subtext mt-1">
-                        สั่งซื้อเมื่อ {new Date(order.createdAt).toLocaleString()}
+                        สั่งซื้อเมื่อ {new Date(order.createdAt).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' })} {new Date(order.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                     </p>
                 </div>
 

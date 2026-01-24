@@ -69,6 +69,9 @@ function Checkout() {
             const defaultAddr = addrList.find(a => a.is_default);
             if (defaultAddr) {
                 fillAddress(defaultAddr);
+            } else if (addrList.length > 0 && !selectedAddressId) {
+                // Determine logic: If no default is set, select the first one automatically
+                fillAddress(addrList[0]);
             }
         } catch (error) {
             console.error("Failed to fetch addresses", error);
@@ -112,6 +115,7 @@ function Checkout() {
         if (!couponCode.trim()) return;
         setCouponError('');
         try {
+            await new Promise(resolve => setTimeout(resolve, 1000));
             const res = await couponService.checkCoupon({
                 code: couponCode,
                 subtotal: calculateSubtotal()
@@ -139,6 +143,7 @@ function Checkout() {
         setSubmitting(true);
 
         try {
+            await new Promise(resolve => setTimeout(resolve, 1000));
             if (!shippingAddress.name || !shippingAddress.address_line || !shippingAddress.district || !shippingAddress.province || !shippingAddress.zip_code || !shippingAddress.phone_number) {
                 toast.error('กรุณากรอกข้อมูลผู้รับและที่อยู่จัดส่งให้ครบถ้วน');
                 setSubmitting(false);
@@ -358,7 +363,7 @@ function Checkout() {
 
                             {appliedCoupon && (
                                 <div className="flex justify-between text-green-600">
-                                    <span className="flex items-center gap-1"><Icon icon="ic:round-discount" /> ส่วนลด ({appliedCoupon.code})</span>
+                                    <span className="flex items-center gap-1"><Icon icon="ic:round-discount" /> ส่วนลด ({appliedCoupon.coupon_code})</span>
                                     <span>-฿{calculateDiscount().toLocaleString()}</span>
                                 </div>
                             )}

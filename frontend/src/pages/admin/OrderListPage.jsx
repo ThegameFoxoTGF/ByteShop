@@ -191,7 +191,7 @@ function OrderListPage() {
                                             <div className="text-xs text-slate-400">{order.user_id?.email}</div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-slate-600">
-                                            {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString()}
+                                            {new Date(order.createdAt).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' })} {new Date(order.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                         </td>
                                         <td className="px-6 py-4 font-semibold text-sea-text">
                                             ฿{order.pricing_info?.total_price?.toLocaleString() || order.total_price?.toLocaleString()}

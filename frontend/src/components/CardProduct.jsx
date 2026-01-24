@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +10,8 @@ function CardProduct({ product }) {
     // Default empty state handling
     if (!product) return null;
 
+    const [wishlistLoading, setWishlistLoading] = useState(false);
+
     const isWishlisted = user?.wishlist?.includes(product._id);
 
     const handleWishlist = async (e) => {
@@ -18,11 +20,17 @@ function CardProduct({ product }) {
             toast.info("กรุณาเข้าสู่ระบบเพื่อบันทึกรายการโปรด");
             return;
         }
+        if (wishlistLoading) return;
+
+        setWishlistLoading(true);
         try {
+            await new Promise(resolve => setTimeout(resolve, 200));
             await toggleWishlist(product._id);
             toast.success(isWishlisted ? "ลบออกจากรายการโปรดแล้ว" : "เพิ่มลงรายการโปรดเรียบร้อย");
         } catch (error) {
             toast.error("เกิดข้อผิดพลาด");
+        } finally {
+            setWishlistLoading(false);
         }
     };
 
@@ -66,14 +74,19 @@ function CardProduct({ product }) {
                 {/* Wishlist Button */}
                 <button
                     onClick={handleWishlist}
+                    disabled={wishlistLoading}
                     className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-white transition-all transform hover:scale-110"
                     title={isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด"}
                 >
-                    <Icon
-                        icon={isWishlisted ? "ic:round-favorite" : "ic:round-favorite-border"}
-                        className={isWishlisted ? "text-red-500" : ""}
-                        width="20"
-                    />
+                    {wishlistLoading ? (
+                        <Icon icon="eos-icons:loading" width="20" />
+                    ) : (
+                        <Icon
+                            icon={isWishlisted ? "ic:round-favorite" : "ic:round-favorite-border"}
+                            className={isWishlisted ? "text-red-500" : ""}
+                            width="20"
+                        />
+                    )}
                 </button>
 
                 {/* Quick Action Overlay (Mobile hidden, Desktop show on hover) */}

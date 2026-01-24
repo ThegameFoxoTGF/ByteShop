@@ -70,19 +70,32 @@ function CartDrawer({ isOpen, onClose }) {
 
     const handleUpdateQuantity = async (productId, newQuantity) => {
         if (newQuantity < 1) return;
-        try {
-            const response = await cartService.updateCartItem(productId, newQuantity);
 
-            if (response.message) {
-                toast.info(response.message);
+        // Optimistic UI Update
+        const oldItems = [...cartItems];
+        const updatedItems = cartItems.map(item => {
+            if (item.product._id === productId) {
+                return { ...item, quantity: newQuantity };
             }
+            return item;
+        });
 
-            await fetchCartCount();
-            loadCart();
+        // Update local state immediately
+        setCartItems(updatedItems);
+        calculateTotal(updatedItems);
+
+        try {
+            // Send request silently
+            await cartService.updateCartItem(productId, newQuantity);
+            await fetchCartCount(); // Sync badge in background works fine
         } catch (error) {
             console.error("Failed to update quantity", error);
             const message = error.response?.data?.message || "Failed to update quantity";
             toast.error(message);
+
+            // Revert on error
+            setCartItems(oldItems);
+            calculateTotal(oldItems);
         }
     };
 

@@ -8,6 +8,11 @@ const addAddress = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
+    // If this is the first address, make it default automatically
+    if (user.address.length === 0) {
+      req.body.is_default = true;
+    }
+
     if (req.body.is_default) {
       user.address.forEach((address) => {
         address.is_default = false;

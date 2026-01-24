@@ -64,6 +64,7 @@ function Profile() {
     e.preventDefault();
     setLoading(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
       const payload = {
         first_name: formData.first_name,
         last_name: formData.last_name,
@@ -76,10 +77,10 @@ function Profile() {
 
       const flattenedUser = {
         ...user,
-        first_name: updatedUser.profile.first_name,
-        last_name: updatedUser.profile.last_name,
-        phone_number: updatedUser.profile.phone_number,
-        birthday: updatedUser.profile.birthday,
+        first_name: updatedUser.first_name,
+        last_name: updatedUser.last_name,
+        phone_number: updatedUser.phone_number,
+        birthday: updatedUser.birthday,
         email: updatedUser.email
       };
 
@@ -106,6 +107,7 @@ function Profile() {
 
     setLoading(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
       await authService.sendOtp(user.email);
       setOtpSent(true);
       setResendTimer(60);
@@ -124,6 +126,7 @@ function Profile() {
 
     setLoading(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
       await userService.updatePassword({
         otp: passwordData.otp,
         newPassword: passwordData.newPassword
@@ -263,14 +266,6 @@ function Profile() {
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-sea-text">ข้อมูลส่วนตัว</h1>
-        {!isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="text-sea-primary hover:bg-sea-primary/10 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
-          >
-            <Icon icon="ic:round-edit" /> แก้ไข
-          </button>
-        )}
       </div>
 
       <div className="bg-white h-full min-h-[500px] p-8 rounded-2xl shadow-sm border border-slate-100 relative">
@@ -372,7 +367,15 @@ function Profile() {
               </div>
               <div>
                 <h3 className="font-bold text-lg text-slate-800">{user?.first_name} {user?.last_name}</h3>
+                <p className="text-slate-500 text-sm">{user?.email}</p>
               </div>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="ml-auto px-6 py-3 bg-sea-primary text-white text-base font-bold rounded-xl shadow-lg shadow-sea-primary/30 hover:bg-sea-deep hover:-translate-y-0.5 transition-all flex items-center gap-2"
+              >
+                <Icon icon="ic:round-edit" width="20" />
+                แก้ไขข้อมูล
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -401,15 +404,20 @@ function Profile() {
               </div>
               <div
                 onClick={() => setIsChangingPassword(true)}
-                className="p-4 rounded-xl border border-slate-100 hover:border-sea-primary hover:bg-sea-primary/5 transition-all cursor-pointer group flex items-center justify-between"
+                className="p-4 rounded-xl border border-red-100 bg-red-50 hover:bg-red-100 hover:border-red-200 transition-all cursor-pointer group flex items-center justify-between shadow-sm hover:shadow-md"
               >
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
-                    <Icon icon="ic:round-lock" className="group-hover:text-sea-primary transition-colors" /> รหัสผ่าน
-                  </label>
-                  <div className="text-slate-800 font-medium">**********</div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-red-500 shadow-sm border border-red-100 group-hover:scale-110 transition-transform">
+                    <Icon icon="ic:round-lock-reset" width="20" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">เปลี่ยนรหัสผ่าน</h4>
+                    <p className="text-xs text-slate-500">เพื่อความปลอดภัยของบัญชี</p>
+                  </div>
                 </div>
-                <Icon icon="ic:round-arrow-forward-ios" className="text-slate-300 group-hover:text-sea-primary group-hover:translate-x-1 transition-all" />
+                <div className="px-3 py-1.5 bg-white text-red-500 text-sm font-bold rounded-lg border border-red-100 shadow-sm group-hover:px-4 transition-all">
+                  แก้ไข
+                </div>
               </div>
             </div>
           </div>

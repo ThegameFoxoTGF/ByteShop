@@ -55,15 +55,19 @@ const getDashboardStats = asyncHandler(async (req, res) => {
         .limit(5)
         .populate('user_id', 'id email profile');
 
-    // 6. Sales Chart Data (Last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    sevenDaysAgo.setHours(0, 0, 0, 0); // Start from beginning of the day
+    // 6. Sales Chart Data
+    // Check range from query: '7d', '30d'
+    const range = req.query.range || '7d';
+    const daysToSubtract = range === '30d' ? 30 : 7;
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - daysToSubtract);
+    startDate.setHours(0, 0, 0, 0); // Start from beginning of the day
 
     const salesChart = await Order.aggregate([
         {
             $match: {
-                createdAt: { $gte: sevenDaysAgo },
+                createdAt: { $gte: startDate },
                 ...salesCondition
             }
         },
@@ -96,6 +100,66 @@ const getDashboardStats = asyncHandler(async (req, res) => {
     });
 });
 
+const getSalesChart = asyncHandler(async (req, res) => {
+    const range = req.query.range || '7d';
+
+    // Define logic based on range
+    let startDate = new Date();
+    let dateFormat = "%Y-%m-%d";
+
+    if (range === '1y') {
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        startDate.setHours(0, 0, 0, 0);
+        dateFormat = "%Y-%m"; // Group by month
+    } else if (range === '1m') {
+        startDate.setDate(startDate.getDate() - 30);
+        startDate.setHours(0, 0, 0, 0);
+    } else {
+        // Default 7d
+        startDate.setDate(startDate.getDate() - 7);
+        startDate.setHours(0, 0, 0, 0);
+    }
+
+    // Reuse the same sales condition
+    const salesCondition = {
+        $or: [
+            {
+                payment_method: { $ne: 'cod' },
+                status: { $in: ['paid', 'processing', 'shipped', 'completed'] }
+            },
+            {
+                payment_method: 'cod',
+                status: 'completed'
+            }
+        ]
+    };
+
+    const salesChart = await Order.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: startDate },
+                ...salesCondition
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    $dateToString: {
+                        format: dateFormat,
+                        date: "$createdAt",
+                        timezone: "+07:00"
+                    }
+                },
+                total: { $sum: "$pricing_info.total_price" }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
+
+    res.json(salesChart);
+});
+
 export {
-    getDashboardStats
+    getDashboardStats,
+    getSalesChart
 };

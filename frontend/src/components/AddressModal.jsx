@@ -57,9 +57,13 @@ function AddressModal({ isOpen, onClose, onSuccess, addressToEdit = null }) {
         }));
     };
 
+    const [loading, setLoading] = useState(false);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
+            await new Promise(resolve => setTimeout(resolve, 1000));
             if (addressToEdit) {
                 await userService.updateShippingAddress(addressToEdit._id, formData);
                 toast.success('แก้ไขที่อยู่เรียบร้อย');
@@ -72,6 +76,8 @@ function AddressModal({ isOpen, onClose, onSuccess, addressToEdit = null }) {
         } catch (error) {
             console.error(error);
             toast.error(error.response?.data?.message || 'บันทึกข้อมูลไม่สำเร็จ');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -215,9 +221,10 @@ function AddressModal({ isOpen, onClose, onSuccess, addressToEdit = null }) {
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 py-3 bg-sea-primary text-white font-bold rounded-xl hover:bg-sea-deep transition-all shadow-lg shadow-sea-primary/20 active:scale-95 translate-y-0"
+                            disabled={loading}
+                            className="flex-1 py-3 bg-sea-primary text-white font-bold rounded-xl hover:bg-sea-deep transition-all shadow-lg shadow-sea-primary/20 active:scale-95 translate-y-0 flex items-center justify-center gap-2"
                         >
-                            บันทึก
+                            {loading ? <Icon icon="eos-icons:loading" /> : 'บันทึก'}
                         </button>
                     </div>
                 </form>
