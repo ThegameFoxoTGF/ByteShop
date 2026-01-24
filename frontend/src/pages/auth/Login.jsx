@@ -18,7 +18,7 @@ function Login() {
         setLoading(true);
         try {
             const userData = await login(email, password);
-            toast.success("Welcome back!");
+            toast.success("เข้าสู่ระบบเรียบร้อย");
 
             if (userData.isAdmin) {
                 navigate('/admin/dashboard');
@@ -27,7 +27,7 @@ function Login() {
             }
         } catch (error) {
             console.error(error);
-            toast.error(error.response?.data?.message || "Failed to login");
+            toast.error(error.response?.data?.message || "เข้าสู่ระบบไม่สำเร็จ");
         } finally {
             setLoading(false);
         }

@@ -6,7 +6,6 @@ const fieldTemplate = new mongoose.Schema({
   value: { type: String },
   type: { type: String },
   unit: { type: String },
-  options: [String]
 }, { _id: false })
 
 const ProductSchema = new mongoose.Schema(

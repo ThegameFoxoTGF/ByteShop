@@ -57,7 +57,7 @@ function Navbar() {
             </div>
             <input
               type="text"
-              placeholder="ค้นหาสินค้าที่ต้องการ..."
+              placeholder="ค้นหาสินค้า..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="block w-full pl-10 pr-4 py-2.5 bg-sea-light/50 border border-transparent rounded-full text-sm text-sea-text placeholder-sea-muted focus:outline-none focus:bg-white focus:border-sea-primary/30 focus:ring-4 focus:ring-sea-primary/10 transition-all duration-300"
@@ -113,12 +113,27 @@ function Navbar() {
                         </div>
                         โปรไฟล์ของฉัน
                       </button>
-                      {/* <button onClick={() => { navigate("/order"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
+
+                      <button onClick={() => { navigate("/profile/orders"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
                         <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
-                          <Icon icon="ic:round-receipt-long" width="18" height="18" />
+                          <Icon icon="ic:round-history" width="18" height="18" />
                         </div>
-                        คำสั่งซื้อของฉัน
-                      </button> */}
+                        ประวัติคำสั่งซื้อ
+                      </button>
+
+                      <button onClick={() => { navigate("/profile/address"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
+                        <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
+                          <Icon icon="ic:round-location-on" width="18" height="18" />
+                        </div>
+                        ที่อยู่ของฉัน
+                      </button>
+
+                      <button onClick={() => { navigate("/profile/wishlist"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
+                        <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
+                          <Icon icon="ic:round-favorite" width="18" height="18" />
+                        </div>
+                        สิ่งที่อยากได้
+                      </button>
                     </div>
 
                     {is_admin && (

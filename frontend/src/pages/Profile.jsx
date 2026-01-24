@@ -142,124 +142,127 @@ function Profile() {
 
   if (isChangingPassword) {
     return (
-      <div className="bg-white h-full min-h-[500px] p-8 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in slide-in-from-right-4 duration-500 relative">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-sea-text flex items-center gap-2">
+      <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-sea-text flex items-center gap-2">
             <button onClick={() => setIsChangingPassword(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
-              <Icon icon="ic:round-arrow-back" />
+              <Icon icon="ic:round-arrow-back" width="28" />
             </button>
             เปลี่ยนรหัสผ่าน
-          </h2>
+          </h1>
         </div>
 
-        <form onSubmit={handleSubmitPassword} className="space-y-6 max-w-lg">
-          <div className="bg-blue-50 p-4 rounded-xl text-sm text-blue-700 mb-6 flex gap-3">
-            <Icon icon="ic:round-info" className="text-xl shrink-0 mt-0.5" />
-            <div>
-              <p className="font-bold mb-1">ขั้นตอนการเปลี่ยนรหัสผ่าน (เพื่อความปลอดภัย)</p>
-              <ul className="list-disc list-inside space-y-1 opacity-90">
-                <li>กรอกรหัสผ่านใหม่ที่ต้องการ</li>
-                <li>กดปุ่ม "ส่ง OTP" เพื่อรับรหัสยืนยันทางอีเมล</li>
-                <li>นำรหัส OTP 6 หลักมากรอกเพื่อยืนยัน</li>
-              </ul>
+        <div className="bg-white h-full min-h-[500px] p-8 rounded-2xl shadow-sm border border-slate-100 relative">
+
+          <form onSubmit={handleSubmitPassword} className="space-y-6 max-w-lg">
+            <div className="bg-blue-50 p-4 rounded-xl text-sm text-blue-700 mb-6 flex gap-3">
+              <Icon icon="ic:round-info" className="text-xl shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold mb-1">ขั้นตอนการเปลี่ยนรหัสผ่าน (เพื่อความปลอดภัย)</p>
+                <ul className="list-disc list-inside space-y-1 opacity-90">
+                  <li>กรอกรหัสผ่านใหม่ที่ต้องการ</li>
+                  <li>กดปุ่ม "ส่ง OTP" เพื่อรับรหัสยืนยันทางอีเมล</li>
+                  <li>นำรหัส OTP 6 หลักมากรอกเพื่อยืนยัน</li>
+                </ul>
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">รหัสผ่านใหม่</label>
-            <input
-              type="password"
-              name="newPassword"
-              value={passwordData.newPassword}
-              onChange={handlePasswordChange}
-              disabled={otpSent}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary disabled:bg-slate-50 disabled:text-slate-400"
-              placeholder="รหัสผ่านอย่างน้อย 6 ตัวอักษร"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">ยืนยันรหัสผ่านใหม่</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={passwordData.confirmPassword}
-              onChange={handlePasswordChange}
-              disabled={otpSent}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary disabled:bg-slate-50 disabled:text-slate-400"
-              placeholder="กรอกรหัสผ่านอีกครั้ง"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">รหัสผ่านใหม่</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+                disabled={otpSent}
+                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary disabled:bg-slate-50 disabled:text-slate-400"
+                placeholder="รหัสผ่านอย่างน้อย 6 ตัวอักษร"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">ยืนยันรหัสผ่านใหม่</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                disabled={otpSent}
+                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary disabled:bg-slate-50 disabled:text-slate-400"
+                placeholder="กรอกรหัสผ่านอีกครั้ง"
+              />
+            </div>
 
-          {/* OTP Section */}
-          <div className="pt-2 border-t border-slate-100">
-            {!otpSent ? (
-              <button
-                type="button"
-                onClick={handleSendOtp}
-                disabled={!passwordData.newPassword || !passwordData.confirmPassword || loading}
-                className="w-full py-2.5 rounded-xl bg-slate-800 text-white font-medium hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-              >
-                {loading ? <Icon icon="eos-icons:loading" /> : <Icon icon="ic:round-send" />}
-                ส่ง OTP ยืนยัน
-              </button>
-            ) : (
-              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-sm font-medium text-slate-700">รหัส OTP</label>
+            {/* OTP Section */}
+            <div className="pt-2 border-t border-slate-100">
+              {!otpSent ? (
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={!passwordData.newPassword || !passwordData.confirmPassword || loading}
+                  className="w-full py-2.5 rounded-xl bg-slate-800 text-white font-medium hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                >
+                  {loading ? <Icon icon="eos-icons:loading" /> : <Icon icon="ic:round-send" />}
+                  ส่ง OTP ยืนยัน
+                </button>
+              ) : (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-sm font-medium text-slate-700">รหัส OTP</label>
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={resendTimer > 0 || loading}
+                        className="text-xs text-sea-primary hover:underline disabled:text-slate-400 disabled:no-underline"
+                      >
+                        {resendTimer > 0 ? `ส่งใหม่ใน ${resendTimer}s` : 'ส่งรหัสใหม่'}
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      name="otp"
+                      value={passwordData.otp}
+                      onChange={handlePasswordChange}
+                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary text-center tracking-widest font-bold text-lg"
+                      placeholder="XXXXXX"
+                      maxLength={6}
+                    />
+                    <p className="text-xs text-slate-500 mt-1">รหัสถูกส่งไปที่ {user?.email}</p>
+                  </div>
+
+                  <div className="flex gap-3">
                     <button
                       type="button"
-                      onClick={handleSendOtp}
-                      disabled={resendTimer > 0 || loading}
-                      className="text-xs text-sea-primary hover:underline disabled:text-slate-400 disabled:no-underline"
+                      onClick={() => {
+                        setOtpSent(false);
+                        setPasswordData(prev => ({ ...prev, otp: "" }));
+                      }}
+                      className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium"
                     >
-                      {resendTimer > 0 ? `ส่งใหม่ใน ${resendTimer}s` : 'ส่งรหัสใหม่'}
+                      แก้ไขรหัสผ่าน
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={!passwordData.otp || loading}
+                      className="flex-2 py-2.5 rounded-xl bg-sea-primary text-white font-bold hover:bg-sea-deep shadow-lg shadow-sea-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                    >
+                      {loading ? <Icon icon="eos-icons:loading" /> : <Icon icon="ic:round-check-circle" />}
+                      ยืนยันการเปลี่ยนรหัสผ่าน
                     </button>
                   </div>
-                  <input
-                    type="text"
-                    name="otp"
-                    value={passwordData.otp}
-                    onChange={handlePasswordChange}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary text-center tracking-widest font-bold text-lg"
-                    placeholder="XXXXXX"
-                    maxLength={6}
-                  />
-                  <p className="text-xs text-slate-500 mt-1">รหัสถูกส่งไปที่ {user?.email}</p>
                 </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOtpSent(false);
-                      setPasswordData(prev => ({ ...prev, otp: "" }));
-                    }}
-                    className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium"
-                  >
-                    แก้ไขรหัสผ่าน
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!passwordData.otp || loading}
-                    className="flex-2 py-2.5 rounded-xl bg-sea-primary text-white font-bold hover:bg-sea-deep shadow-lg shadow-sea-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                  >
-                    {loading ? <Icon icon="eos-icons:loading" /> : <Icon icon="ic:round-check-circle" />}
-                    ยืนยันการเปลี่ยนรหัสผ่าน
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </form>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white h-full min-h-[500px] p-8 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in slide-in-from-right-4 duration-500 relative">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-sea-text">ข้อมูลส่วนตัว</h2>
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-sea-text">ข้อมูลส่วนตัว</h1>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
@@ -270,145 +273,148 @@ function Profile() {
         )}
       </div>
 
-      {isEditing ? (
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">ชื่อ</label>
-              <input
-                type="text"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">นามสกุล</label>
-              <input
-                type="text"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
-                required
-              />
-            </div>
-          </div>
+      <div className="bg-white h-full min-h-[500px] p-8 rounded-2xl shadow-sm border border-slate-100 relative">
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">อีเมล</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary bg-slate-50 text-slate-500 cursor-not-allowed"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">เบอร์โทรศัพท์</label>
-            <input
-              type="tel"
-              name="phone_number"
-              value={formData.phone_number}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
-              placeholder="08x-xxx-xxxx"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">วันเกิด</label>
-            <input
-              type="date"
-              name="birthday"
-              value={formData.birthday}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
-            />
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={() => {
-                setIsEditing(false);
-                setFormData({
-                  first_name: user.first_name || "",
-                  last_name: user.last_name || "",
-                  email: user.email || "",
-                  phone_number: user.phone_number || "",
-                  birthday: user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : "",
-                });
-              }}
-              className="px-6 py-2 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors"
-              disabled={loading}
-            >
-              ยกเลิก
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2 rounded-xl bg-sea-primary text-white font-bold shadow-lg shadow-sea-primary/30 hover:bg-sea-deep transition-all flex items-center gap-2"
-            >
-              {loading && <Icon icon="eos-icons:loading" />}
-              บันทึก
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="space-y-6">
-          <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-sea-primary text-2xl font-bold border border-slate-100 shadow-sm">
-              {user?.first_name?.[0].toUpperCase()}
-            </div>
-            <div>
-              <h3 className="font-bold text-lg text-slate-800">{user?.first_name} {user?.last_name}</h3>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-4 rounded-xl border border-slate-100 hover:border-sea-primary/30 transition-colors group">
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
-                <Icon icon="ic:round-email" className="group-hover:text-sea-primary transition-colors" /> อีเมล
-              </label>
-              <div className="text-slate-800 font-medium">{user?.email}</div>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-100 hover:border-sea-primary/30 transition-colors group">
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
-                <Icon icon="ic:round-phone" className="group-hover:text-sea-primary transition-colors" /> เบอร์โทรศัพท์
-              </label>
-              <div className="text-slate-800 font-medium">{user?.phone_number || '-'}</div>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-100 hover:border-sea-primary/30 transition-colors group">
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
-                <Icon icon="ic:round-cake" className="group-hover:text-sea-primary transition-colors" /> วันเกิด
-              </label>
-              <div className="text-slate-800 font-medium">
-                {user?.birthday
-                  ? new Date(user.birthday).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })
-                  : '-'
-                }
-              </div>
-            </div>
-            <div
-              onClick={() => setIsChangingPassword(true)}
-              className="p-4 rounded-xl border border-slate-100 hover:border-sea-primary hover:bg-sea-primary/5 transition-all cursor-pointer group flex items-center justify-between"
-            >
+        {isEditing ? (
+          <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
-                  <Icon icon="ic:round-lock" className="group-hover:text-sea-primary transition-colors" /> รหัสผ่าน
-                </label>
-                <div className="text-slate-800 font-medium">**********</div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">ชื่อ</label>
+                <input
+                  type="text"
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
+                  required
+                />
               </div>
-              <Icon icon="ic:round-arrow-forward-ios" className="text-slate-300 group-hover:text-sea-primary group-hover:translate-x-1 transition-all" />
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">นามสกุล</label>
+                <input
+                  type="text"
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">อีเมล</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary bg-slate-50 text-slate-500 cursor-not-allowed"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">เบอร์โทรศัพท์</label>
+              <input
+                type="tel"
+                name="phone_number"
+                value={formData.phone_number}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
+                placeholder="08x-xxx-xxxx"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">วันเกิด</label>
+              <input
+                type="date"
+                name="birthday"
+                value={formData.birthday}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
+              />
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditing(false);
+                  setFormData({
+                    first_name: user.first_name || "",
+                    last_name: user.last_name || "",
+                    email: user.email || "",
+                    phone_number: user.phone_number || "",
+                    birthday: user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : "",
+                  });
+                }}
+                className="px-6 py-2 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors"
+                disabled={loading}
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-6 py-2 rounded-xl bg-sea-primary text-white font-bold shadow-lg shadow-sea-primary/30 hover:bg-sea-deep transition-all flex items-center gap-2"
+              >
+                {loading && <Icon icon="eos-icons:loading" />}
+                บันทึก
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-sea-primary text-2xl font-bold border border-slate-100 shadow-sm">
+                {user?.first_name?.[0].toUpperCase()}
+              </div>
+              <div>
+                <h3 className="font-bold text-lg text-slate-800">{user?.first_name} {user?.last_name}</h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 rounded-xl border border-slate-100 hover:border-sea-primary/30 transition-colors group">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
+                  <Icon icon="ic:round-email" className="group-hover:text-sea-primary transition-colors" /> อีเมล
+                </label>
+                <div className="text-slate-800 font-medium">{user?.email}</div>
+              </div>
+              <div className="p-4 rounded-xl border border-slate-100 hover:border-sea-primary/30 transition-colors group">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
+                  <Icon icon="ic:round-phone" className="group-hover:text-sea-primary transition-colors" /> เบอร์โทรศัพท์
+                </label>
+                <div className="text-slate-800 font-medium">{user?.phone_number || '-'}</div>
+              </div>
+              <div className="p-4 rounded-xl border border-slate-100 hover:border-sea-primary/30 transition-colors group">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
+                  <Icon icon="ic:round-cake" className="group-hover:text-sea-primary transition-colors" /> วันเกิด
+                </label>
+                <div className="text-slate-800 font-medium">
+                  {user?.birthday
+                    ? new Date(user.birthday).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })
+                    : '-'
+                  }
+                </div>
+              </div>
+              <div
+                onClick={() => setIsChangingPassword(true)}
+                className="p-4 rounded-xl border border-slate-100 hover:border-sea-primary hover:bg-sea-primary/5 transition-all cursor-pointer group flex items-center justify-between"
+              >
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-500 mb-2">
+                    <Icon icon="ic:round-lock" className="group-hover:text-sea-primary transition-colors" /> รหัสผ่าน
+                  </label>
+                  <div className="text-slate-800 font-medium">**********</div>
+                </div>
+                <Icon icon="ic:round-arrow-forward-ios" className="text-slate-300 group-hover:text-sea-primary group-hover:translate-x-1 transition-all" />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

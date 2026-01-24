@@ -19,18 +19,18 @@ function Register() {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-            toast.error("Passwords do not match");
+            toast.error("รหัสผ่านไม่ตรงกัน");
             return;
         }
 
         setLoading(true);
         try {
             await register(email, password);
-            toast.success("Registration successful!");
+            toast.success("สมัครสมาชิกเรียบร้อย");
             navigate('/');
         } catch (error) {
             console.error(error);
-            toast.error(error.response?.data?.message || "Failed to register");
+            toast.error(error.response?.data?.message || "สมัครสมาชิกไม่สำเร็จ");
         } finally {
             setLoading(false);
         }

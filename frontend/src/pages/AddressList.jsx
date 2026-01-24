@@ -54,7 +54,7 @@ function AddressList() {
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-sea-text">ที่อยู่ของฉัน</h2>
+                <h1 className="text-2xl font-bold text-sea-text">ที่อยู่ของฉัน</h1>
                 <button
                     onClick={() => openModal()}
                     className="flex items-center gap-2 px-4 py-2 bg-sea-primary text-white rounded-xl hover:bg-sea-deep transition-all shadow-lg shadow-sea-primary/20"

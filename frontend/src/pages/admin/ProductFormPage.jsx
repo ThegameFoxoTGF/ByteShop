@@ -609,6 +609,20 @@ function ProductFormPage() {
                                             placeholder={`ระบุ ${spec.label}`}
                                         />
                                         {spec.unit && <span className="text-xs text-slate-500 mt-1">หน่วย: {spec.unit}</span>}
+                                        {spec.type === 'select' && spec.options && (
+                                            <select
+                                                value={getSpecValue(spec.key)}
+                                                onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
+                                                className="mt-2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sea-primary"
+                                            >
+                                                <option value="">เลือก {spec.label}</option>
+                                                {spec.options.map((option, index) => (
+                                                    <option key={index} value={option}>
+                                                        {option}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -666,16 +680,6 @@ function ProductFormPage() {
                                 <span className="text-sm font-medium text-sea-text">เปิดขายสินค้า (Active)</span>
                             </label>
 
-                            <label className="flex items-center gap-3 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    name="is_featured"
-                                    checked={formData.is_featured}
-                                    onChange={handleInputChange}
-                                    className="w-5 h-5 rounded text-sea-primary focus:ring-sea-primary"
-                                />
-                                <span className="text-sm font-medium text-sea-text">สินค้าแนะนำ (Featured)</span>
-                            </label>
                         </div>
                     </div>
 

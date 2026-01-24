@@ -59,7 +59,7 @@ function OrderHistory() {
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-            <h2 className="text-xl font-bold text-sea-text">ประวัติคำสั่งซื้อ ({total})</h2>
+            <h1 className="text-2xl font-bold text-sea-text">ประวัติคำสั่งซื้อ ({total})</h1>
 
             {loadingOrders ? (
                 <div className="flex justify-center p-12"><Icon icon="eos-icons:loading" width="32" className="text-sea-primary" /></div>
