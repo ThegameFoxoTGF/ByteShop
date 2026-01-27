@@ -24,9 +24,7 @@ function BrandFormPage() {
 
     const [formData, setFormData] = useState({
         name: '',
-        slug: '',
-        logo: '',
-        description: ''
+        slug: ''
     });
 
     useEffect(() => {
@@ -41,9 +39,7 @@ function BrandFormPage() {
             const data = await brandService.getBrandById(id);
             setFormData({
                 name: data.name || '',
-                slug: data.slug || '',
-                logo: data.logo || '',
-                description: data.description || ''
+                slug: data.slug || ''
             });
         } catch (error) {
             console.error('Error fetching brand:', error);
@@ -151,33 +147,8 @@ function BrandFormPage() {
                             />
                             <p className="text-xs text-sea-subtext mt-1">ใช้สำหรับสร้างลิงก์ URL (ระบบจะสร้างให้อัตโนมัติจากชื่อแบรนด์)</p>
                         </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-sea-text mb-2">โลโก้ (URL รูปภาพ)</label>
-                            <input
-                                type="text"
-                                name="logo"
-                                value={formData.logo}
-                                onChange={handleInputChange}
-                                placeholder="เช่น https://example.com/logo.png"
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all font-mono text-sm"
-                            />
-                            {formData.logo && (
-                                <div className="mt-2 p-2 border border-slate-200 rounded-lg inline-block bg-white">
-                                    <img src={formData.logo} alt="Preview" className="h-12 object-contain" onError={(e) => e.target.style.display = 'none'} />
-                                </div>
-                            )}
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-sea-text mb-2">คำอธิบาย (รายละเอียด)</label>
-                            <textarea
-                                name="description"
-                                value={formData.description}
-                                onChange={handleInputChange}
-                                rows="3"
-                                placeholder="รายละเอียดเกี่ยวกับแบรนด์นี้..."
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
-                            ></textarea>
-                        </div>
+
+
                     </div>
                 </div>
 

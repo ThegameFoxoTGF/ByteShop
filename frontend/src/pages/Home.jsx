@@ -227,26 +227,18 @@ function Home() {
 
   return (
     <div className='min-h-screen bg-slate-50'>
-      <section className='bg-linear-to-b from-sea-primary/10 to-slate-50 pt-16 pb-8 px-4'>
-        <div className='max-w-7xl mx-auto text-center'>
-          <h1 className='text-4xl md:text-5xl font-extrabold text-sea-deep mb-6'>
-            ค้นพบสินค้า <span className='text-sea-primary'>พรีเมียม</span> สำหรับคุณ
-          </h1>
 
-          {/* Mobile Filter Toggle */}
-          <button
-            onClick={() => setShowMobileFilter(true)}
-            className="md:hidden flex items-center justify-center gap-2 mx-auto px-6 py-2 bg-white rounded-full text-sea-text font-medium shadow-sm border border-slate-200"
-          >
-            <Icon icon="ic:round-filter-list" />
-            ตัวกรอง
-          </button>
-        </div>
-      </section>
+      <div className='max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-8'>
 
-      <div className='max-w-7xl mx-auto px-4 pb-20 flex flex-col md:flex-row gap-8'>
+        {/* Mobile Filter Toggle Button - visible only on mobile */}
+        <button
+          onClick={() => setShowMobileFilter(true)}
+          className="md:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-xl text-sea-text font-medium shadow-sm border border-slate-200 mb-4"
+        >
+          <Icon icon="ic:round-filter-list" />
+          ตัวกรองสินค้า
+        </button>
 
-        {/* Sidebar Filters */}
         {/* Sidebar Filters */}
         <aside className={`fixed inset-0 z-50 bg-white md:bg-white md:static md:z-0 md:w-1/4 p-6 md:p-6 md:rounded-2xl md:shadow-sm md:border md:border-slate-100 overflow-y-auto md:overflow-visible transition-transform duration-300 ${showMobileFilter ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} `}>
           <div className="flex items-center justify-between md:hidden mb-6">
@@ -275,7 +267,7 @@ function Home() {
                       {selectedCategory === cat._id && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
                     </div>
                     <input type="radio" name="category" className="hidden" checked={selectedCategory === cat._id} onChange={() => setSelectedCategory(cat._id)} />
-                    <span className="font-medium">{cat.name}</span>
+                    <span className="font-medium">{cat.label || cat.name}</span>
                   </label>
                 ))}
               </div>
@@ -381,16 +373,21 @@ function Home() {
               <span className="text-sm text-slate-500 mr-2">ตัวกรองที่เลือก:</span>
               {selectedCategory && (
                 <span className="inline-flex items-center gap-1 px-3 py-1 bg-sea-primary/10 text-sea-primary rounded-full text-xs font-bold">
-                  หมวดหมู่: {categories.find(c => c._id === selectedCategory)?.name}
+                  หมวดหมู่: {categories.find(c => c._id === selectedCategory)?.label || categories.find(c => c._id === selectedCategory)?.name}
                   <button onClick={() => setSelectedCategory('')}><Icon icon="ic:round-close" /></button>
                 </span>
               )}
-              {Object.keys(activeDynamicFilters).map(key => (
-                <span key={key} className="inline-flex items-center gap-1 px-3 py-1 bg-sea-primary/10 text-sea-primary rounded-full text-xs font-bold capitalize">
-                  {key.replace('_', ' ')}: {activeDynamicFilters[key]}
-                  <button onClick={() => toggleDynamicFilter(key, activeDynamicFilters[key])}><Icon icon="ic:round-close" /></button>
-                </span>
-              ))}
+              {Object.keys(activeDynamicFilters).map(key => {
+                // Find label from dynamicFilters, otherwise fallback to formatted key
+                const filter = dynamicFilters.find(f => f.key === key);
+                const label = filter ? filter.label : key.replace('_', ' ');
+                return (
+                  <span key={key} className="inline-flex items-center gap-1 px-3 py-1 bg-sea-primary/10 text-sea-primary rounded-full text-xs font-bold capitalize">
+                    {label}: {activeDynamicFilters[key]}
+                    <button onClick={() => toggleDynamicFilter(key, activeDynamicFilters[key])}><Icon icon="ic:round-close" /></button>
+                  </span>
+                );
+              })}
               {selectedBrand && (
                 <span className="inline-flex items-center gap-1 px-3 py-1 bg-sea-primary/10 text-sea-primary rounded-full text-xs font-bold">
                   แบรนด์: {brands.find(b => b._id === selectedBrand)?.name}

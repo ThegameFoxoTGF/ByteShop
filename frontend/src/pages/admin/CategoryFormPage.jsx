@@ -387,8 +387,8 @@ function CategoryFormPage() {
                                 onChange={handleInputChange}
                                 placeholder="เช่น แล็ปท็อป"
                                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
-                                required
                             />
+                            <p className="text-xs text-sea-subtext mt-1">ไม่จำเป็น</p>
                         </div>
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-sea-text mb-2">URL Slug (ลิงก์ถาวร)</label>

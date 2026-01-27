@@ -48,7 +48,7 @@ const getBrandById = asyncHandler(async (req, res) => {
 //@route   POST /api/brands
 //@access  Private/Admin
 const createBrand = asyncHandler(async (req, res) => {
-    const { name, logo, description, slug } = req.body;
+    const { name, slug } = req.body;
 
     const brandExists = await Brand.findOne({ name });
     if (brandExists) {
@@ -69,8 +69,6 @@ const createBrand = asyncHandler(async (req, res) => {
     const brand = await Brand.create({
         name,
         slug: brandSlug,
-        logo,
-        description,
     });
 
     if (brand) {
@@ -98,8 +96,6 @@ const updateBrand = asyncHandler(async (req, res) => {
         }
 
         brand.name = req.body.name || brand.name;
-        brand.logo = req.body.logo || brand.logo;
-        brand.description = req.body.description || brand.description;
 
         const updatedBrand = await brand.save();
         res.json(updatedBrand);

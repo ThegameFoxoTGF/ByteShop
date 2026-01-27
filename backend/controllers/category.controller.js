@@ -99,7 +99,9 @@ const updateCategory = asyncHandler(async (req, res) => {
         }
 
         category.name = req.body.name || category.name;
-        category.label = req.body.label || category.label;
+        if (req.body.label === undefined) {
+            category.label = category.name;
+        }
         if (req.body.filters !== undefined) {
             category.filters = req.body.filters;
         }

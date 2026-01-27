@@ -114,8 +114,8 @@ function ProductListPage() {
                                     <th className="px-6 py-4">ราคา</th>
                                     <th className="px-6 py-4">ส่วนลด</th>
                                     <th className="px-6 py-4">สต็อก</th>
-                                    <th className="px-6 py-4">การเปิดใช้งาน</th>
-                                    <th className="px-6 py-4 rounded-tr-2xl text-right">การดำเนินการ</th>
+                                    <th className="px-6 py-4">สถานะ</th>
+                                    <th className="px-6 py-4 rounded-tr-2xl text-right">ดำเนินการ</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
@@ -178,14 +178,14 @@ function ProductListPage() {
                                                 }`}>
                                                 <div className={`w-1.5 h-1.5 rounded-full ${product.stock > 10 ? 'bg-green-500' : product.stock > 0 ? 'bg-amber-500' : 'bg-red-500'
                                                     }`} />
-                                                {product.stock} in stock
+                                                {product.stock}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${product.is_active ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'}`}
                                             >
                                                 <div className={`w-1.5 h-1.5 rounded-full ${product.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
-                                                {product.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+                                                {product.is_active ? 'เปิด' : 'ปิด'}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">

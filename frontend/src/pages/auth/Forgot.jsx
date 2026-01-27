@@ -17,7 +17,8 @@ function Forgot() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordToken, setPasswordToken] = useState('');
 
-    const [showPassword, setShowPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         let timer;
@@ -183,8 +184,8 @@ function Forgot() {
                                     onClick={handleResendOtp}
                                     disabled={countdown > 0 || loading}
                                     className={`w-full py-2.5 rounded-lg text-sm font-medium transition-colors border border-dashed ${countdown > 0
-                                            ? 'text-slate-400 border-slate-300 bg-slate-50 cursor-not-allowed'
-                                            : 'text-sea-primary border-sea-primary/50 hover:bg-sea-primary/5 hover:border-sea-primary'
+                                        ? 'text-slate-400 border-slate-300 bg-slate-50 cursor-not-allowed'
+                                        : 'text-sea-primary border-sea-primary/50 hover:bg-sea-primary/5 hover:border-sea-primary'
                                         }`}
                                 >
                                     {countdown > 0 ? `ขอรหัสใหม่ได้ใน ${countdown} วินาที` : 'ส่งรหัส OTP อีกครั้ง'}
@@ -205,40 +206,47 @@ function Forgot() {
                     {step === 2 && (
                         <form className="space-y-6" onSubmit={handleResetPassword}>
                             <div className="space-y-4">
-                                <div className="relative">
+                                <div>
                                     <label className="block text-sm font-medium text-sea-text mb-1.5 ml-1">New Password</label>
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        required
-                                        className="block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sea-text focus:outline-none focus:border-sea-primary focus:ring-4 focus:ring-sea-primary/10 transition-all duration-300"
-                                        placeholder="••••••••"
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        minLength={6}
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type={showNewPassword ? "text" : "password"}
+                                            required
+                                            className="block w-full pl-4 pr-12 py-3 bg-white border border-slate-200 rounded-xl text-sea-text focus:outline-none focus:border-sea-primary focus:ring-4 focus:ring-sea-primary/10 transition-all duration-300"
+                                            placeholder="••••••••"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            minLength={6}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-sea-primary transition-colors"
+                                        >
+                                            <Icon icon={showNewPassword ? "ic:round-visibility" : "ic:round-visibility-off"} width="20" />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-sea-text mb-1.5 ml-1">Confirm Password</label>
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        required
-                                        className="block w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sea-text focus:outline-none focus:border-sea-primary focus:ring-4 focus:ring-sea-primary/10 transition-all duration-300"
-                                        placeholder="••••••••"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        minLength={6}
-                                    />
-                                </div>
-
-                                <div className="flex items-center gap-2 ml-1">
-                                    <input
-                                        type="checkbox"
-                                        id="showPw"
-                                        checked={showPassword}
-                                        onChange={(e) => setShowPassword(e.target.checked)}
-                                        className="w-4 h-4 text-sea-primary border-slate-300 rounded focus:ring-sea-primary"
-                                    />
-                                    <label htmlFor="showPw" className="text-sm text-slate-600 select-none">Show Password</label>
+                                    <div className="relative">
+                                        <input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            required
+                                            className="block w-full pl-4 pr-12 py-3 bg-white border border-slate-200 rounded-xl text-sea-text focus:outline-none focus:border-sea-primary focus:ring-4 focus:ring-sea-primary/10 transition-all duration-300"
+                                            placeholder="••••••••"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            minLength={6}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-sea-primary transition-colors"
+                                        >
+                                            <Icon icon={showConfirmPassword ? "ic:round-visibility" : "ic:round-visibility-off"} width="20" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 

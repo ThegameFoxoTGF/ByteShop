@@ -366,6 +366,9 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
             order.payment_info.payment_status = 'refunded';
         }
 
+        if (order.coupon_info) {
+            await Coupon.findByIdAndUpdate(order.coupon_info.coupon_id, { $inc: { used_count: -1 } });
+        }
         order.status = 'cancelled';
 
     } else {

@@ -10,7 +10,7 @@ const fieldTemplate = new mongoose.Schema({
 
 const CategorySchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true, unique: true },
-    label: { type: String, required: true, trim: true },
+    label: { type: String, trim: true },
     slug: { type: String, required: true, unique: true },
 
     filters: [fieldTemplate],

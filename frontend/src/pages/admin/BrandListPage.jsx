@@ -115,8 +115,7 @@ function BrandListPage() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider text-sea-muted font-semibold">
-                                        <th className="px-6 py-4 rounded-tl-2xl">รูปภาพ</th>
-                                        <th className="px-6 py-4">ชื่อแบรนด์</th>
+                                        <th className="px-6 py-4 rounded-tl-2xl">ชื่อแบรนด์</th>
                                         <th className="px-6 py-4 rounded-tr-2xl text-right">จัดการ</th>
                                     </tr>
                                 </thead>
@@ -126,15 +125,6 @@ function BrandListPage() {
                                             key={brand._id}
                                             className="hover:bg-slate-50/50 transition-colors group"
                                         >
-                                            <td className="px-6 py-4">
-                                                <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 flex items-center justify-center overflow-hidden p-1">
-                                                    {brand.logo ? (
-                                                        <img src={brand.logo} alt={brand.name} className="w-full h-full object-contain" />
-                                                    ) : (
-                                                        <Icon icon="ic:round-branding-watermark" className="text-slate-300 w-6 h-6" />
-                                                    )}
-                                                </div>
-                                            </td>
                                             <td className="px-6 py-4">
                                                 <span className="font-medium text-sea-text">{brand.name}</span>
                                             </td>

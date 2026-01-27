@@ -37,12 +37,6 @@ const ProductSchema = new mongoose.Schema(
 
     stock: { type: Number, default: 0 },
     weight_g: { type: Number },
-    dimensions: {
-      length: { type: String },
-      width: { type: String },
-      height: { type: String },
-      unit: { type: String },
-    },
 
     warranty_period: { type: Number },
     warranty_provider: { type: String },

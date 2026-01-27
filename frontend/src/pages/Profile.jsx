@@ -28,6 +28,8 @@ function Profile() {
   });
   const [otpSent, setOtpSent] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -172,27 +174,47 @@ function Profile() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">รหัสผ่านใหม่</label>
-              <input
-                type="password"
-                name="newPassword"
-                value={passwordData.newPassword}
-                onChange={handlePasswordChange}
-                disabled={otpSent}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary disabled:bg-slate-50 disabled:text-slate-400"
-                placeholder="รหัสผ่านอย่างน้อย 6 ตัวอักษร"
-              />
+              <div className="relative">
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  disabled={otpSent}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary disabled:bg-slate-50 disabled:text-slate-400 pr-10"
+                  placeholder="รหัสผ่านอย่างน้อย 6 ตัวอักษร"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-sea-primary transition-colors"
+                  disabled={otpSent}
+                >
+                  <Icon icon={showNewPassword ? "ic:round-visibility" : "ic:round-visibility-off"} width="20" />
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">ยืนยันรหัสผ่านใหม่</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={passwordData.confirmPassword}
-                onChange={handlePasswordChange}
-                disabled={otpSent}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary disabled:bg-slate-50 disabled:text-slate-400"
-                placeholder="กรอกรหัสผ่านอีกครั้ง"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  disabled={otpSent}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary disabled:bg-slate-50 disabled:text-slate-400 pr-10"
+                  placeholder="กรอกรหัสผ่านอีกครั้ง"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-sea-primary transition-colors"
+                  disabled={otpSent}
+                >
+                  <Icon icon={showConfirmPassword ? "ic:round-visibility" : "ic:round-visibility-off"} width="20" />
+                </button>
+              </div>
             </div>
 
             {/* OTP Section */}
