@@ -111,6 +111,14 @@ function Checkout() {
         return Math.max(0, calculateSubtotal() + calculateShipping() - calculateDiscount());
     };
 
+    const calculateTax = () => {
+        return calculateTotal() * 0.07;
+    };
+
+    const calculatePriceBeforeTax = () => {
+        return calculateTotal() - calculateTax();
+    };
+
     const handleApplyCoupon = async () => {
         if (!couponCode.trim()) return;
         setCouponError('');
@@ -367,6 +375,17 @@ function Checkout() {
                                     <span>-฿{calculateDiscount().toLocaleString()}</span>
                                 </div>
                             )}
+
+                            <div className="pt-2 mt-2 border-t border-slate-50 space-y-1">
+                                <div className="flex justify-between text-slate-500 text-xs">
+                                    <span>ราคาก่อนภาษี</span>
+                                    <span>฿{calculatePriceBeforeTax().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                </div>
+                                <div className="flex justify-between text-slate-500 text-xs">
+                                    <span>ภาษี (7%)</span>
+                                    <span>฿{calculateTax().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                </div>
+                            </div>
 
                             {/* Coupon Input */}
                             <div className="pt-2">

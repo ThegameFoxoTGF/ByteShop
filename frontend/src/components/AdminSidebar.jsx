@@ -6,13 +6,13 @@ function AdminSidebar() {
     const location = useLocation();
 
     const menuItems = [
-        { path: '/admin', icon: 'ic:baseline-dashboard', label: 'Dashboard' },
-        { path: '/admin/products', icon: 'ic:baseline-inventory', label: 'Products' },
-        { path: '/admin/orders', icon: 'ic:baseline-shopping-cart', label: 'Orders' },
-        { path: '/admin/customers', icon: 'ic:baseline-people', label: 'Customers' },
-        { path: '/admin/categories', icon: 'ic:baseline-category', label: 'Categories' },
-        { path: '/admin/brands', icon: 'ic:baseline-apple', label: 'Brands' },
-        { path: '/admin/coupons', icon: 'ic:baseline-local-offer', label: 'Coupons' },
+        { path: '/admin', icon: 'ic:baseline-dashboard', label: 'แดชบอร์ด' },
+        { path: '/admin/products', icon: 'ic:baseline-inventory', label: 'ผลิตภัณฑ์' },
+        { path: '/admin/orders', icon: 'ic:baseline-shopping-cart', label: 'คำสั่งซื้อ' },
+        { path: '/admin/customers', icon: 'ic:baseline-people', label: 'ลูกค้า' },
+        { path: '/admin/categories', icon: 'ic:baseline-category', label: 'หมวดหมู่' },
+        { path: '/admin/brands', icon: 'ic:baseline-apple', label: 'แบรนด์' },
+        { path: '/admin/coupons', icon: 'ic:baseline-local-offer', label: 'คูปอง' },
     ];
 
     return (
@@ -23,7 +23,7 @@ function AdminSidebar() {
                     <Icon icon="ic:baseline-admin-panel-settings" />
                 </div>
                 <div>
-                    <h2 className="text-lg font-bold text-sea-text leading-tight">Admin Panel</h2>
+                    <h2 className="text-lg font-bold text-sea-text leading-tight">แผงควบคุม</h2>
                     <p className="text-xs text-sea-subtext">ByteShop Manager</p>
                 </div>
             </div>

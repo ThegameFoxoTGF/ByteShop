@@ -442,6 +442,19 @@ function ProductFormPage() {
                             </div>
 
                             <div>
+                                <label className="block text-sm font-medium text-sea-text mb-1">คำค้นหา (Keywords)</label>
+                                <input
+                                    type="text"
+                                    name="search_keywords"
+                                    value={formData.search_keywords}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
+                                    placeholder="คั่นด้วยเครื่องหมายจุลภาค (,) เช่น gaming, rgb, intel"
+                                />
+                                <p className="text-xs text-sea-subtext mt-1">ช่วยในการค้นหาสินค้าได้ง่ายขึ้น</p>
+                            </div>
+
+                            <div>
                                 <label className="block text-sm font-medium text-sea-text mb-1">คำอธิบายรายละเอียด</label>
                                 <textarea
                                     name="description"
@@ -532,18 +545,7 @@ function ProductFormPage() {
                                     placeholder="เช่น Synnex, Advice, ศูนย์ไทย"
                                 />
                             </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-sea-text mb-1">คำค้นหา (Keywords)</label>
-                                <input
-                                    type="text"
-                                    name="search_keywords"
-                                    value={formData.search_keywords}
-                                    onChange={handleInputChange}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
-                                    placeholder="คั่นด้วยเครื่องหมายจุลภาค (,) เช่น gaming, rgb, intel"
-                                />
-                                <p className="text-xs text-sea-subtext mt-1">ช่วยในการค้นหาสินค้าได้ง่ายขึ้น</p>
-                            </div>
+
                         </div>
                     </div>
 
@@ -597,28 +599,36 @@ function ProductFormPage() {
                                         <label className="block text-sm font-medium text-sea-text mb-1">
                                             {spec.label} <span className="text-slate-400 text-xs">({spec.key})</span>
                                         </label>
-                                        <input
-                                            type={spec.type === 'number' ? 'number' : 'text'}
-                                            value={getSpecValue(spec.key)}
-                                            onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sea-primary"
-                                            placeholder={`ระบุ ${spec.label}`}
-                                        />
-                                        {spec.unit && <span className="text-xs text-slate-500 mt-1">หน่วย: {spec.unit}</span>}
-                                        {spec.type === 'select' && spec.options && (
-                                            <select
-                                                value={getSpecValue(spec.key)}
-                                                onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
-                                                className="mt-2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sea-primary"
-                                            >
-                                                <option value="">เลือก {spec.label}</option>
-                                                {spec.options.map((option, index) => (
-                                                    <option key={index} value={option}>
-                                                        {option}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        )}
+                                        <div className="flex gap-2 items-start">
+                                            <div className="flex-1">
+                                                <input
+                                                    type={spec.type === 'number' ? 'number' : 'text'}
+                                                    value={getSpecValue(spec.key)}
+                                                    onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
+                                                    className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none transition-colors ${spec.type === 'select'
+                                                        ? 'bg-slate-100 border-slate-200 text-slate-500 cursor-not-allowed'
+                                                        : 'bg-slate-50 border-slate-200 focus:border-sea-primary'
+                                                        }`}
+                                                    placeholder={`ระบุ ${spec.label}`}
+                                                    readOnly={spec.type === 'select'}
+                                                />
+                                                {spec.unit && <span className="text-xs text-slate-500 mt-1 block">หน่วย: {spec.unit}</span>}
+                                            </div>
+                                            {spec.type === 'select' && spec.options && (
+                                                <select
+                                                    value=""
+                                                    onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
+                                                    className="w-33 px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none hover:border-sea-primary text-sm text-slate-700 cursor-pointer shadow-sm"
+                                                >
+                                                    <option value="" disabled>เลือกตัวเลือก</option>
+                                                    {spec.options.map((option, idx) => (
+                                                        <option key={idx} value={option}>
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -748,7 +758,7 @@ function ProductFormPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-3 lg:sticky lg:top-10 z-10">
                         <button
                             type="submit"
                             disabled={loading || uploading}

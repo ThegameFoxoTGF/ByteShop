@@ -105,9 +105,13 @@ const createOrder = asyncHandler(async (req, res) => {
     }
 
     let shipping_fee = subtotal < 5000 ? 50 : 0;
-    const total_price = subtotal - discount + shipping_fee;
-    const tax_price = total_price * 0.07;
-    const subtotal_before_tax = total_price - tax_price;
+
+    let total_price_calc = subtotal - discount + shipping_fee;
+    if (total_price_calc < 0) total_price_calc = 0;
+
+    const total_price = Number(total_price_calc.toFixed(2));
+    const tax_price = Number((total_price * 0.07).toFixed(2));
+    const subtotal_before_tax = Number((total_price - tax_price).toFixed(2));
 
     let status = "pending";
     if (payment_method === 'cod') {
@@ -123,12 +127,12 @@ const createOrder = asyncHandler(async (req, res) => {
         shipping_address,
         coupon_info: couponInfo,
         pricing_info: {
-            subtotal,
-            discount,
-            shipping_fee,
+            subtotal: Number(subtotal.toFixed(2)),
+            discount: Number(discount.toFixed(2)),
+            shipping_fee: Number(shipping_fee.toFixed(2)),
             tax_price,
             subtotal_before_tax,
-            total_price: total_price < 0 ? 0 : total_price,
+            total_price,
         },
     });
 

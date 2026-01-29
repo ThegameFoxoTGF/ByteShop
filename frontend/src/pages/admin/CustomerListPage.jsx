@@ -68,7 +68,7 @@ function CustomerListPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-sea-text">Customer Management</h1>
+                    <h1 className="text-2xl font-bold text-sea-text">ลูกค้า</h1>
                     <p className="text-sea-subtext mt-1">จัดการข้อมูลลูกค้า</p>
                 </div>
             </div>
@@ -139,11 +139,11 @@ function CustomerListPage() {
                                                     )}
                                                     {user.is_active ? (
                                                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
-                                                            <Icon icon="ic:round-check-circle" /> Active
+                                                            <Icon icon="ic:round-check-circle" /> เปิดใช้งาน
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">
-                                                            <Icon icon="ic:round-cancel" /> Disabled
+                                                            <Icon icon="ic:round-cancel" /> ปิดใช้งาน
                                                         </span>
                                                     )}
                                                 </div>

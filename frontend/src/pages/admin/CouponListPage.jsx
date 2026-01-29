@@ -69,7 +69,7 @@ function CouponListPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-sea-text">Coupons</h1>
+                    <h1 className="text-2xl font-bold text-sea-text">คูปอง</h1>
                     <p className="text-sea-subtext mt-1">จัดการคูปองส่วนลด</p>
                 </div>
                 <Link
@@ -153,7 +153,7 @@ function CouponListPage() {
                                                     ? 'bg-green-50 text-green-700 border-green-100'
                                                     : 'bg-red-50 text-red-700 border-red-100'
                                                     }`}>
-                                                    {coupon.is_active ? 'Active' : 'Inactive'}
+                                                    {coupon.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-slate-600">

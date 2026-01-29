@@ -133,12 +133,12 @@ function ProductDetailView({ product }) {
                     <div className="flex items-end gap-3">
                         <span className="text-3xl font-bold text-sea-primary">฿{product.selling_price.toLocaleString()}</span>
                         {product.original_price > product.selling_price && (
-                            <span className="text-slate-400 line-through mb-1">฿{product.original_price.toLocaleString()}</span>
-                        )}
-                        {product.discount > 0 && (
-                            <span className="bg-red-50 text-red-500 text-xs px-2 py-1 rounded-full font-medium mb-2">
-                                -฿{product.discount.toLocaleString()}
-                            </span>
+                            <>
+                                <span className="text-slate-400 line-through mb-1">฿{product.original_price.toLocaleString()}</span>
+                                <span className="bg-red-50 text-red-500 text-xs px-2 py-1 rounded-full font-medium mb-2">
+                                    -{Math.round(((product.original_price - product.selling_price) / product.original_price) * 100)}%
+                                </span>
+                            </>
                         )}
                     </div>
 

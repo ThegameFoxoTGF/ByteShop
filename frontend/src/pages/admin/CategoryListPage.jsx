@@ -68,7 +68,7 @@ function CategoryListPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-sea-text">Category Management</h1>
+                    <h1 className="text-2xl font-bold text-sea-text">หมวดหมู่</h1>
                     <p className="text-sea-subtext mt-1">จัดการรายชื่อหมวดหมู่ในระบบ</p>
                 </div>
                 <Link

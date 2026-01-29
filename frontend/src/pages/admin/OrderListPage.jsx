@@ -113,7 +113,7 @@ function OrderListPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-sea-text">Orders</h1>
+                    <h1 className="text-2xl font-bold text-sea-text">คำสั่งซื้อ</h1>
                     <p className="text-sea-subtext mt-1">จัดการคำสั่งซื้อทั้งหมด</p>
                 </div>
             </div>
@@ -187,8 +187,23 @@ function OrderListPage() {
                                             <span className="font-mono text-slate-700 font-medium">{order.order_id || order._id.substring(0, 8).toUpperCase()}</span>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-sea-text">
-                                            {order.user_id ? `${order.user_id.profile?.first_name || ''} ${order.user_id.profile?.last_name || ''}`.trim() || 'Unknown' : 'Unknown User'}
-                                            <div className="text-xs text-slate-400">{order.user_id?.email}</div>
+                                            {(() => {
+                                                const user = order.user_id;
+                                                if (!user) return 'Unknown User';
+
+                                                const fullName = `${user.profile?.first_name || ''} ${user.profile?.last_name || ''}`.trim();
+
+                                                if (fullName) {
+                                                    return (
+                                                        <>
+                                                            {fullName}
+                                                            <div className="text-xs text-slate-400">{user.email}</div>
+                                                        </>
+                                                    );
+                                                }
+
+                                                return user.email;
+                                            })()}
                                         </td>
                                         <td className="px-6 py-4 text-sm text-slate-600">
                                             {new Date(order.createdAt).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' })} {new Date(order.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}

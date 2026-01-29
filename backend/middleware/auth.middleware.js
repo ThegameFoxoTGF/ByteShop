@@ -9,6 +9,17 @@ const protect = asyncHandler(async (req, res, next) => {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             req.user = await User.findById(decoded.userId).select("-password");
+
+            if (!req.user) {
+                res.status(401);
+                throw new Error("ไม่พบผู้ใช้งานในระบบ");
+            }
+
+            if (req.user.is_active === false) {
+                res.status(401);
+                throw new Error("บัญชีของคุณถูกระงับการใช้งาน");
+            }
+
             next();
         } catch (error) {
             console.error(error);

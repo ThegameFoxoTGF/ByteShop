@@ -61,7 +61,7 @@ function ProductListPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-sea-text">Products</h1>
+                    <h1 className="text-2xl font-bold text-sea-text">ผลิตภัณฑ์</h1>
                     <p className="text-sea-subtext mt-1">จัดการสินค้าของคุณ</p>
                 </div>
                 <Link

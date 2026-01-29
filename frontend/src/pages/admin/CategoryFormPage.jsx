@@ -346,7 +346,7 @@ function CategoryFormPage() {
     }
 
     return (
-        <div className="p-6 max-w-5xl mx-auto space-y-6">
+        <div className="p-6 max-w-7xl mx-auto space-y-6">
             <div className="flex items-center gap-4">
                 <Link to="/admin/categories" className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors">
                     <Icon icon="ic:round-arrow-back" width="24" />
@@ -359,164 +359,167 @@ function CategoryFormPage() {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Basic Info Section */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6">
-                    <h2 className="text-lg font-semibold text-sea-text flex items-center gap-2">
-                        <Icon icon="ic:round-info" className="text-sea-primary" /> ข้อมูลพื้นฐาน
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-sea-text mb-2">ชื่อหมวดหมู่</label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                placeholder="เช่น laptops"
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-sea-text mb-2">ป้ายกำกับ (แสดงหน้าเว็บ)</label>
-                            <input
-                                type="text"
-                                name="label"
-                                value={formData.label}
-                                onChange={handleInputChange}
-                                placeholder="เช่น แล็ปท็อป"
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
-                            />
-                            <p className="text-xs text-sea-subtext mt-1">ไม่จำเป็น</p>
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-sea-text mb-2">URL Slug (ลิงก์ถาวร)</label>
-                            <input
-                                type="text"
-                                name="slug"
-                                value={formData.slug}
-                                onChange={handleInputChange}
-                                onBlur={handleSlugBlur}
-                                placeholder="laptops"
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-600 focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
-                                required
-                            />
-                            <p className="text-xs text-sea-subtext mt-1">ใช้สำหรับสร้างลิงก์ URL (ระบบจะสร้างให้อัตโนมัติจากชื่อหมวดหมู่)</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white p-8 rounded-3xl shadow-xs border border-slate-100 space-y-8">
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-xl font-bold text-sea-text flex items-center gap-2.5">
-                            <div className="p-2 bg-sea-light/10 rounded-xl">
-                                <Icon icon="ic:round-filter-alt" className="text-sea-primary" width="24" />
-                            </div>
-                            ตัวกรองสินค้า (Filters)
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column - Content */}
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Basic Info Section */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6">
+                        <h2 className="text-lg font-semibold text-sea-text flex items-center gap-2">
+                            <Icon icon="ic:round-info" className="text-sea-primary" /> ข้อมูลพื้นฐาน
                         </h2>
-                        <p className="text-sm text-sea-subtext">กำหนดคุณลักษณะต่างๆ ที่ลูกค้าสามารถใช้กรองสินค้าในหมวดหมู่นี้</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-sea-text mb-2">ชื่อหมวดหมู่</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    placeholder="เช่น laptops"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-sea-text mb-2">ป้ายกำกับ (แสดงหน้าเว็บ)</label>
+                                <input
+                                    type="text"
+                                    name="label"
+                                    value={formData.label}
+                                    onChange={handleInputChange}
+                                    placeholder="เช่น แล็ปท็อป"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
+                                />
+                                <p className="text-xs text-sea-subtext mt-1">ไม่จำเป็น</p>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-sea-text mb-2">URL Slug (ลิงก์ถาวร)</label>
+                                <input
+                                    type="text"
+                                    name="slug"
+                                    value={formData.slug}
+                                    onChange={handleInputChange}
+                                    onBlur={handleSlugBlur}
+                                    placeholder="laptops"
+                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-600 focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
+                                    required
+                                />
+                                <p className="text-xs text-sea-subtext mt-1">ใช้สำหรับสร้างลิงก์ URL (ระบบจะสร้างให้อัตโนมัติจากชื่อหมวดหมู่)</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="space-y-6">
-                        {filters.length === 0 ? (
-                            <div className="group text-center py-12 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-sea-primary/30 transition-all">
-                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
-                                    <Icon icon="ic:round-filter-list-off" className="text-slate-300" width="32" />
+                    <div className="bg-white p-8 rounded-3xl shadow-xs border border-slate-100 space-y-8">
+                        <div className="flex flex-col gap-1">
+                            <h2 className="text-xl font-bold text-sea-text flex items-center gap-2.5">
+                                <div className="p-2 bg-sea-light/10 rounded-xl">
+                                    <Icon icon="ic:round-filter-alt" className="text-sea-primary" width="24" />
                                 </div>
-                                <h3 className="text-slate-600 font-medium mb-1">ยังไม่มีการกำหนดตัวกรอง</h3>
-                                <p className="text-slate-400 text-xs mb-4">เพิ่มตัวกรองเพื่อให้ลูกค้าค้นหาสินค้าได้ง่ายขึ้น</p>
-                                <button
-                                    type="button"
-                                    onClick={() => addField(setFilters)}
-                                    className="px-6 py-2 bg-white text-sea-primary text-sm font-bold rounded-xl border border-slate-200 hover:border-sea-primary hover:shadow-sm transition-all shadow-xs"
-                                >
-                                    เพิ่มตัวกรองแรกของคุณ
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="space-y-0">
-                                    {filters.map((item, index) => renderFieldEditor(item, index, filters, setFilters))}
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => addField(setFilters)}
-                                    className="w-full group flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 hover:text-sea-primary hover:border-sea-primary hover:bg-sea-light/5 transition-all outline-none"
-                                >
-                                    <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-sea-light/10 flex items-center justify-center transition-colors">
-                                        <Icon icon="ic:round-add" width="24" />
+                                ตัวกรองสินค้า (Filters)
+                            </h2>
+                            <p className="text-sm text-sea-subtext">กำหนดคุณลักษณะต่างๆ ที่ลูกค้าสามารถใช้กรองสินค้าในหมวดหมู่นี้</p>
+                        </div>
+
+                        <div className="space-y-6">
+                            {filters.length === 0 ? (
+                                <div className="group text-center py-12 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-sea-primary/30 transition-all">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
+                                        <Icon icon="ic:round-filter-list-off" className="text-slate-300" width="32" />
                                     </div>
-                                    <span className="font-bold tracking-wide">เพิ่มตัวกรองใหม่</span>
-                                </button>
-                            </>
-                        )}
+                                    <h3 className="text-slate-600 font-medium mb-1">ยังไม่มีการกำหนดตัวกรอง</h3>
+                                    <p className="text-slate-400 text-xs mb-4">เพิ่มตัวกรองเพื่อให้ลูกค้าค้นหาสินค้าได้ง่ายขึ้น</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => addField(setFilters)}
+                                        className="px-6 py-2 bg-white text-sea-primary text-sm font-bold rounded-xl border border-slate-200 hover:border-sea-primary hover:shadow-sm transition-all shadow-xs"
+                                    >
+                                        เพิ่มตัวกรองแรกของคุณ
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="space-y-0">
+                                        {filters.map((item, index) => renderFieldEditor(item, index, filters, setFilters))}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => addField(setFilters)}
+                                        className="w-full group flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 hover:text-sea-primary hover:border-sea-primary hover:bg-sea-light/5 transition-all outline-none"
+                                    >
+                                        <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-sea-light/10 flex items-center justify-center transition-colors">
+                                            <Icon icon="ic:round-add" width="24" />
+                                        </div>
+                                        <span className="font-bold tracking-wide">เพิ่มตัวกรองใหม่</span>
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-3xl shadow-xs border border-slate-100 space-y-8">
+                        <div className="flex flex-col gap-1">
+                            <h2 className="text-xl font-bold text-sea-text flex items-center gap-2.5">
+                                <div className="p-2 bg-sea-light/10 rounded-xl">
+                                    <Icon icon="ic:round-list" className="text-sea-primary" width="24" />
+                                </div>
+                                ข้อมูลทางเทคนิค (Specifications)
+                            </h2>
+                            <p className="text-sm text-sea-subtext">กำหนดหัวข้อรายละเอียดทางเทคนิคที่จะแสดงในหน้าข้อมูลสินค้า</p>
+                        </div>
+
+                        <div className="space-y-6">
+                            {specifications.length === 0 ? (
+                                <div className="group text-center py-12 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-sea-primary/30 transition-all">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
+                                        <Icon icon="ic:round-assignment" className="text-slate-300" width="32" />
+                                    </div>
+                                    <h3 className="text-slate-600 font-medium mb-1">ยังไม่มีการกำหนดหัวข้อสเปค</h3>
+                                    <p className="text-slate-400 text-xs mb-4">กำหนดสเปคเพื่อแสดงรายละเอียดที่ชัดเจนให้กับลูกค้า</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => addField(setSpecifications)}
+                                        className="px-6 py-2 bg-white text-sea-primary text-sm font-bold rounded-xl border border-slate-200 hover:border-sea-primary hover:shadow-sm transition-all shadow-xs"
+                                    >
+                                        เพิ่มสเปคแรกของคุณ
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="space-y-0">
+                                        {specifications.map((item, index) => renderFieldEditor(item, index, specifications, setSpecifications))}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => addField(setSpecifications)}
+                                        className="w-full group flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 hover:text-sea-primary hover:border-sea-primary hover:bg-sea-light/5 transition-all outline-none"
+                                    >
+                                        <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-sea-light/10 flex items-center justify-center transition-colors">
+                                            <Icon icon="ic:round-add" width="24" />
+                                        </div>
+                                        <span className="font-bold tracking-wide">เพิ่มข้อมูลทางเทคนิคใหม่</span>
+                                    </button>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-8 rounded-3xl shadow-xs border border-slate-100 space-y-8">
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-xl font-bold text-sea-text flex items-center gap-2.5">
-                            <div className="p-2 bg-sea-light/10 rounded-xl">
-                                <Icon icon="ic:round-list" className="text-sea-primary" width="24" />
-                            </div>
-                            ข้อมูลทางเทคนิค (Specifications)
-                        </h2>
-                        <p className="text-sm text-sea-subtext">กำหนดหัวข้อรายละเอียดทางเทคนิคที่จะแสดงในหน้าข้อมูลสินค้า</p>
-                    </div>
-
-                    <div className="space-y-6">
-                        {specifications.length === 0 ? (
-                            <div className="group text-center py-12 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-sea-primary/30 transition-all">
-                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
-                                    <Icon icon="ic:round-assignment" className="text-slate-300" width="32" />
-                                </div>
-                                <h3 className="text-slate-600 font-medium mb-1">ยังไม่มีการกำหนดหัวข้อสเปค</h3>
-                                <p className="text-slate-400 text-xs mb-4">กำหนดสเปคเพื่อแสดงรายละเอียดที่ชัดเจนให้กับลูกค้า</p>
-                                <button
-                                    type="button"
-                                    onClick={() => addField(setSpecifications)}
-                                    className="px-6 py-2 bg-white text-sea-primary text-sm font-bold rounded-xl border border-slate-200 hover:border-sea-primary hover:shadow-sm transition-all shadow-xs"
-                                >
-                                    เพิ่มสเปคแรกของคุณ
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="space-y-0">
-                                    {specifications.map((item, index) => renderFieldEditor(item, index, specifications, setSpecifications))}
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => addField(setSpecifications)}
-                                    className="w-full group flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 hover:text-sea-primary hover:border-sea-primary hover:bg-sea-light/5 transition-all outline-none"
-                                >
-                                    <div className="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-sea-light/10 flex items-center justify-center transition-colors">
-                                        <Icon icon="ic:round-add" width="24" />
-                                    </div>
-                                    <span className="font-bold tracking-wide">เพิ่มข้อมูลทางเทคนิคใหม่</span>
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-end gap-4">
-                    <Link
-                        to="/admin/categories"
-                        className="px-6 py-2.5 rounded-xl text-slate-600 bg-white border border-slate-200 font-medium hover:bg-slate-50 transition-colors"
-                    >
-                        ยกเลิก
-                    </Link>
+                {/* Right Column - Actions */}
+                <div className="flex flex-col gap-3 lg:sticky lg:top-10 z-10 h-fit">
                     <button
                         type="submit"
                         disabled={loading}
-                        className="px-8 py-2.5 rounded-xl bg-linear-to-r from-sea-primary to-sea-deep text-white font-semibold shadow-lg shadow-sea-primary/20 hover:shadow-sea-primary/40 transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="w-full py-3 rounded-xl bg-linear-to-r from-sea-primary to-sea-deep text-white font-semibold shadow-lg shadow-sea-primary/20 hover:shadow-sea-primary/40 transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {loading && <Icon icon="eos-icons:loading" />}
                         {isEditMode ? 'อัปเดตหมวดหมู่' : 'สร้างหมวดหมู่ใหม่'}
                     </button>
+                    <Link
+                        to="/admin/categories"
+                        className="w-full py-3 rounded-xl text-slate-600 bg-white border border-slate-200 font-medium hover:bg-slate-50 transition-colors text-center"
+                    >
+                        ยกเลิก
+                    </Link>
                 </div>
             </form>
         </div>
