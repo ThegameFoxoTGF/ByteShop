@@ -57,6 +57,18 @@ function OrderHistory() {
         }
     };
 
+    const handleConfirmReceived = async (orderId) => {
+        if (!window.confirm("คุณได้รับสินค้าเรียบร้อยแล้วใช่หรือไม่?")) return;
+        try {
+            await orderService.confirmReceived(orderId);
+            toast.success("ยืนยันการรับสินค้าเรียบร้อยแล้ว");
+            fetchOrders(); // Refresh list
+        } catch (error) {
+            console.error(error);
+            toast.error("ไม่สามารถยืนยันได้: " + (error.response?.data?.message || "Internal Error"));
+        }
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <h1 className="text-2xl font-bold text-sea-text">ประวัติคำสั่งซื้อ ({total})</h1>
@@ -86,9 +98,21 @@ function OrderHistory() {
                                             {new Date(order.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                         </p>
                                     </div>
-                                    <Link to={`/order/${order._id}`} className="px-4 py-2 text-sm font-medium text-sea-primary bg-sea-primary/5 hover:bg-sea-primary/10 rounded-lg transition-colors text-center whitespace-nowrap">
-                                        ดูรายละเอียด
-                                    </Link>
+                                    <div className="flex items-center gap-2">
+                                        {order.status === 'shipped' && (
+                                            <button
+                                                onClick={() => handleConfirmReceived(order._id)}
+                                                className="px-4 py-2 text-sm font-bold text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors shadow-sm active:scale-95 flex items-center gap-1"
+                                                title="ยืนยันว่าได้รับสินค้าแล้ว"
+                                            >
+                                                <Icon icon="ic:round-check-circle" /> <span className="hidden sm:inline">ฉันได้รับสินค้าแล้ว</span>
+                                                <span className="sm:hidden">รับสินค้า</span>
+                                            </button>
+                                        )}
+                                        <Link to={`/order/${order._id}`} className="px-4 py-2 text-sm font-medium text-sea-primary bg-sea-primary/5 hover:bg-sea-primary/10 rounded-lg transition-colors text-center whitespace-nowrap">
+                                            ดูรายละเอียด
+                                        </Link>
+                                    </div>
                                 </div>
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                     <div className="flex items-center gap-2">

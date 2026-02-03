@@ -94,7 +94,7 @@ function CartDrawer({ isOpen, onClose }) {
         try {
             // Send request silently
             await cartService.updateCartItem(productId, newQuantity);
-            await fetchCartCount(); // Sync badge in background works fine
+            await fetchCartCount(); // Sync badge in background
         } catch (error) {
             console.error("Failed to update quantity", error);
             const message = error.response?.data?.message || "Failed to update quantity";
@@ -117,11 +117,11 @@ function CartDrawer({ isOpen, onClose }) {
             />
 
             {/* Drawer Panel */}
-            <div className="absolute inset-y-0 right-0 flex max-w-full pl-10">
-                <div className="w-screen max-w-md transform transition-transform duration-300 ease-in-out bg-white shadow-2xl flex flex-col h-full animate-in slide-in-from-right">
+            <div className="absolute inset-y-0 right-0 flex max-w-full md:pl-10">
+                <div className="w-screen md:max-w-md transform transition-transform duration-300 ease-in-out bg-white shadow-2xl flex flex-col h-full animate-in slide-in-from-right">
 
                     {/* Header */}
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/50 backdrop-blur-xl">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/50 backdrop-blur-xl shrink-0">
                         <h2 className="text-xl font-bold text-sea-text flex items-center gap-2">
                             <Icon icon="ic:round-shopping-bag" className="text-sea-primary" />
                             ตะกร้าสินค้า
@@ -136,7 +136,7 @@ function CartDrawer({ isOpen, onClose }) {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+                    <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50">
                         {loading ? (
                             <div className="flex flex-col items-center justify-center h-64 space-y-4">
                                 <div className="w-10 h-10 border-4 border-sea-light border-t-sea-primary rounded-full animate-spin"></div>
@@ -161,9 +161,9 @@ function CartDrawer({ isOpen, onClose }) {
                         ) : (
                             <div className="space-y-4">
                                 {cartItems.map((item, index) => (
-                                    <div key={item._id || index} className="group relative bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-sea-primary/20 transition-all duration-200 flex gap-4">
+                                    <div key={item._id || index} className="group relative bg-white p-3 md:p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-sea-primary/20 transition-all duration-200 flex gap-3 md:gap-4">
                                         {/* Product Image */}
-                                        <div className="w-20 h-20 bg-slate-100 rounded-lg shrink-0 overflow-hidden relative">
+                                        <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-100 rounded-lg shrink-0 overflow-hidden relative">
                                             {item.product?.main_image ? (
                                                 <img
                                                     src={item.product.main_image.url}
@@ -180,44 +180,45 @@ function CartDrawer({ isOpen, onClose }) {
                                         {/* Product Details */}
                                         <div className="flex-1 min-w-0 flex flex-col justify-between">
                                             <div>
-                                                <h4 className="font-medium text-sea-text truncate pr-4">{item.product?.name || 'Unknown Product'}</h4>
+                                                <h4 className="font-medium text-sea-text truncate pr-6 text-sm md:text-base">{item.product?.name || 'Unknown Product'}</h4>
                                                 <p className="text-sm text-sea-subtext">{/* Variation or Option if any */}</p>
                                             </div>
 
                                             <div className="flex items-center justify-between mt-2">
-                                                <div className="flex items-center gap-1 font-semibold text-sea-primary">
+                                                <div className="flex flex-col md:flex-row md:items-center gap-0 md:gap-1 font-semibold text-sea-primary text-sm">
                                                     <span>฿{(item.product?.selling_price || item.product?.original_price || 0).toLocaleString()}</span>
-                                                    <span className="text-sm text-sea-muted">x {item.quantity}</span>
-                                                    <span className="text-sm text-sea-muted">฿{((item.product?.selling_price || item.product?.original_price || 0) * item.quantity).toLocaleString()}</span>
-
+                                                    <div className="flex items-center gap-1 text-xs text-sea-muted">
+                                                        <span className="hidden md:inline">x {item.quantity}</span>
+                                                        <span className="md:hidden">Total: ฿{((item.product?.selling_price || item.product?.original_price || 0) * item.quantity).toLocaleString()}</span>
+                                                    </div>
                                                 </div>
 
                                                 {/* Quantity Controls */}
-                                                <div className="flex items-center bg-slate-50 rounded-lg border border-slate-200">
+                                                <div className="flex items-center bg-slate-50 rounded-lg border border-slate-200 h-8">
                                                     <button
                                                         onClick={() => handleUpdateQuantity(item.product?._id, item.quantity - 1)}
-                                                        className="p-1 hover:bg-white hover:text-red-500 rounded-l-lg transition-colors disabled:opacity-50 cursor-pointer"
+                                                        className="w-8 h-full flex items-center justify-center hover:bg-white hover:text-red-500 rounded-l-lg transition-colors disabled:opacity-50 cursor-pointer"
                                                         disabled={item.quantity <= 1}
                                                     >
-                                                        <Icon icon="ic:round-remove" width="16" />
+                                                        <Icon icon="ic:round-remove" width="14" />
                                                     </button>
                                                     <span className="w-8 text-center text-xs font-semibold text-sea-text">
                                                         {item.quantity}
                                                     </span>
                                                     <button
                                                         onClick={() => handleUpdateQuantity(item.product?._id, item.quantity + 1)}
-                                                        className="p-1 hover:bg-white hover:text-green-500 rounded-r-lg transition-colors cursor-pointer"
+                                                        className="w-8 h-full flex items-center justify-center hover:bg-white hover:text-green-500 rounded-r-lg transition-colors cursor-pointer"
                                                     >
-                                                        <Icon icon="ic:round-add" width="16" />
+                                                        <Icon icon="ic:round-add" width="14" />
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Delete Action */}
+                                        {/* Delete Action - Visible on Mobile too */}
                                         <button
                                             onClick={() => handleRemove(item.product?._id)}
-                                            className="absolute top-3 right-3 p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+                                            className="absolute top-2 right-2 p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all md:opacity-0 md:group-hover:opacity-100 cursor-pointer"
                                         >
                                             <Icon icon="ic:round-delete-outline" width="18" />
                                         </button>

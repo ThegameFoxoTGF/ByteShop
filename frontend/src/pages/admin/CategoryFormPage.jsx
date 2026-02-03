@@ -18,7 +18,6 @@ const FIELD_TYPES = [
     { value: 'text', label: 'ข้อความ (Text)' },
     { value: 'number', label: 'ตัวเลข (Number)' },
     { value: 'select', label: 'เลือกหนึ่งรายการ (Single Select)' },
-    { value: 'multiselect', label: 'เลือกได้หลายรายการ (Multi Select)' },
     { value: 'boolean', label: 'ใช่/ไม่ใช่ (Boolean)' }
 ];
 

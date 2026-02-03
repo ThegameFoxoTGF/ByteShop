@@ -67,6 +67,17 @@ function Navbar() {
           {/* Right Actions */}
           <div className="flex items-center gap-4">
 
+            {/* Search Toggle (Mobile) */}
+            <button
+              onClick={() => {
+                const searchForm = document.getElementById('mobile-search-form');
+                if (searchForm) searchForm.classList.toggle('hidden');
+              }}
+              className="md:hidden p-2.5 rounded-full border border-sea-muted text-sea-subtext hover:bg-sea-light hover:text-sea-primary transition-all duration-200 group cursor-pointer"
+            >
+              <Icon icon="ic:round-search" width="24" height="24" className="transform group-hover:scale-110 transition-transform duration-200" />
+            </button>
+
             {/* Cart Button */}
             <button
               onClick={() => setIsCartOpen(true)}
@@ -163,6 +174,22 @@ function Navbar() {
           </div>
 
         </div>
+
+        {/* Mobile Search Form (Hidden by default) */}
+        <form id="mobile-search-form" onSubmit={handleSearch} className="hidden md:hidden pb-4 animate-in fade-in slide-in-from-top-2">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Icon icon="ic:round-search" className="h-5 w-5 text-sea-muted" />
+            </div>
+            <input
+              type="text"
+              placeholder="ค้นหาสินค้า..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="block w-full pl-10 pr-4 py-2.5 bg-sea-light/50 border border-transparent rounded-xl text-sm text-sea-text placeholder-sea-muted focus:outline-none focus:bg-white focus:border-sea-primary/30 focus:ring-4 focus:ring-sea-primary/10 transition-all duration-300"
+            />
+          </div>
+        </form>
       </div>
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>

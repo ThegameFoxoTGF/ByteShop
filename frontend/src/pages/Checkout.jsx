@@ -8,6 +8,7 @@ import userService from '../services/user.service';
 import couponService from '../services/coupon.service';
 import { useCart } from '../contexts/CartContext';
 import AddressModal from '../components/AddressModal';
+import Breadcrumb from '../components/Breadcrumb';
 
 function Checkout() {
     const navigate = useNavigate();
@@ -189,6 +190,10 @@ function Checkout() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
+            <Breadcrumb items={[
+                { label: 'หน้าหลัก', path: '/', icon: 'ic:round-home' },
+                { label: 'ชำระเงิน', icon: 'ic:round-shopping-cart-checkout' }
+            ]} />
             <h1 className="text-2xl font-bold text-sea-text mb-6 flex items-center gap-2">
                 <Icon icon="ic:round-shopping-cart-checkout" className="text-sea-primary" />
                 ชำระเงิน (Checkout)
@@ -215,11 +220,11 @@ function Checkout() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {/* Add New Button Card */}
                                 <div
                                     onClick={() => setIsModalOpen(true)}
-                                    className="shrink-0 w-32 p-4 border border-dashed border-slate-300 rounded-xl cursor-pointer hover:border-sea-primary hover:bg-sea-primary/5 transition-all flex flex-col items-center justify-center text-slate-400 hover:text-sea-primary gap-2 min-h-[140px]"
+                                    className="p-4 border border-dashed border-slate-300 rounded-xl cursor-pointer hover:border-sea-primary hover:bg-sea-primary/5 transition-all flex flex-col items-center justify-center text-slate-400 hover:text-sea-primary gap-2 min-h-[120px]"
                                 >
                                     <Icon icon="ic:round-add-circle" width="32" />
                                     <span className="text-xs font-bold">เพิ่มใหม่</span>
@@ -229,7 +234,7 @@ function Checkout() {
                                     <div
                                         key={addr._id}
                                         onClick={() => fillAddress(addr)}
-                                        className={`shrink-0 w-64 p-4 border rounded-xl cursor-pointer transition-all group relative ${selectedAddressId === addr._id
+                                        className={`p-4 border rounded-xl cursor-pointer transition-all group relative ${selectedAddressId === addr._id
                                             ? 'border-sea-primary bg-sea-primary/5 ring-1 ring-sea-primary'
                                             : 'border-slate-100 bg-slate-50/50 hover:border-sea-primary hover:bg-sea-primary/5'
                                             }`}
@@ -244,7 +249,7 @@ function Checkout() {
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed h-8">
                                             {addr.address_line}, {addr.sub_district}, {addr.district}, {addr.province} {addr.zip_code}
                                         </p>
                                         <div className="mt-2 flex items-center justify-between">

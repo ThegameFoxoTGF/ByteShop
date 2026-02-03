@@ -50,7 +50,7 @@ function Home() {
   const [limit] = useState(12);
 
   // Filter State
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [selectedBrand, setSelectedBrand] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [appliedPriceRange, setAppliedPriceRange] = useState({ min: '', max: '' });

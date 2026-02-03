@@ -428,6 +428,46 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     res.json(updatedOrder);
 });
 
+// @desc    Confirm order received (User)
+// @route   PUT /api/order/:id/received
+// @access  Private
+const confirmOrderReceived = asyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+        res.status(404);
+        throw new Error("ไม่พบคำสั่งซื้อ");
+    }
+
+    // Check user ownership
+    if (order.user_id.toString() !== req.user._id.toString()) {
+        res.status(401);
+        throw new Error("ไม่มีสิทธิ์จัดการคำสั่งซื้อนี้");
+    }
+
+    // Check current status
+    // Allow if status is shipped
+    if (order.status !== 'shipped') {
+        res.status(400);
+        throw new Error("ต้องรอให้สินค้าจัดส่งก่อนจึงจะยืนยันรับได้");
+    }
+
+    order.status = 'completed';
+    order.shipping_info.is_delivered = true;
+    order.shipping_info.delivered_at = new Date();
+
+    // If COD, ensure payment is marked as paid
+    if (order.payment_method === 'cod') {
+        order.payment_info.payment_status = 'paid';
+        if (!order.payment_info.payment_date) {
+            order.payment_info.payment_date = new Date();
+        }
+    }
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+});
+
 export {
     createOrder,
     getAllOrders,
@@ -435,5 +475,6 @@ export {
     updateOrderToPaid,
     updateOrderAddress,
     cancelOrder,
+    confirmOrderReceived,
     updateOrderStatus
 }

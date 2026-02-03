@@ -29,6 +29,10 @@ const orderService = {
         const response = await axiosClient.put(`/order/${id}/status`, { status, ...extraData });
         return response.data;
     },
+    confirmReceived: async (id) => {
+        const response = await axiosClient.put(`/order/${id}/received`);
+        return response.data;
+    },
 };
 
 export default orderService;

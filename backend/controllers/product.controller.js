@@ -311,7 +311,6 @@ const updateProduct = asyncHandler(async (req, res) => {
         if (original_price !== undefined) product.original_price = original_price;
         if (discount !== undefined) product.discount = discount;
 
-        product.weight_g = weight_g !== undefined ? weight_g : product.weight_g;
         product.dimensions = dimensions || product.dimensions;
         product.warranty_period = warranty_period !== undefined ? warranty_period : product.warranty_period;
         product.warranty_provider = warranty_provider || product.warranty_provider;

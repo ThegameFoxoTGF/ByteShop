@@ -4,6 +4,7 @@ import { Icon } from '@iconify/react';
 import { toast } from 'react-toastify';
 import orderService from '../services/order.service';
 import uploadService from '../services/upload.service';
+import Breadcrumb from '../components/Breadcrumb';
 
 function Order() {
     const { id } = useParams();
@@ -85,6 +86,18 @@ function Order() {
         }
     };
 
+    const handleConfirmReceived = async () => {
+        if (!window.confirm("คุณได้รับสินค้าเรียบร้อยแล้วใช่หรือไม่?")) return;
+        try {
+            await orderService.confirmReceived(id);
+            toast.success("ยืนยันการรับสินค้าเรียบร้อยแล้ว");
+            fetchOrder();
+        } catch (error) {
+            console.error(error);
+            toast.error("ไม่สามารถยืนยันได้: " + (error.response?.data?.message || "Internal Error"));
+        }
+    };
+
     const getStatusStep = (status) => {
         const steps = ['pending', 'waiting_verification', 'paid', 'processing', 'shipped', 'completed'];
         const currentIdx = steps.indexOf(status);
@@ -116,14 +129,12 @@ function Order() {
     return (
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
-            {/* Header / Nav */}
-            <div className="flex items-center gap-3 text-sm text-slate-500 mb-4">
-                <Link to="/profile/orders" className="hover:text-sea-primary flex items-center gap-1">
-                    <Icon icon="ic:round-arrow-back" /> ย้อนกลับ
-                </Link>
-                <span>/</span>
-                <span className="text-slate-800 font-medium">คำสั่งซื้อ #{order.order_id}</span>
-            </div>
+            <Breadcrumb items={[
+                { label: 'หน้าหลัก', path: '/', icon: 'ic:round-home' },
+                { label: 'บัญชีผู้ใช้', path: '/profile', icon: 'ic:round-account-circle' },
+                { label: 'ประวัติคำสั่งซื้อ', path: '/profile/orders', icon: 'ic:round-history' },
+                { label: `คำสั่งซื้อ #${order.order_id}`, icon: 'ic:round-receipt' }
+            ]} />
 
             {/* Status Card */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -156,6 +167,16 @@ function Order() {
                             >
                                 <Icon icon="ic:round-cancel" className="text-red-400 group-hover:text-red-500 transition-colors" width="18" />
                                 ยกเลิกคำสั่งซื้อ
+                            </button>
+                        )}
+
+                        {order.status === 'shipped' && !isCancelled && (
+                            <button
+                                onClick={handleConfirmReceived}
+                                className="mt-5 px-6 py-2.5 text-sm font-bold text-white bg-green-500 rounded-xl hover:bg-green-600 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 active:scale-95 group w-fit cursor-pointer animate-in fade-in slide-in-from-bottom-2"
+                            >
+                                <Icon icon="ic:round-check-circle" width="20" />
+                                ฉันได้รับสินค้าแล้ว
                             </button>
                         )}
                     </div>

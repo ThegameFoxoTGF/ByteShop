@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import cartService from '../services/cart.service';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import Breadcrumb from './Breadcrumb';
 
 function ProductDetailView({ product }) {
     const navigate = useNavigate();
@@ -84,8 +85,23 @@ function ProductDetailView({ product }) {
         }
     };
 
+    const breadcrumbItems = [
+        { label: 'หน้าหลัก', path: '/', icon: 'ic:round-home' }
+    ];
+
+    if (product.category_id && (product.category_id.name || product.category_id.label)) {
+        breadcrumbItems.push({
+            label: product.category_id.label || product.category_id.name,
+            path: `/?category=${product.category_id._id}`,
+            icon: 'ic:round-category'
+        });
+    }
+
+    breadcrumbItems.push({ label: product.name });
+
     return (
         <div className="space-y-12 animate-in fade-in duration-500">
+            <Breadcrumb items={breadcrumbItems} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
                 {/* Image Gallery */}
                 <div className="space-y-4">

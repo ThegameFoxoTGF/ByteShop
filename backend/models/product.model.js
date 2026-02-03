@@ -36,7 +36,6 @@ const ProductSchema = new mongoose.Schema(
     discount: { type: Number, default: 0 },
 
     stock: { type: Number, default: 0 },
-    weight_g: { type: Number },
 
     warranty_period: { type: Number },
     warranty_provider: { type: String },

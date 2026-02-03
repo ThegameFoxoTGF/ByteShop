@@ -45,7 +45,6 @@ function ProductFormPage() {
         main_image: null, // { url: '', public_id: '' }
         images: [], // [ { url: '', public_id: '' } ]
         is_active: true,
-        is_featured: false,
         filters: {}, // { key: value } or { key: [values] }
         specifications: [], // [ { key: 'screen_size', value: '15 inch', label: 'Screen Size' } ] ? Or just match the schema
         warranty_period: '',
@@ -110,7 +109,6 @@ function ProductFormPage() {
                 main_image: data.main_image || null,
                 images: data.image || [],
                 is_active: data.is_active ?? true,
-                is_featured: data.is_featured ?? false,
                 filters: filtersObj,
                 specifications: data.specifications || [],
                 warranty_period: data.warranty_period || '',
@@ -573,6 +571,29 @@ function ProductFormPage() {
                                                     <option key={opt} value={opt}>{opt}</option>
                                                 ))}
                                             </select>
+                                        ) : filter.type === 'boolean' ? (
+                                            <div className="flex gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleFilterChange(filter.key, 'Yes')}
+                                                    className={`flex-1 py-2.5 rounded-xl border font-medium transition-all ${formData.filters[filter.key] === 'Yes'
+                                                        ? 'bg-sea-primary text-white border-sea-primary shadow-md shadow-sea-primary/20'
+                                                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                                        }`}
+                                                >
+                                                    ใช่
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleFilterChange(filter.key, 'No')}
+                                                    className={`flex-1 py-2.5 rounded-xl border font-medium transition-all ${formData.filters[filter.key] === 'No'
+                                                        ? 'bg-sea-primary text-white border-sea-primary shadow-md shadow-sea-primary/20'
+                                                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                                        }`}
+                                                >
+                                                    ไม่ใช่
+                                                </button>
+                                            </div>
                                         ) : (
                                             <input
                                                 type={filter.type === 'number' ? 'number' : 'text'}
@@ -600,33 +621,65 @@ function ProductFormPage() {
                                             {spec.label} <span className="text-slate-400 text-xs">({spec.key})</span>
                                         </label>
                                         <div className="flex gap-2 items-start">
-                                            <div className="flex-1">
-                                                <input
-                                                    type={spec.type === 'number' ? 'number' : 'text'}
-                                                    value={getSpecValue(spec.key)}
-                                                    onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
-                                                    className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none transition-colors ${spec.type === 'select'
-                                                        ? 'bg-slate-100 border-slate-200 text-slate-500 cursor-not-allowed'
-                                                        : 'bg-slate-50 border-slate-200 focus:border-sea-primary'
-                                                        }`}
-                                                    placeholder={`ระบุ ${spec.label}`}
-                                                    readOnly={spec.type === 'select'}
-                                                />
-                                                {spec.unit && <span className="text-xs text-slate-500 mt-1 block">หน่วย: {spec.unit}</span>}
-                                            </div>
-                                            {spec.type === 'select' && spec.options && (
-                                                <select
-                                                    value=""
-                                                    onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
-                                                    className="w-33 px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none hover:border-sea-primary text-sm text-slate-700 cursor-pointer shadow-sm"
-                                                >
-                                                    <option value="" disabled>เลือกตัวเลือก</option>
-                                                    {spec.options.map((option, idx) => (
-                                                        <option key={idx} value={option}>
-                                                            {option}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                            {spec.type === 'boolean' ? (
+                                                <div className="w-full flex gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSpecChange(spec.key, 'Yes', spec.label, spec.unit)}
+                                                        className={`flex-1 py-2.5 rounded-xl border font-medium transition-all ${getSpecValue(spec.key) === 'Yes'
+                                                            ? 'bg-sea-primary text-white border-sea-primary shadow-md shadow-sea-primary/20'
+                                                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                                            }`}
+                                                    >
+                                                        ใช่
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSpecChange(spec.key, 'No', spec.label, spec.unit)}
+                                                        className={`flex-1 py-2.5 rounded-xl border font-medium transition-all ${getSpecValue(spec.key) === 'No'
+                                                            ? 'bg-sea-primary text-white border-sea-primary shadow-md shadow-sea-primary/20'
+                                                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                                            }`}
+                                                    >
+                                                        ไม่ใช่
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="flex-1">
+                                                        <input
+                                                            type={spec.type === 'number' ? 'number' : 'text'}
+                                                            value={getSpecValue(spec.key)}
+                                                            onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
+                                                            className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none transition-colors ${spec.type === 'select'
+                                                                ? 'bg-slate-100 border-slate-200 text-slate-500 cursor-not-allowed'
+                                                                : 'bg-slate-50 border-slate-200 focus:border-sea-primary'
+                                                                }`}
+                                                            placeholder={`ระบุ ${spec.label}`}
+                                                            readOnly={spec.type === 'select'}
+                                                        />
+                                                        {spec.type === 'number' && (
+                                                            <p className="text-xs text-sea-subtext mt-1">
+                                                                * กรุณาระบุเป็นตัวเลขเท่านั้น
+                                                            </p>
+                                                        )}
+                                                        {spec.unit && <span className="text-xs text-slate-500 mt-1 block">หน่วย: {spec.unit}</span>}
+                                                    </div>
+                                                    {spec.type === 'select' && spec.options && (
+                                                        <select
+                                                            value=""
+                                                            onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
+                                                            className="w-33 px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none hover:border-sea-primary text-sm text-slate-700 cursor-pointer shadow-sm"
+                                                        >
+                                                            <option value="" disabled>เลือกตัวเลือก</option>
+                                                            {spec.options.map((option, idx) => (
+                                                                <option key={idx} value={option}>
+                                                                    {option}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    )}
+                                                </>
                                             )}
                                         </div>
                                     </div>
