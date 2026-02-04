@@ -141,6 +141,8 @@ const getCategoryFilters = asyncHandler(async (req, res) => {
     const filters = await Product.aggregate([
         { $match: { category_id: new mongoose.Types.ObjectId(categoryId), is_active: true } },
         { $unwind: "$filters" },
+        // Unwind values if they are arrays, so each value becomes an option
+        { $unwind: { path: "$filters.value", preserveNullAndEmptyArrays: true } },
         {
             $group: {
                 _id: "$filters.key",

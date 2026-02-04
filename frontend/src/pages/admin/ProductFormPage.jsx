@@ -594,6 +594,64 @@ function ProductFormPage() {
                                                     ไม่ใช่
                                                 </button>
                                             </div>
+                                        ) : filter.type === 'array' ? (
+                                            <div className="space-y-2">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {(Array.isArray(formData.filters[filter.key]) ? formData.filters[filter.key] : formData.filters[filter.key] ? [formData.filters[filter.key]] : []).map((val, idx) => (
+                                                        <span key={idx} className="inline-flex items-center px-2.5 py-1 bg-sea-light/10 text-sea-primary text-sm font-medium rounded-lg border border-sea-light/20">
+                                                            {val}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const currentVal = Array.isArray(formData.filters[filter.key]) ? formData.filters[filter.key] : (formData.filters[filter.key] ? [formData.filters[filter.key]] : []);
+                                                                    const newVal = currentVal.filter((_, i) => i !== idx);
+                                                                    handleFilterChange(filter.key, newVal, true);
+                                                                }}
+                                                                className="ml-1.5 text-sea-primary/60 hover:text-red-500 transition-colors"
+                                                            >
+                                                                <Icon icon="ic:round-close" width="14" />
+                                                            </button>
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        placeholder={`ระบุ ${filter.label} แล้วกด Enter`}
+                                                        className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-sea-primary transition-colors bg-slate-50"
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                const val = e.target.value.trim();
+                                                                if (val) {
+                                                                    const currentVal = Array.isArray(formData.filters[filter.key]) ? formData.filters[filter.key] : (formData.filters[filter.key] ? [formData.filters[filter.key]] : []);
+                                                                    if (!currentVal.includes(val)) {
+                                                                        handleFilterChange(filter.key, [...currentVal, val], true);
+                                                                    }
+                                                                    e.target.value = '';
+                                                                }
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="px-4 py-2 bg-sea-primary/10 text-sea-primary hover:bg-sea-primary hover:text-white rounded-xl font-medium transition-all"
+                                                        onClick={(e) => {
+                                                            const input = e.currentTarget.previousSibling;
+                                                            const val = input.value.trim();
+                                                            if (val) {
+                                                                const currentVal = Array.isArray(formData.filters[filter.key]) ? formData.filters[filter.key] : (formData.filters[filter.key] ? [formData.filters[filter.key]] : []);
+                                                                if (!currentVal.includes(val)) {
+                                                                    handleFilterChange(filter.key, [...currentVal, val], true);
+                                                                }
+                                                                input.value = '';
+                                                            }
+                                                        }}
+                                                    >
+                                                        เพิ่ม
+                                                    </button>
+                                                </div>
+                                            </div>
                                         ) : (
                                             <input
                                                 type={filter.type === 'number' ? 'number' : 'text'}
@@ -643,6 +701,65 @@ function ProductFormPage() {
                                                     >
                                                         ไม่ใช่
                                                     </button>
+                                                </div>
+                                            ) : spec.type === 'array' ? (
+                                                <div className="flex-1 space-y-2">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {(Array.isArray(getSpecValue(spec.key)) ? getSpecValue(spec.key) : getSpecValue(spec.key) ? [getSpecValue(spec.key)] : []).map((val, idx) => (
+                                                            <span key={idx} className="inline-flex items-center px-2.5 py-1 bg-sea-light/10 text-sea-primary text-sm font-medium rounded-lg border border-sea-light/20">
+                                                                {val}
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        const currentVal = Array.isArray(getSpecValue(spec.key)) ? getSpecValue(spec.key) : (getSpecValue(spec.key) ? [getSpecValue(spec.key)] : []);
+                                                                        const newVal = currentVal.filter((_, i) => i !== idx);
+                                                                        handleSpecChange(spec.key, newVal, spec.label, spec.unit);
+                                                                    }}
+                                                                    className="ml-1.5 text-sea-primary/60 hover:text-red-500 transition-colors"
+                                                                >
+                                                                    <Icon icon="ic:round-close" width="14" />
+                                                                </button>
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder={`ระบุ ${spec.label} แล้วกด Enter`}
+                                                            className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-sea-primary transition-colors bg-slate-50"
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    e.preventDefault();
+                                                                    const val = e.target.value.trim();
+                                                                    if (val) {
+                                                                        const currentVal = Array.isArray(getSpecValue(spec.key)) ? getSpecValue(spec.key) : (getSpecValue(spec.key) ? [getSpecValue(spec.key)] : []);
+                                                                        if (!currentVal.includes(val)) {
+                                                                            handleSpecChange(spec.key, [...currentVal, val], spec.label, spec.unit);
+                                                                        }
+                                                                        e.target.value = '';
+                                                                    }
+                                                                }
+                                                            }}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            className="px-4 py-2 bg-sea-primary/10 text-sea-primary hover:bg-sea-primary hover:text-white rounded-xl font-medium transition-all"
+                                                            onClick={(e) => {
+                                                                const input = e.currentTarget.previousSibling;
+                                                                const val = input.value.trim();
+                                                                if (val) {
+                                                                    const currentVal = Array.isArray(getSpecValue(spec.key)) ? getSpecValue(spec.key) : (getSpecValue(spec.key) ? [getSpecValue(spec.key)] : []);
+                                                                    if (!currentVal.includes(val)) {
+                                                                        handleSpecChange(spec.key, [...currentVal, val], spec.label, spec.unit);
+                                                                    }
+                                                                    input.value = '';
+                                                                }
+                                                            }}
+                                                        >
+                                                            เพิ่ม
+                                                        </button>
+                                                    </div>
+                                                    {spec.unit && <span className="text-xs text-slate-500 mt-1 block">หน่วย: {spec.unit}</span>}
                                                 </div>
                                             ) : (
                                                 <>

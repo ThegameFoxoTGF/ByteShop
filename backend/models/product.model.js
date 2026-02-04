@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const fieldTemplate = new mongoose.Schema({
   key: { type: String },
   label: { type: String },
-  value: { type: String },
+  value: { type: mongoose.Schema.Types.Mixed }, // String or Array
   type: { type: String },
   unit: { type: String },
 }, { _id: false })

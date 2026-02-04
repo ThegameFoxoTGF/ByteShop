@@ -18,7 +18,9 @@ const FIELD_TYPES = [
     { value: 'text', label: 'ข้อความ (Text)' },
     { value: 'number', label: 'ตัวเลข (Number)' },
     { value: 'select', label: 'เลือกหนึ่งรายการ (Single Select)' },
-    { value: 'boolean', label: 'ใช่/ไม่ใช่ (Boolean)' }
+    { value: 'multiselect', label: 'เลือกหลายรายการ (Multi Select)' },
+    { value: 'boolean', label: 'ใช่/ไม่ใช่ (Boolean)' },
+    { value: 'array', label: 'แบบหลายค่า (Array Text)' }
 ];
 
 function CategoryFormPage() {
