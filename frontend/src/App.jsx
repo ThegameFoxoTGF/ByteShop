@@ -36,9 +36,12 @@ import OrderFormPage from "./pages/admin/OrderFormPage";
 import BrandListPage from "./pages/admin/BrandListPage";
 import BrandFormPage from "./pages/admin/BrandFormPage";
 
+import ScrollToTop from "./components/ScrollToTop";
+
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
 
         <Route element={<MainLayout />}>
