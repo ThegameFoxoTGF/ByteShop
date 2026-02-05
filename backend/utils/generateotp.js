@@ -65,7 +65,7 @@ const otpTemplate = (otp) => {
             <h1 style="margin:0; font-size: 28px;">Byte IT Store</h1>
         </div>
         <div class="content">
-            <h2 style="color: #1e293b;">ยืนยันตัวตนของคุณ</h2>
+            <h2 style="color: #1e293b;">รีเซ็ตรหัสผ่าน</h2>
             <p style="color: #475569; font-size: 16px;">สวัสดีครับ, โปรดใช้รหัส OTP ด้านล่างนี้เพื่อดำเนินการต่อให้เสร็จสมบูรณ์:</p>
             
             <div class="otp-code">${otp}</div>

@@ -17,7 +17,7 @@ function CardProduct({ product }) {
     const handleWishlist = async (e) => {
         e.preventDefault(); // Prevent navigation
         if (!user) {
-            toast.info("กรุณาเข้าสู่ระบบเพื่อบันทึกรายการโปรด");
+            toast.info("กรุณาเข้าสู่ระบบเพื่อบันทึกรายการที่อยากได้");
             return;
         }
         if (wishlistLoading) return;
@@ -26,7 +26,7 @@ function CardProduct({ product }) {
         try {
             await new Promise(resolve => setTimeout(resolve, 200));
             await toggleWishlist(product._id);
-            toast.success(isWishlisted ? "ลบออกจากรายการโปรดแล้ว" : "เพิ่มลงรายการโปรดเรียบร้อย");
+            toast.success(isWishlisted ? "ลบออกจากรายการที่อยากได้แล้ว" : "เพิ่มลงรายการที่อยากได้เรียบร้อย");
         } catch (error) {
             toast.error("เกิดข้อผิดพลาด");
         } finally {
@@ -76,7 +76,7 @@ function CardProduct({ product }) {
                     onClick={handleWishlist}
                     disabled={wishlistLoading}
                     className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-white transition-all transform hover:scale-110"
-                    title={isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด"}
+                    title={isWishlisted ? "ลบออกจากสิ่งที่อยากได้" : "เพิ่มลงสิ่งที่อยากได้"}
                 >
                     {wishlistLoading ? (
                         <Icon icon="eos-icons:loading" width="20" />

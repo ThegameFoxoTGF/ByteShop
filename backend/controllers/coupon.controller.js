@@ -19,7 +19,6 @@ const checkCoupon = asyncHandler(async (req, res) => {
   });
 
   if (!coupon) {
-    console.log(coupon);
     res.status(404);
     throw new Error("คูปองไม่ถูกต้อง");
   }
@@ -186,7 +185,7 @@ const updateCoupon = asyncHandler(async (req, res) => {
         ? req.body.usagePerUser
         : coupon.usagePerUser;
     coupon.start_date = req.body.start_date || coupon.start_date;
-    coupon.end_date = req.body.end_date
+    coupon.end_date = req.body.end_date;
     coupon.is_active =
       req.body.is_active !== undefined ? req.body.is_active : coupon.is_active;
 

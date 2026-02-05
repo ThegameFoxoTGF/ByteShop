@@ -303,7 +303,6 @@ function Profile() {
                   value={formData.first_name}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
-                  required
                 />
               </div>
               <div>
@@ -314,7 +313,6 @@ function Profile() {
                   value={formData.last_name}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-sea-primary"
-                  required
                 />
               </div>
             </div>

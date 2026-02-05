@@ -47,8 +47,8 @@ function CouponFormPage() {
                 is_active: data.is_active
             });
         } catch (error) {
-            console.error('Error fetching coupon:', error);
-            toast.error('Failed to fetch coupon details');
+            console.error('เกิดข้อผิดพลาดในการดึงข้อมูลคูปอง:', error);
+            toast.error('เกิดข้อผิดพลาดในการดึงข้อมูลคูปอง');
             navigate('/admin/coupons');
         } finally {
             setFetching(false);
@@ -78,15 +78,15 @@ function CouponFormPage() {
 
             if (isEditMode) {
                 await couponService.updateCoupon(id, payload);
-                toast.success('Coupon updated successfully');
+                toast.success('คูปองอัปเดตเรียบร้อย');
             } else {
                 await couponService.createCoupon(payload);
-                toast.success('Coupon created successfully');
+                toast.success('สร้างคูปองเรียบร้อย');
             }
             navigate('/admin/coupons');
         } catch (error) {
-            console.error('Error saving coupon:', error);
-            const msg = error.response?.data?.message || 'Failed to save coupon';
+            console.error('เกิดข้อผิดพลาดในการบันทึกคูปอง:', error);
+            const msg = error.response?.data?.message || 'เกิดข้อผิดพลาด';
             toast.error(msg);
         } finally {
             setLoading(false);

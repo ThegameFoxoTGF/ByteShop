@@ -112,9 +112,9 @@ function Forgot() {
                             <span className="text-2xl font-bold">B</span>
                         </Link>
                         <h2 className="text-3xl font-bold text-sea-text mb-2">
-                            {step === 0 && 'Forgot Password'}
-                            {step === 1 && 'Confirm OTP'}
-                            {step === 2 && 'New Password'}
+                            {step === 0 && 'รีเซ็ตรหัสผ่าน'}
+                            {step === 1 && 'ยืนยันรหัส OTP'}
+                            {step === 2 && 'รหัสผ่านใหม่'}
                         </h2>
                         <p className="text-sea-subtext">
                             {step === 0 && 'ป้อนอีเมลของคุณเพื่อรับรหัส OTP'}

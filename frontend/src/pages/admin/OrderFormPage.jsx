@@ -149,7 +149,7 @@ function OrderFormPage() {
                         onClick={() => navigate('/admin/orders')}
                         className="flex items-center gap-2 text-slate-500 hover:text-sea-primary transition-colors mb-2"
                     >
-                        <Icon icon="ic:round-arrow-back" /> Back to Orders
+                        <Icon icon="ic:round-arrow-back" /> กลับสู่รายการคำสั่งซื้อ
                     </button>
                     <h1 className="text-2xl font-bold text-sea-text flex items-center gap-3">
                         Order #{order.order_id || order._id.substring(0, 8).toUpperCase()}
@@ -183,7 +183,7 @@ function OrderFormPage() {
                             disabled={saving || (status === order.status && status !== 'shipped')}
                             className="px-4 py-2 bg-sea-primary text-white rounded-lg text-sm font-medium shadow-lg shadow-sea-primary/20 hover:bg-sea-deep disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
-                            {saving ? 'Updating...' : 'Update Status'}
+                            {saving ? 'กำลังอัปเดต...' : 'อัปเดตสถานะ'}
                         </button>
                     </div>
 

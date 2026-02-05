@@ -184,7 +184,6 @@ function ProductFormPage() {
         return () => {
             // Only cleanup if NOT saved and there are uploaded images
             if (!isSavedRef.current && uploadedImagesRef.current.length > 0) {
-                console.log('Cleaning up orphaned images:', uploadedImagesRef.current);
                 uploadedImagesRef.current.forEach(public_id => {
                     uploadService.deleteImage(public_id).catch(err => console.error('Cleanup error:', err));
                 });

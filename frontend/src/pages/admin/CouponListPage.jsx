@@ -35,8 +35,8 @@ function CouponListPage() {
                 setTotal(response.total || 0);
             }
         } catch (error) {
-            console.error('Error fetching coupons:', error);
-            toast.error("Failed to load coupons");
+            console.error('เกิดข้อผิดพลาดในการดึงข้อมูลคูปอง:', error);
+            toast.error("เกิดข้อผิดพลาดในการดึงข้อมูลคูปอง");
         } finally {
             setLoading(false);
         }
@@ -52,14 +52,14 @@ function CouponListPage() {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this coupon?')) {
+        if (window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบคูปองนี้?')) {
             try {
                 await couponService.deleteCoupon(id);
-                toast.success('Coupon deleted successfully');
+                toast.success('ลบคูปองเรียบร้อย');
                 fetchCoupons();
             } catch (error) {
-                console.error('Error deleting coupon:', error);
-                toast.error('Failed to delete coupon');
+                console.error('เกิดข้อผิดพลาดในการลบคูปอง:', error);
+                toast.error('เกิดข้อผิดพลาดในการลบคูปอง');
             }
         }
     };
