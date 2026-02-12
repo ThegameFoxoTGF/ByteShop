@@ -54,7 +54,7 @@ function Forgot() {
             toast.success("ส่งรหัส OTP ใหม่เรียบร้อย");
             setCountdown(60);
         } catch (error) {
-            toast.error(error.response?.data?.message || "ส่ง OTP ไม่สำเร็จ");
+            toast.error(error.response?.data?.message || "ส่ง OTP ใหม่ไม่สำเร็จ");
         } finally {
             setLoading(false);
         }
@@ -87,7 +87,7 @@ function Forgot() {
         setLoading(true);
         try {
             await authService.resetPassword(email, passwordToken, newPassword);
-            toast.success("เปลี่ยนรหัสผ่านเรียบร้อย กรุณาเข้าสู่ระบบใหม่");
+            toast.success("เปลี่ยนรหัสผ่านสำเร็จ");
             navigate('/login');
         } catch (error) {
             console.error(error);

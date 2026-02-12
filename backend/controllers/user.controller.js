@@ -145,62 +145,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Get user wishlist with product details
-// @route   GET /api/user/wishlist
-// @access  Private
-const getWishlist = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id).populate("wishlist");
-
-    if (user) {
-        res.json(user.wishlist);
-    } else {
-        res.status(404);
-        throw new Error("ไม่พบผู้ใช้");
-    }
-});
-
-// @desc    Add product to wishlist
-// @route   POST /api/user/wishlist/:id
-// @access  Private
-const addWishlist = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id);
-    const productId = req.params.id;
-
-    if (user) {
-        // Check if product already in wishlist
-        if (user.wishlist.includes(productId)) {
-            res.status(400);
-            throw new Error("สินค้านี้อยู่ในรายการสิ่งที่อยากได้แล้ว");
-        }
-
-        user.wishlist.push(productId);
-        await user.save();
-
-        res.json({ message: "เพิ่มลงในสิ่งทีอยากได้แล้ว", wishlist: user.wishlist });
-    } else {
-        res.status(404);
-        throw new Error("ไม่พบผู้ใช้");
-    }
-});
-
-// @desc    Remove product from wishlist
-// @route   DELETE /api/user/wishlist/:id
-// @access  Private
-const removeWishlist = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id);
-    const productId = req.params.id;
-
-    if (user) {
-        user.wishlist = user.wishlist.filter(id => id.toString() !== productId);
-        await user.save();
-
-        res.json({ message: "ลบออกจากสิ่งที่อยากได้แล้ว", wishlist: user.wishlist });
-    } else {
-        res.status(404);
-        throw new Error("ไม่พบผู้ใช้");
-    }
-});
-
 // @desc    Update user profile
 // @route   PUT /api/user/profile
 // @access  Private

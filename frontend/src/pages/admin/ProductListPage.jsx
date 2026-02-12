@@ -28,7 +28,7 @@ function ProductListPage() {
             setTotal(response.total || 0);
         } catch (error) {
             console.error('Error fetching products:', error);
-            toast.error("Failed to load products");
+            toast.error("ไม่สามารถโหลดข้อมูลสินค้าได้");
         } finally {
             setLoading(false);
         }
@@ -39,14 +39,14 @@ function ProductListPage() {
     }, [page, limit, keyword]);
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this product?')) {
+        if (window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?')) {
             try {
                 await productService.deleteProduct(id);
-                toast.success('Product deleted successfully');
+                toast.success('ลบสินค้าเรียบร้อย');
                 fetchProducts();
             } catch (error) {
                 console.error('Error deleting product:', error);
-                toast.error('Failed to delete product');
+                toast.error('ไม่สามารถลบสินค้าได้');
             }
         }
     };
@@ -141,18 +141,18 @@ function ProductListPage() {
                                                 </div>
                                                 <div>
                                                     <h3 className="font-medium text-sea-text group-hover:text-sea-primary transition-colors">{product.name}</h3>
-                                                    <p className="text-xs text-sea-muted truncate max-w-[200px]">{product.sku || 'No SKU'}</p>
+                                                    <p className="text-xs text-sea-muted truncate max-w-[200px]">{product.sku || 'ไม่มี SKU'}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-sea-text">
                                             <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium text-xs">
-                                                {product.category?.name || product.category_id?.name || 'Uncategorized'}
+                                                {product.category?.name || product.category_id?.name || 'ไม่มีหมวดหมู่'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-sea-text">
                                             <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium text-xs">
-                                                {product.brand?.name || product.brand_id?.name || 'Unbranded'}
+                                                {product.brand?.name || product.brand_id?.name || 'ไม่มีแบรนด์'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
@@ -193,14 +193,14 @@ function ProductListPage() {
                                                 <Link
                                                     to={`/admin/products/${product._id}`}
                                                     className="p-2 text-slate-400 hover:text-sea-primary hover:bg-sea-light/50 rounded-lg transition-all"
-                                                    title="Edit"
+                                                    title="แก้ไข"
                                                 >
                                                     <Icon icon="ic:round-edit" width="20" />
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(product._id)}
                                                     className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                                    title="Delete"
+                                                    title="ลบ"
                                                 >
                                                     <Icon icon="ic:round-delete-outline" width="20" />
                                                 </button>

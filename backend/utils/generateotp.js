@@ -62,7 +62,7 @@ const otpTemplate = (otp) => {
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin:0; font-size: 28px;">Byte IT Store</h1>
+            <h1 style="margin:0; font-size: 28px;">ByteShop</h1>
         </div>
         <div class="content">
             <h2 style="color: #1e293b;">รีเซ็ตรหัสผ่าน</h2>
@@ -75,7 +75,7 @@ const otpTemplate = (otp) => {
         </div>
         <div class="footer">
             <p>หากคุณไม่ได้ทำรายการนี้ โปรดเพิกเฉยต่ออีเมลฉบับนี้</p>
-            <p>&copy; 2026 Byte IT Store. All rights reserved.</p>
+            <p>&copy; 2026 ByteShop. All rights reserved.</p>
         </div>
     </div>
 </body>

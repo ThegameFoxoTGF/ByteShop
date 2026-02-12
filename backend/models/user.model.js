@@ -16,7 +16,6 @@ const AddressSchema = new mongoose.Schema({
 
 const UserSchema = new mongoose.Schema(
     {
-        is_active: { type: Boolean, default: true },
         email: {
             type: String,
             required: true,
@@ -44,6 +43,7 @@ const UserSchema = new mongoose.Schema(
         address: [AddressSchema],
 
         is_admin: { type: Boolean, default: false },
+        is_active: { type: Boolean, default: true },
 
         wishlist: [
             {

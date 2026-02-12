@@ -32,7 +32,7 @@ function ProductDetailView({ product }) {
 
     const handleWishlist = async () => {
         if (!user) {
-            toast.info("กรุณาเข้าสู่ระบบเพื่อบันทึกรายการที่อยากได้");
+            toast.info("กรุณาเข้าสู่ระบบ");
             return;
         }
         if (wishlistLoading) return;
@@ -41,7 +41,7 @@ function ProductDetailView({ product }) {
         try {
             await new Promise(resolve => setTimeout(resolve, 200));
             await toggleWishlist(product._id);
-            toast.success(isWishlisted ? "ลบออกจากรายการที่อยากได้แล้ว" : "เพิ่มลงรายการที่อยากได้เรียบร้อย");
+            toast.success(isWishlisted ? "ลบออกจากรายการโปรดแล้ว" : "เพิ่มลงรายการโปรดเรียบร้อย");
         } catch (error) {
             toast.error("เกิดข้อผิดพลาด");
         } finally {
@@ -60,8 +60,8 @@ function ProductDetailView({ product }) {
 
     const handleAddToCart = async () => {
         if (!user) {
-            toast.info('กรุณาสมัครสมาชิกก่อนสั่งซื้อ');
-            navigate('/register');
+            toast.info('กรุณาเข้าสู่ระบบก่อนสั่งซื้อ');
+            navigate('/login');
             return;
         }
 
@@ -119,7 +119,7 @@ function ProductDetailView({ product }) {
                         )}
                         {product.stock <= 0 && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                <span className="text-white font-bold text-xl px-4 py-2 border-2 border-white rounded-lg transform -rotate-12">OUT OF STOCK</span>
+                                <span className="text-white font-bold text-xl px-4 py-2 border-2 border-white rounded-lg transform -rotate-12">สินค้าหมด</span>
                             </div>
                         )}
                     </div>
@@ -212,7 +212,7 @@ function ProductDetailView({ product }) {
                                 onClick={handleWishlist}
                                 disabled={wishlistLoading}
                                 className={`w-14 h-14 flex items-center justify-center border rounded-xl transition-all transform active:scale-95 ${isWishlisted ? 'border-red-500 bg-red-50 text-red-500 hover:shadow-lg hover:shadow-red-200' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-slate-50'}`}
-                                title={isWishlisted ? "ลบออกจากสิ่งที่อยากได้" : "เพิ่มลงสิ่งที่อยากได้"}
+                                title={isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด"}
                             >
                                 {wishlistLoading ? <Icon icon="eos-icons:loading" /> : <Icon icon={isWishlisted ? "ic:round-favorite" : "ic:round-favorite-border"} width="28" />}
                             </button>

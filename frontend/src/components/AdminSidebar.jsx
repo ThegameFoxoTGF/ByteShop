@@ -72,7 +72,7 @@ function AdminSidebar() {
                     <div className="p-2 bg-white rounded-lg shadow-sm group-hover:shadow text-inherit transition-shadow">
                         <Icon icon="ic:baseline-logout" width="20" height="20" />
                     </div>
-                    <span className="font-medium">Back to Home</span>
+                    <span className="font-medium">กลับสู่หน้าหลัก</span>
                 </Link>
             </div>
         </aside>

@@ -104,7 +104,7 @@ function Navbar() {
                     </div>
                   </div>
                   <span className="text-sm font-medium text-sea-text max-w-[100px] truncate hidden sm:block">
-                    {user.first_name || 'User'}
+                    {user.first_name || user.email?.split('@')[0]}
                   </span>
                   <Icon icon="ic:round-keyboard-arrow-down" className={`text-sea-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
                 </button>
@@ -143,7 +143,7 @@ function Navbar() {
                         <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
                           <Icon icon="ic:round-favorite" width="18" height="18" />
                         </div>
-                        สิ่งที่อยากได้
+                        รายการโปรด
                       </button>
                     </div>
 

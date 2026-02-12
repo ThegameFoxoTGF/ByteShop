@@ -37,7 +37,7 @@ function OrderListPage() {
             }
         } catch (error) {
             console.error('Error fetching orders:', error);
-            toast.error("Failed to load orders");
+            toast.error("โหลดข้อมูลคำสั่งซื้อไม่สำเร็จ");
         } finally {
             setLoading(false);
         }
@@ -189,7 +189,7 @@ function OrderListPage() {
                                         <td className="px-6 py-4 text-sm text-sea-text">
                                             {(() => {
                                                 const user = order.user_id;
-                                                if (!user) return 'Unknown User';
+                                                if (!user) return 'ไม่พบผู้ใช้';
 
                                                 const fullName = `${user.profile?.first_name || ''} ${user.profile?.last_name || ''}`.trim();
 

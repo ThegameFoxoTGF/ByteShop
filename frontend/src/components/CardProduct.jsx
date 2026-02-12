@@ -17,7 +17,7 @@ function CardProduct({ product }) {
     const handleWishlist = async (e) => {
         e.preventDefault(); // Prevent navigation
         if (!user) {
-            toast.info("กรุณาเข้าสู่ระบบเพื่อบันทึกรายการที่อยากได้");
+            toast.info("กรุณาเข้าสู่ระบบ");
             return;
         }
         if (wishlistLoading) return;
@@ -26,7 +26,7 @@ function CardProduct({ product }) {
         try {
             await new Promise(resolve => setTimeout(resolve, 200));
             await toggleWishlist(product._id);
-            toast.success(isWishlisted ? "ลบออกจากรายการที่อยากได้แล้ว" : "เพิ่มลงรายการที่อยากได้เรียบร้อย");
+            toast.success(isWishlisted ? "ลบออกจากรายการโปรดแล้ว" : "เพิ่มลงรายการโปรดเรียบร้อย");
         } catch (error) {
             toast.error("เกิดข้อผิดพลาด");
         } finally {
@@ -61,7 +61,7 @@ function CardProduct({ product }) {
                 <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
                     {product.stock <= 0 && (
                         <span className="bg-slate-700 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
-                            Out of Stock
+                            สินค้าหมด
                         </span>
                     )}
                     {discountPercentage > 0 && (
@@ -76,7 +76,7 @@ function CardProduct({ product }) {
                     onClick={handleWishlist}
                     disabled={wishlistLoading}
                     className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-white transition-all transform hover:scale-110"
-                    title={isWishlisted ? "ลบออกจากสิ่งที่อยากได้" : "เพิ่มลงสิ่งที่อยากได้"}
+                    title={isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด"}
                 >
                     {wishlistLoading ? (
                         <Icon icon="eos-icons:loading" width="20" />
@@ -92,7 +92,7 @@ function CardProduct({ product }) {
                 {/* Quick Action Overlay (Mobile hidden, Desktop show on hover) */}
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center">
                     <span className="bg-white text-sea-deep px-6 py-2.5 rounded-full font-bold shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-2">
-                        View Details
+                        ดูรายละเอียด
                     </span>
                 </div>
             </div>

@@ -21,7 +21,7 @@ function ProfileLayout() {
             } else if (path.includes('/address')) {
                 base.push({ label: 'ที่อยู่ของฉัน', icon: 'ic:round-location-on' });
             } else if (path.includes('/wishlist')) {
-                base.push({ label: 'สิ่งที่อยากได้', icon: 'ic:round-favorite' });
+                base.push({ label: 'รายการโปรด', icon: 'ic:round-favorite' });
             }
         }
 

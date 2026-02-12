@@ -97,7 +97,7 @@ function CartDrawer({ isOpen, onClose }) {
             await fetchCartCount(); // Sync badge in background
         } catch (error) {
             console.error("Failed to update quantity", error);
-            const message = error.response?.data?.message || "Failed to update quantity";
+            const message = error.response?.data?.message || "อัปเดตจำนวนสินค้าไม่สำเร็จ";
             toast.error(message);
 
             // Revert on error
@@ -140,7 +140,7 @@ function CartDrawer({ isOpen, onClose }) {
                         {loading ? (
                             <div className="flex flex-col items-center justify-center h-64 space-y-4">
                                 <div className="w-10 h-10 border-4 border-sea-light border-t-sea-primary rounded-full animate-spin"></div>
-                                <p className="text-sea-muted text-sm">Loading your cart...</p>
+                                <p className="text-sea-muted text-sm">กำลังโหลดตะกร้าสินค้า...</p>
                             </div>
                         ) : cartItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
@@ -180,7 +180,7 @@ function CartDrawer({ isOpen, onClose }) {
                                         {/* Product Details */}
                                         <div className="flex-1 min-w-0 flex flex-col justify-between">
                                             <div>
-                                                <h4 className="font-medium text-sea-text truncate pr-6 text-sm md:text-base">{item.product?.name || 'Unknown Product'}</h4>
+                                                <h4 className="font-medium text-sea-text truncate pr-6 text-sm md:text-base">{item.product?.name || 'สินค้าไม่ระบุชื่อ'}</h4>
                                                 <p className="text-sm text-sea-subtext">{/* Variation or Option if any */}</p>
                                             </div>
 

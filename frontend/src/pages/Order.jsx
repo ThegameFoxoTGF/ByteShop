@@ -82,7 +82,7 @@ function Order() {
             fetchOrder();
         } catch (error) {
             console.error(error);
-            toast.error("ไม่สามารถยกเลิกคำสั่งซื้อได้: " + (error.response?.data?.message || "Internal Error"));
+            toast.error("ไม่สามารถยกเลิกคำสั่งซื้อได้: " + (error.response?.data?.message || "เกิดข้อผิดพลาดภายในระบบ"));
         }
     };
 
@@ -94,7 +94,7 @@ function Order() {
             fetchOrder();
         } catch (error) {
             console.error(error);
-            toast.error("ไม่สามารถยืนยันได้: " + (error.response?.data?.message || "Internal Error"));
+            toast.error("ไม่สามารถยืนยันได้: " + (error.response?.data?.message || "เกิดข้อผิดพลาดภายในระบบ"));
         }
     };
 

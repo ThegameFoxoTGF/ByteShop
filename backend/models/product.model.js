@@ -10,10 +10,9 @@ const fieldTemplate = new mongoose.Schema({
 
 const ProductSchema = new mongoose.Schema(
   {
-    is_active: { type: Boolean, default: true },
 
-    sku: { type: String, unique: true, required: true, trim: true },
     name: { type: String, required: true, trim: true },
+    sku: { type: String, unique: true, required: true, trim: true },
     slug: { type: String, required: true, trim: true },
 
     category_id: {
@@ -43,6 +42,7 @@ const ProductSchema = new mongoose.Schema(
     search_keywords: [{ type: String }],
     filters: [fieldTemplate],
     specifications: [fieldTemplate],
+    is_active: { type: Boolean, default: true },
   },
   {
     timestamps: true,

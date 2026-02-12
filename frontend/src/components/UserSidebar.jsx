@@ -16,7 +16,7 @@ function UserSidebar() {
                 <div className="w-20 h-20 mx-auto bg-sea-primary/10 rounded-full flex items-center justify-center text-sea-primary mb-4">
                     <Icon icon="ic:round-person" width="48" />
                 </div>
-                <h2 className="font-bold text-lg text-sea-text truncate">{user?.first_name || user?.name || 'User'}</h2>
+                <h2 className="font-bold text-lg text-sea-text truncate">{user?.first_name || user?.email?.split('@')[0]}</h2>
                 <p className="text-sm text-slate-500 truncate">{user?.email}</p>
             </div>
 
@@ -45,7 +45,7 @@ function UserSidebar() {
                     to="/profile/wishlist"
                     className={({ isActive }) => `shrink-0 px-4 md:px-6 py-3 md:py-4 flex items-center gap-2 md:gap-3 transition-colors border-b-2 md:border-b-0 md:border-l-4 text-sm md:text-base whitespace-nowrap ${isActive ? 'border-sea-primary text-sea-primary bg-sea-primary/5 md:bg-transparent' : 'border-transparent text-slate-600 hover:text-sea-primary'}`}
                 >
-                    <Icon icon="ic:round-favorite" className="text-lg md:text-xl" /> <span className="md:inline">สิ่งที่อยากได้</span>
+                    <Icon icon="ic:round-favorite" className="text-lg md:text-xl" /> <span className="md:inline">รายการโปรด</span>
                 </NavLink>
             </div>
         </div>

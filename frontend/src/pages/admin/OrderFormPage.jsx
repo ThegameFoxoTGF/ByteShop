@@ -24,7 +24,7 @@ function OrderFormPage() {
             setStatus(data.status);
         } catch (error) {
             console.error('Error fetching order:', error);
-            toast.error('Failed to load order details');
+            toast.error('โหลดข้อมูลคำสั่งซื้อไม่สำเร็จ');
             navigate('/admin/orders');
         } finally {
             setLoading(false);

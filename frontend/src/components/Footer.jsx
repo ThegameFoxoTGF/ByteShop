@@ -36,7 +36,7 @@ function Footer() {
                         <Link to="/" className="w-full text-2xl font-black justify-center items-center text-sea-primary mb-2 flex gap-2">
                             <Icon icon="ic:round-computer" /> ByteShop
                         </Link>
-                        <p className="w-full text-center text-slate-400 text-sm">&copy; 2026 ByteShop. All rights reserved.</p>
+                        <p className="w-full text-center text-slate-400 text-sm">&copy; 2026 ByteShop. สงวนลิขสิทธิ์.</p>
                     </div>
                 </div>
             </div>

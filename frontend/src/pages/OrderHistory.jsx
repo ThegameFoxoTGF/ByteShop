@@ -65,7 +65,7 @@ function OrderHistory() {
             fetchOrders(); // Refresh list
         } catch (error) {
             console.error(error);
-            toast.error("ไม่สามารถยืนยันได้: " + (error.response?.data?.message || "Internal Error"));
+            toast.error("ไม่สามารถยืนยันได้: " + (error.response?.data?.message || "เกิดข้อผิดพลาดภายในระบบ"));
         }
     };
 

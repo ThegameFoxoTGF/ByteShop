@@ -31,7 +31,7 @@ function WishlistPage() {
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-            <h1 className="text-2xl font-bold text-sea-text">สิ่งที่อยากได้ ({total})</h1>
+            <h1 className="text-2xl font-bold text-sea-text">รายการโปรด ({total})</h1>
 
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
@@ -43,8 +43,8 @@ function WishlistPage() {
                     <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                         <Icon icon="ic:round-favorite-border" className="text-slate-300 text-4xl" />
                     </div>
-                    <h3 className="text-xl font-bold text-sea-text">ยังไม่มีรายการสิ่งที่อยากได้</h3>
-                    <p className="text-sea-subtext mt-1">กดหัวใจที่สินค้าที่คุณชอบเพื่อบันทึกไว้ที่นี่</p>
+                    <h3 className="text-xl font-bold text-sea-text">ยังไม่มีรายการโปรด</h3>
+                    <p className="text-sea-subtext mt-1">กดหัวใจที่สินค้าที่คุณชื่นชอบเพื่อบันทึกไว้ที่นี่</p>
                 </div>
             ) : (
                 <>
