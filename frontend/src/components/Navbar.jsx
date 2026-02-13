@@ -78,18 +78,20 @@ function Navbar() {
               <Icon icon="ic:round-search" width="24" height="24" className="transform group-hover:scale-110 transition-transform duration-200" />
             </button>
 
-            {/* Cart Button */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative p-2.5 rounded-full border border-sea-muted text-sea-subtext hover:bg-sea-light hover:text-sea-primary transition-all duration-200 group cursor-pointer"
-            >
-              <Icon icon="ic:outline-shopping-bag" width="24" height="24" className="transform group-hover:scale-110 transition-transform duration-200" />
-              {cartCount > 0 && (
-                <span className="absolute top-1 right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-white shadow-sm">
-                  {cartCount}
-                </span>
-              )}
-            </button>
+            {/* Cart Button - Hidden for Admin */}
+            {!is_admin && (
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2.5 rounded-full border border-sea-muted text-sea-subtext hover:bg-sea-light hover:text-sea-primary transition-all duration-200 group cursor-pointer"
+              >
+                <Icon icon="ic:outline-shopping-bag" width="24" height="24" className="transform group-hover:scale-110 transition-transform duration-200" />
+                {cartCount > 0 && (
+                  <span className="absolute top-1 right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-white shadow-sm">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            )}
 
             {/* Auth Section */}
             {user ? (
@@ -117,35 +119,37 @@ function Navbar() {
                       <p className="text-sm font-medium text-sea-text truncate">{user.email || 'user@example.com'}</p>
                     </div>
 
-                    <div className="px-2 space-y-0.5">
-                      <button onClick={() => { navigate("/profile"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
-                        <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
-                          <Icon icon="ic:round-person-outline" width="18" height="18" />
-                        </div>
-                        โปรไฟล์ของฉัน
-                      </button>
+                    {!is_admin && (
+                      <div className="px-2 space-y-0.5">
+                        <button onClick={() => { navigate("/profile"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
+                          <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
+                            <Icon icon="ic:round-person-outline" width="18" height="18" />
+                          </div>
+                          โปรไฟล์ของฉัน
+                        </button>
 
-                      <button onClick={() => { navigate("/profile/orders"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
-                        <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
-                          <Icon icon="ic:round-history" width="18" height="18" />
-                        </div>
-                        ประวัติคำสั่งซื้อ
-                      </button>
+                        <button onClick={() => { navigate("/profile/orders"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
+                          <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
+                            <Icon icon="ic:round-history" width="18" height="18" />
+                          </div>
+                          ประวัติคำสั่งซื้อ
+                        </button>
 
-                      <button onClick={() => { navigate("/profile/address"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
-                        <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
-                          <Icon icon="ic:round-location-on" width="18" height="18" />
-                        </div>
-                        ที่อยู่ของฉัน
-                      </button>
+                        <button onClick={() => { navigate("/profile/address"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
+                          <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
+                            <Icon icon="ic:round-location-on" width="18" height="18" />
+                          </div>
+                          ที่อยู่ของฉัน
+                        </button>
 
-                      <button onClick={() => { navigate("/profile/wishlist"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
-                        <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
-                          <Icon icon="ic:round-favorite" width="18" height="18" />
-                        </div>
-                        รายการโปรด
-                      </button>
-                    </div>
+                        <button onClick={() => { navigate("/profile/wishlist"); setOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-sea-subtext hover:bg-sea-light hover:text-sea-primary rounded-xl transition-colors text-left group cursor-pointer">
+                          <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-sea-primary transition-colors">
+                            <Icon icon="ic:round-favorite" width="18" height="18" />
+                          </div>
+                          รายการโปรด
+                        </button>
+                      </div>
+                    )}
 
                     {is_admin && (
                       <div className="my-2 border-t border-slate-50 pt-2 px-2">

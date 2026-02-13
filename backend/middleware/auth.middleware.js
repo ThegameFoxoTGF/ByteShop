@@ -41,4 +41,19 @@ const admin = (req, res, next) => {
     }
 }
 
-export { protect, admin };
+const optionalAuth = asyncHandler(async (req, res, next) => {
+    let token = req.cookies.jwt;
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = await User.findById(decoded.userId).select("-password");
+        } catch (error) {
+            console.error(error);
+            // Don't throw error, just continue as guest
+        }
+    }
+    next();
+});
+
+export { protect, admin, optionalAuth };

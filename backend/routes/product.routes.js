@@ -10,13 +10,11 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/product.controller.js";
-import { protect, admin } from "../middleware/auth.middleware.js";
+import { protect, admin, optionalAuth } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.route("/").get(getProducts).post(protect, admin, createProduct);
-
-router.get("/all", protect, admin, getProducts);
+router.route("/").get(optionalAuth, getProducts).post(protect, admin, createProduct);
 
 router.get("/filters/:categoryId", getCategoryFilters);
 router.get("/brands/:categoryId", getCategoryBrands);

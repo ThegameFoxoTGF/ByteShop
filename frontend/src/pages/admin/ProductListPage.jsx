@@ -17,7 +17,7 @@ function ProductListPage() {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await productService.getAllProducts({
+            const response = await productService.getProducts({
                 page,
                 limit,
                 keyword

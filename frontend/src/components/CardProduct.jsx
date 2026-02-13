@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
 
 function CardProduct({ product }) {
-    const { user, toggleWishlist } = useAuth();
+    const { user, toggleWishlist, is_admin } = useAuth();
 
     // Default empty state handling
     if (!product) return null;
@@ -69,25 +69,33 @@ function CardProduct({ product }) {
                             -{discountPercentage}%
                         </span>
                     )}
+                    {is_admin && product.is_active === false && (
+                        <span className="bg-slate-800 text-slate-200 w-fit text-xs font-bold px-2.5 py-1 rounded-full border border-slate-600 shadow-sm flex items-center gap-1">
+                            <Icon icon="ic:round-visibility-off" width="14" />
+                            ซ่อนอยู่
+                        </span>
+                    )}
                 </div>
 
-                {/* Wishlist Button */}
-                <button
-                    onClick={handleWishlist}
-                    disabled={wishlistLoading}
-                    className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-white transition-all transform hover:scale-110"
-                    title={isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด"}
-                >
-                    {wishlistLoading ? (
-                        <Icon icon="eos-icons:loading" width="20" />
-                    ) : (
-                        <Icon
-                            icon={isWishlisted ? "ic:round-favorite" : "ic:round-favorite-border"}
-                            className={isWishlisted ? "text-red-500" : ""}
-                            width="20"
-                        />
-                    )}
-                </button>
+                {/* Wishlist Button - Hidden for Admin */}
+                {!is_admin && (
+                    <button
+                        onClick={handleWishlist}
+                        disabled={wishlistLoading}
+                        className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-white transition-all transform hover:scale-110"
+                        title={isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด"}
+                    >
+                        {wishlistLoading ? (
+                            <Icon icon="eos-icons:loading" width="20" />
+                        ) : (
+                            <Icon
+                                icon={isWishlisted ? "ic:round-favorite" : "ic:round-favorite-border"}
+                                className={isWishlisted ? "text-red-500" : ""}
+                                width="20"
+                            />
+                        )}
+                    </button>
+                )}
 
                 {/* Quick Action Overlay (Mobile hidden, Desktop show on hover) */}
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center">

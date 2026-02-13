@@ -20,6 +20,12 @@ const createOrder = asyncHandler(async (req, res) => {
     const user = req.user._id;
     const { shipping_address, payment_method, coupon_code } = req.body;
 
+    // Security: Admin cannot place orders
+    if (req.user.is_admin) {
+        res.status(403);
+        throw new Error("ผู้ดูแลระบบ (Admin) ไม่สามารถสั่งซื้อสินค้าได้");
+    }
+
     const cart = await Cart.findOne({ user }).populate("items.product");
 
     if (!cart || cart.items.length === 0) {

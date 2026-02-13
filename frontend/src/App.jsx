@@ -2,16 +2,19 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import ProtectedRoute from "./routes/Protected.Route";
 import AdminRoute from "./routes/Admin.Route";
+import UserRoute from "./routes/User.Route";
 import GuestRoute from "./routes/Guest.Route";
 
 import MainLayout from "./layouts/MainLayout";
 import AdminLayout from "./layouts/AdminLayout";
 
 import Home from "./pages/Home";
+
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Forgot from "./pages/auth/Forgot";
+
 import Profile from "./pages/Profile";
 import ProfileLayout from "./layouts/ProfileLayout";
 import OrderHistory from "./pages/OrderHistory";
@@ -22,8 +25,6 @@ import ProductDetail from "./pages/ProductDetail";
 import WishlistPage from "./pages/WishlistPage";
 
 import Dashboard from "./pages/admin/Dashboard";
-import Forgot from "./pages/auth/Forgot";
-
 import ProductListPage from "./pages/admin/ProductListPage";
 import ProductFormPage from "./pages/admin/ProductFormPage";
 import CategoryListPage from "./pages/admin/CategoryListPage";
@@ -55,8 +56,8 @@ function App() {
             <Route path="forgot" element={<Forgot />} />
           </Route>
 
-          {/* Protected Routes */}
-          <Route element={<ProtectedRoute />}>
+          {/* User Routes (Restricted for Admin) */}
+          <Route element={<UserRoute />}>
             <Route path="checkout" element={<Checkout />} />
             <Route path="order/:id" element={<Order />} />
             <Route path="profile" element={<ProfileLayout />}>

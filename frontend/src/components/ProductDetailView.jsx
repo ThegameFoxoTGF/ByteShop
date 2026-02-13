@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import cartService from '../services/cart.service';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -10,7 +10,7 @@ import Breadcrumb from './Breadcrumb';
 function ProductDetailView({ product }) {
     const navigate = useNavigate();
     const { fetchCartCount } = useCart();
-    const { user, toggleWishlist } = useAuth();
+    const { user, toggleWishlist, is_admin } = useAuth();
 
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -149,6 +149,11 @@ function ProductDetailView({ product }) {
                             ) : (
                                 <span className="text-red-500 flex items-center gap-1"><Icon icon="ic:round-error" /> สินค้าหมด</span>
                             )}
+                            {is_admin && product.is_active === false && (
+                                <span className="text-slate-500 flex items-center gap-1 border border-slate-300 px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100">
+                                    <Icon icon="ic:round-visibility-off" /> ซ่อนอยู่
+                                </span>
+                            )}
                         </div>
                     </div>
 
@@ -174,7 +179,7 @@ function ProductDetailView({ product }) {
                                 <button
                                     onClick={() => handleQuantityChange(quantity - 1)}
                                     className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-sea-primary hover:bg-slate-50 transition-colors disabled:opacity-50"
-                                    disabled={quantity <= 1 || product.stock <= 0}
+                                    disabled={quantity <= 1 || product.stock <= 0 || is_admin}
                                 >
                                     <Icon icon="ic:round-remove" />
                                 </button>
@@ -185,12 +190,12 @@ function ProductDetailView({ product }) {
                                     className="w-14 h-10 text-center border-x border-slate-200 text-slate-700 focus:outline-none"
                                     min="1"
                                     max={product.stock}
-                                    disabled={product.stock <= 0}
+                                    disabled={product.stock <= 0 || is_admin}
                                 />
                                 <button
                                     onClick={() => handleQuantityChange(quantity + 1)}
                                     className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-sea-primary hover:bg-slate-50 transition-colors disabled:opacity-50"
-                                    disabled={quantity >= product.stock || product.stock <= 0}
+                                    disabled={quantity >= product.stock || product.stock <= 0 || is_admin}
                                 >
                                     <Icon icon="ic:round-add" />
                                 </button>
@@ -200,19 +205,29 @@ function ProductDetailView({ product }) {
 
                         {/* Actions */}
                         <div className="flex gap-4">
-                            <button
-                                onClick={handleAddToCart}
-                                disabled={product.stock <= 0 || addingToCart}
-                                className="flex-1 bg-sea-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-sea-primary/30 hover:shadow-sea-primary/40 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
-                            >
-                                {addingToCart ? <Icon icon="eos-icons:loading" /> : <Icon icon="ic:round-add-shopping-cart" />}
-                                เพิ่มลงตะกร้า
-                            </button>
+                            {is_admin ? (
+                                <Link
+                                    to={`/admin/products/${product._id}`}
+                                    className="flex-1 bg-sea-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-sea-primary/30 hover:shadow-sea-primary/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <Icon icon="ic:round-edit" />
+                                    แก้ไขสินค้า
+                                </Link>
+                            ) : (
+                                <button
+                                    onClick={handleAddToCart}
+                                    disabled={product.stock <= 0 || addingToCart}
+                                    className="flex-1 bg-sea-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-sea-primary/30 hover:shadow-sea-primary/40 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                                >
+                                    {addingToCart ? <Icon icon="eos-icons:loading" /> : <Icon icon="ic:round-add-shopping-cart" />}
+                                    เพิ่มลงตะกร้า
+                                </button>
+                            )}
                             <button
                                 onClick={handleWishlist}
-                                disabled={wishlistLoading}
-                                className={`w-14 h-14 flex items-center justify-center border rounded-xl transition-all transform active:scale-95 ${isWishlisted ? 'border-red-500 bg-red-50 text-red-500 hover:shadow-lg hover:shadow-red-200' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-slate-50'}`}
-                                title={isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด"}
+                                disabled={wishlistLoading || is_admin}
+                                title={is_admin ? "แอดมินไม่สามารถบันทึกรายการโปรดได้" : (isWishlisted ? "ลบออกจากรายการโปรด" : "เพิ่มลงรายการโปรด")}
+                                className={`w-14 h-14 flex items-center justify-center border rounded-xl transition-all transform active:scale-95 ${isWishlisted ? 'border-red-500 bg-red-50 text-red-500 hover:shadow-lg hover:shadow-red-200' : 'border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-slate-50'} ${is_admin ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {wishlistLoading ? <Icon icon="eos-icons:loading" /> : <Icon icon={isWishlisted ? "ic:round-favorite" : "ic:round-favorite-border"} width="28" />}
                             </button>

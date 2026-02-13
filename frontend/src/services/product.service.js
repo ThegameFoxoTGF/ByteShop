@@ -26,10 +26,7 @@ const productService = {
         return response.data;
     },
 
-    getAllProducts: async (params) => {
-        const response = await axiosClient.get("/product/all", { params });
-        return response.data;
-    },
+
 
     // Admin
     createProduct: async (productData) => {
