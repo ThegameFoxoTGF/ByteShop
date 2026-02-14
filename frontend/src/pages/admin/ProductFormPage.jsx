@@ -540,7 +540,21 @@ function ProductFormPage() {
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
                                     placeholder="เช่น Synnex, Advice, ศูนย์ไทย"
+                                    list="warranty_providers"
                                 />
+                                <datalist id="warranty_providers">
+                                    <option value="Synnex" />
+                                    <option value="Ingram Micro" />
+                                    <option value="SIS" />
+                                    <option value="SVOA" />
+                                    <option value="Ascenti Resources" />
+                                    <option value="Advice" />
+                                    <option value="JIB" />
+                                    <option value="IT City" />
+                                    <option value="Banana IT" />
+                                    <option value="ศูนย์ไทย" />
+                                    <option value="ประกันร้าน" />
+                                </datalist>
                             </div>
 
                         </div>

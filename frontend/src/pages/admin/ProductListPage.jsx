@@ -170,13 +170,13 @@ function ProductListPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${product.stock > 10
+                                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${product.stock > 5
                                                 ? 'bg-green-50 text-green-700 border-green-100'
                                                 : product.stock > 0
                                                     ? 'bg-amber-50 text-amber-700 border-amber-100'
                                                     : 'bg-red-50 text-red-700 border-red-100'
                                                 }`}>
-                                                <div className={`w-1.5 h-1.5 rounded-full ${product.stock > 10 ? 'bg-green-500' : product.stock > 0 ? 'bg-amber-500' : 'bg-red-500'
+                                                <div className={`w-1.5 h-1.5 rounded-full ${product.stock > 5 ? 'bg-green-500' : product.stock > 0 ? 'bg-amber-500' : 'bg-red-500'
                                                     }`} />
                                                 {product.stock}
                                             </div>

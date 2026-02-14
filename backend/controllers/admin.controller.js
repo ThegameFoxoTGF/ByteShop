@@ -37,7 +37,7 @@ const getDashboardStats = asyncHandler(async (req, res) => {
 
     // 2. Total Orders
     const totalOrders = await Order.countDocuments();
-    const pendingOrders = await Order.countDocuments({ status: 'pending' });
+    const pendingOrders = await Order.countDocuments({ status: 'waiting_verification' });
 
     // 3. Total Users
     const totalUsers = await User.countDocuments();
@@ -47,7 +47,7 @@ const getDashboardStats = asyncHandler(async (req, res) => {
 
     // 4. Total Products
     const totalProducts = await Product.countDocuments();
-    const lowStockProducts = await Product.countDocuments({ stock: { $lte: 10 } });
+    const lowStockProducts = await Product.countDocuments({ stock: { $lte: 5 } });
 
     // 5. Recent Orders
     const recentOrders = await Order.find()

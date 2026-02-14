@@ -138,7 +138,7 @@ function Order() {
 
             {/* Status Card */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
                     <div>
                         <h1 className="text-xl font-bold text-sea-text flex items-center gap-2">
                             คำสั่งซื้อ #{order.order_id}
@@ -160,15 +160,7 @@ function Order() {
                             </div>
                         )}
 
-                        {order.status === 'pending' && !isCancelled && (
-                            <button
-                                onClick={handleCancelOrder}
-                                className="mt-5 px-4 py-2 text-sm font-medium text-red-500 bg-white border border-red-100 rounded-xl hover:bg-red-50 hover:border-red-200 transition-all duration-300 flex items-center gap-2 shadow-sm hover:shadow active:scale-95 group w-fit cursor-pointer"
-                            >
-                                <Icon icon="ic:round-cancel" className="text-red-400 group-hover:text-red-500 transition-colors" width="18" />
-                                ยกเลิกคำสั่งซื้อ
-                            </button>
-                        )}
+
 
                         {order.status === 'shipped' && !isCancelled && (
                             <button
@@ -180,32 +172,44 @@ function Order() {
                             </button>
                         )}
                     </div>
-                    {!isCancelled && (
-                        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                            {['pending', 'waiting_verification', 'paid', 'processing', 'shipped', 'completed'].map((step, idx) => (
-                                <div key={step} className="flex flex-col items-center gap-1 min-w-[60px]">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-colors border-2 ${idx <= currentStep ? 'bg-sea-primary text-white border-sea-primary' : 'bg-white text-slate-300 border-slate-200'}`}>
-                                        <Icon icon={
-                                            step === 'pending' ? 'ic:round-access-time' :
-                                                step === 'waiting_verification' ? 'ic:round-manage-search' :
-                                                    step === 'paid' ? 'ic:round-check-circle' :
-                                                        step === 'processing' ? 'ic:round-inventory-2' :
-                                                            step === 'shipped' ? 'ic:round-local-shipping' :
-                                                                'ic:round-flag'
-                                        } width="16" />
+                    <div className="flex flex-col md:items-end gap-3">
+                        {order.status === 'pending' && !isCancelled && (
+                            <button
+                                onClick={handleCancelOrder}
+                                className="px-4 py-2 text-sm font-medium text-red-500 bg-white border border-red-100 rounded-xl hover:bg-red-50 hover:border-red-200 transition-all duration-300 flex items-center gap-2 shadow-sm hover:shadow active:scale-95 group w-fit cursor-pointer"
+                            >
+                                <Icon icon="ic:round-cancel" className="text-red-400 group-hover:text-red-500 transition-colors" width="18" />
+                                ยกเลิกคำสั่งซื้อ
+                            </button>
+                        )}
+
+                        {!isCancelled && (
+                            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                                {['pending', 'waiting_verification', 'paid', 'processing', 'shipped', 'completed'].map((step, idx) => (
+                                    <div key={step} className="flex flex-col items-center gap-1 min-w-[60px]">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-colors border-2 ${idx <= currentStep ? 'bg-sea-primary text-white border-sea-primary' : 'bg-white text-slate-300 border-slate-200'}`}>
+                                            <Icon icon={
+                                                step === 'pending' ? 'ic:round-access-time' :
+                                                    step === 'waiting_verification' ? 'ic:round-manage-search' :
+                                                        step === 'paid' ? 'ic:round-check-circle' :
+                                                            step === 'processing' ? 'ic:round-inventory-2' :
+                                                                step === 'shipped' ? 'ic:round-local-shipping' :
+                                                                    'ic:round-flag'
+                                            } width="16" />
+                                        </div>
+                                        <span className={`text-[10px] whitespace-nowrap ${idx <= currentStep ? 'text-sea-primary font-medium' : 'text-slate-400'}`}>
+                                            {step === 'pending' ? 'รอชำระ' :
+                                                step === 'waiting_verification' ? 'รอตรวจสอบ' :
+                                                    step === 'paid' ? 'ชำระแล้ว' :
+                                                        step === 'processing' ? 'เตรียมของ' :
+                                                            step === 'shipped' ? 'ส่งแล้ว' :
+                                                                'สำเร็จ'}
+                                        </span>
                                     </div>
-                                    <span className={`text-[10px] whitespace-nowrap ${idx <= currentStep ? 'text-sea-primary font-medium' : 'text-slate-400'}`}>
-                                        {step === 'pending' ? 'รอชำระ' :
-                                            step === 'waiting_verification' ? 'รอตรวจสอบ' :
-                                                step === 'paid' ? 'ชำระแล้ว' :
-                                                    step === 'processing' ? 'เตรียมของ' :
-                                                        step === 'shipped' ? 'ส่งแล้ว' :
-                                                            'สำเร็จ'}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Bank Transfer / Payment Upload */}

@@ -37,7 +37,7 @@ const OrderSchema = new mongoose.Schema({
             ref: "Coupon"
         },
         coupon_code: { type: String },
-        coupon_discount_type: { type: String, enum: ["fixed", "percentage"], default: "fixed" },
+        coupon_discount_type: { type: String, enum: ["fixed", "percentage"] },
     },
 
     payment_method: { type: String, enum: ['cod', 'bank_transfer'], required: true },

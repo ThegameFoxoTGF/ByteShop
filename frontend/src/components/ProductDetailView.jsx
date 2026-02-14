@@ -266,9 +266,9 @@ function ProductDetailView({ product }) {
                                             <span className="text-slate-500 font-medium">{spec.label || spec.key}</span>
                                             <span className="col-span-2 text-slate-700">
                                                 {Array.isArray(spec.value) ? (
-                                                    <div className="flex flex-wrap gap-2">
+                                                    <div className="flex flex-col gap-1">
                                                         {spec.value.map((val, i) => (
-                                                            <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                                                            <span key={i} className="text-slate-700">
                                                                 {val}
                                                             </span>
                                                         ))}

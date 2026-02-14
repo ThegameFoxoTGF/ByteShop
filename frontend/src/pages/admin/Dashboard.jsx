@@ -95,6 +95,31 @@ function Dashboard() {
         }
     };
 
+    const getPaymentStatusColor = (status) => {
+        switch (status) {
+            case 'paid': return 'text-green-600';
+            case 'pending': return 'text-yellow-600';
+            case 'refunded': return 'text-red-600';
+            default: return 'text-slate-600';
+        }
+    };
+
+    const getPaymentStatusText = (status) => {
+        switch (status) {
+            case 'paid': return 'ชำระเงินแล้ว';
+            case 'pending': return 'รอการชำระเงิน';
+            case 'refunded': return 'คืนเงิน';
+            default: return status;
+        }
+    };
+    const getPaymentMethodText = (method) => {
+        switch (method) {
+            case 'cod': return 'เงินสด';
+            case 'bank_transfer': return 'โอนเงิน';
+            default: return method;
+        }
+    };
+
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-8">
             {/* Header */}
@@ -172,7 +197,7 @@ function Dashboard() {
                         {stats.lowStockProducts > 0 ? (
                             <div className="text-center py-6">
                                 <div className="text-4xl font-bold text-orange-500 mb-2">{stats.lowStockProducts}</div>
-                                <p className="text-slate-500 text-sm mb-4">รายการที่เหลือน้อยกว่า 10 ชิ้น</p>
+                                <p className="text-slate-500 text-sm mb-4">รายการที่เหลือน้อยกว่า 5 ชิ้น</p>
                                 <Link to="/admin/products" className="text-sea-primary text-sm font-medium hover:underline">
                                     จัดการสต็อกสินค้า
                                 </Link>
@@ -218,55 +243,76 @@ function Dashboard() {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider text-sea-muted font-semibold">
-                                <th className="px-6 py-4">Order ID</th>
+                                <th className="px-6 py-4 rounded-tl-2xl">หมายเลขคำสั่งซื้อ</th>
                                 <th className="px-6 py-4">ลูกค้า</th>
-                                <th className="px-6 py-4">ยอดรวม</th>
-                                <th className="px-6 py-4">สถานะ</th>
                                 <th className="px-6 py-4">วันที่</th>
-                                <th className="px-6 py-4 text-right">ดำเนินการ</th>
+                                <th className="px-6 py-4">ราคา</th>
+                                <th className="px-6 py-4">สถานะ</th>
+                                <th className="px-6 py-4">การชำระเงิน</th>
+                                <th className="px-6 py-4 rounded-tr-2xl text-right">การดำเนินการ</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50 text-sm">
+                        <tbody className="divide-y divide-slate-50">
                             {stats.recentOrders.length > 0 ? (
                                 stats.recentOrders.map((order) => (
-                                    <tr key={order._id} className="hover:bg-slate-50/50 transition-colors group">
+                                    <tr
+                                        key={order._id}
+                                        className="hover:bg-slate-50/50 transition-colors group"
+                                    >
                                         <td className="px-6 py-4">
-                                            <span className="font-mono font-medium text-slate-700 bg-slate-100 px-2 py-1 rounded text-xs border border-slate-200">
-                                                {order.order_id || order._id.substring(0, 8)}
-                                            </span>
+                                            <span className="font-mono text-slate-700 font-medium">{order.order_id || order._id.substring(0, 8).toUpperCase()}</span>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-sea-text">
+                                            {(() => {
+                                                const user = order.user_id;
+                                                if (!user) return 'ไม่พบผู้ใช้';
+
+                                                const fullName = `${user.profile?.first_name || ''} ${user.profile?.last_name || ''}`.trim();
+
+                                                if (fullName) {
+                                                    return (
+                                                        <>
+                                                            {fullName}
+                                                            <div className="text-xs text-slate-400">{user.email}</div>
+                                                        </>
+                                                    );
+                                                }
+
+                                                return user.email;
+                                            })()}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-slate-600">
+                                            {new Date(order.createdAt).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' })} {new Date(order.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                        </td>
+                                        <td className="px-6 py-4 font-semibold text-sea-text">
+                                            ฿{order.pricing_info?.total_price?.toLocaleString() || order.total_price?.toLocaleString()}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-slate-800">
-                                                    {order.user_id ? `${order.user_id.profile?.first_name || ''} ${order.user_id.profile?.last_name || ''}`.trim() || 'Unknown' : 'Unknown'}
-                                                </span>
-                                                <span className="text-xs text-slate-400">{order.user_id?.email}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 font-bold text-sea-text">
-                                            ฿{order.pricing_info.total_price.toLocaleString()}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2.5 py-1 rounded-full text-xs font-bold border uppercase ${getStatusColor(order.status)}`}>
+                                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium border uppercase ${getStatusColor(order.status)}`}>
                                                 {getStatusText(order.status)}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-slate-500 text-xs">
-                                            {new Date(order.createdAt).toLocaleDateString('th-TH')}
+                                        <td className="px-6 py-4 text-sm">
+                                            <div className="flex flex-col">
+                                                <span className="uppercase text-xs font-bold text-slate-500">{getPaymentMethodText(order.payment_method)}</span>
+                                                <span className={`font-medium ${getPaymentStatusColor(order.payment_info?.payment_status || 'pending')}`}>
+                                                    {getPaymentStatusText(order.payment_info?.payment_status || 'pending')}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <Link
                                                 to={`/admin/orders/${order._id}`}
-                                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-600 hover:text-sea-primary hover:border-sea-primary transition-all text-xs font-medium shadow-xs"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:border-sea-primary hover:text-sea-primary transition-all bg-white"
                                             >
-                                                ดู <Icon icon="ic:round-arrow-forward" />
+                                                จัดการ <Icon icon="ic:round-arrow-forward" />
                                             </Link>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-8 text-center text-slate-400">
+                                    <td colSpan="7" className="px-6 py-8 text-center text-slate-400">
                                         ยังไม่มีคำสั่งซื้อล่าสุด
                                     </td>
                                 </tr>
