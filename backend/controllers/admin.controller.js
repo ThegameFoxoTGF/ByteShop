@@ -7,10 +7,6 @@ import Product from "../models/product.model.js";
 // @route   GET /api/admin/dashboard
 // @access  Private/Admin
 const getDashboardStats = asyncHandler(async (req, res) => {
-    // 1. Total Sales (Revenue) - from paid/completed orders
-    // Condition: 
-    // - If non-COD: status in [paid, processing, shipped, completed]
-    // - If COD: status MUST be 'completed'
     const salesCondition = {
         $or: [
             {
@@ -103,24 +99,21 @@ const getDashboardStats = asyncHandler(async (req, res) => {
 const getSalesChart = asyncHandler(async (req, res) => {
     const range = req.query.range || '7d';
 
-    // Define logic based on range
     let startDate = new Date();
     let dateFormat = "%Y-%m-%d";
 
     if (range === '1y') {
         startDate.setFullYear(startDate.getFullYear() - 1);
         startDate.setHours(0, 0, 0, 0);
-        dateFormat = "%Y-%m"; // Group by month
+        dateFormat = "%Y-%m";
     } else if (range === '1m') {
         startDate.setDate(startDate.getDate() - 30);
         startDate.setHours(0, 0, 0, 0);
     } else {
-        // Default 7d
         startDate.setDate(startDate.getDate() - 7);
         startDate.setHours(0, 0, 0, 0);
     }
 
-    // Reuse the same sales condition
     const salesCondition = {
         $or: [
             {

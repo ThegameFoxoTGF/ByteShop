@@ -1,9 +1,6 @@
 import cloudinary from "../config/cloudinary.js";
 import asyncHandler from "../middleware/asynchandler.js";
 
-// @desc    Upload image
-// @route   POST /api/upload
-// @access  Public
 const uploadToCloudinary = async (file, folder, width, height, crop) => {
     if (!file) throw new Error("กรุณาอัปโหลดรูปภาพ");
 
@@ -43,7 +40,6 @@ const uploadImage = asyncHandler(async (req, res) => {
         throw new Error("กรุณาอัปโหลดรูปภาพ");
     }
 
-    //Check /slip
     const isSlip = req.path.includes("slip") || req.baseUrl.includes("slip");
 
     const folder = isSlip ? "ByteShop/slip" : "ByteShop/images";

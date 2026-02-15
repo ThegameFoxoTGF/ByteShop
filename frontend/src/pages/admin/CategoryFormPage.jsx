@@ -4,14 +4,13 @@ import { Icon } from '@iconify/react';
 import { toast } from 'react-toastify';
 import categoryService from '../../services/category.service';
 
-// Simple slugify helper to avoid external dependency
 const simpleSlugify = (text, separator = '-') => {
     return text
         .toString()
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9]+/g, separator) // Replace non-alphanumeric chars with separator
-        .replace(new RegExp(`^${separator}+|${separator}+$`, 'g'), ''); // Remove leading/trailing separators
+        .replace(/[^a-z0-9]+/g, separator)
+        .replace(new RegExp(`^${separator}+|${separator}+$`, 'g'), '');
 };
 
 const FIELD_TYPES = [
@@ -25,20 +24,16 @@ const FIELD_TYPES = [
 function CategoryFormPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    // If id is 'new' (from URL /categories/new matching :id), it's not edit mode
     const isEditMode = id && id !== 'new';
 
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(isEditMode);
-
-    // Basic Category Info
     const [formData, setFormData] = useState({
         name: '',
         label: '',
         slug: ''
     });
 
-    // Dynamic Lists
     const [filters, setFilters] = useState([]);
     const [specifications, setSpecifications] = useState([]);
 
@@ -72,8 +67,6 @@ function CategoryFormPage() {
         const { name, value } = e.target;
         setFormData(prev => {
             const updates = { ...prev, [name]: value };
-            // Auto-generate slug from name if creating new and slug hasn't been manually touched (roughly)
-            // Or just allow user to click a 'generate' button. Let's do auto-generate if name changes and not in edit mode
             if (name === 'name' && !isEditMode) {
                 updates.slug = simpleSlugify(value, '-');
             }
@@ -82,7 +75,6 @@ function CategoryFormPage() {
     };
 
     const handleSlugBlur = () => {
-        // Ensure slug is valid on blur
         if (formData.slug) {
             setFormData(prev => ({
                 ...prev,
@@ -141,8 +133,6 @@ function CategoryFormPage() {
                 const oldLabel = prev[index].label || '';
                 const oldKey = prev[index].key || '';
 
-                // Smart auto-generate: Update key if it was empty OR if it matched the previous label's slug
-                // This allows the key to "follow" the label until the user manually changes the key.
                 if (!oldKey || oldKey === simpleSlugify(oldLabel, '_')) {
                     newList[index].key = simpleSlugify(value, '_');
                 }

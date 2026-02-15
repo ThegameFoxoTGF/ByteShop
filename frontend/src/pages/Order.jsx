@@ -63,9 +63,8 @@ function Order() {
                 public_id: uploadRes.public_id
             });
             toast.success('แจ้งชำระเงินเรียบร้อยแล้ว');
-            // After successful upload, turn off edit mode if it was on
             if (isEditingSlip) setIsEditingSlip(false);
-            fetchOrder(); // Refresh data
+            fetchOrder();
         } catch (error) {
             console.error(error);
             toast.error('อัปโหลดสลิปไม่สำเร็จ');

@@ -8,7 +8,6 @@ const SalesChart = ({ initialData }) => {
     const [chartData, setChartData] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Filter labels map
     const rangeLabels = {
         '7d': '7 วันล่าสุด',
         '1m': '1 เดือนล่าสุด',
@@ -30,7 +29,6 @@ const SalesChart = ({ initialData }) => {
     const processData = (rawData, selectedRange) => {
         let items = [];
         if (selectedRange === '1y') {
-            // Last 12 months
             const today = new Date();
             for (let i = 11; i >= 0; i--) {
                 const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
@@ -46,7 +44,6 @@ const SalesChart = ({ initialData }) => {
                 });
             }
         } else {
-            // Days (7d or 1m)
             const days = selectedRange === '1m' ? 30 : 7;
             for (let i = days - 1; i >= 0; i--) {
                 const d = new Date();
@@ -67,7 +64,6 @@ const SalesChart = ({ initialData }) => {
         setChartData(items);
     };
 
-    // Initial load
     useEffect(() => {
         if (initialData && range === '7d') {
             processData(initialData, '7d');
@@ -121,7 +117,7 @@ const SalesChart = ({ initialData }) => {
                             tickLine={false}
                             tick={{ fill: '#94a3b8', fontSize: 12 }}
                             dy={10}
-                            interval={range === '1m' ? 3 : 0} // Skip ticks for month view to fit
+                            interval={range === '1m' ? 3 : 0}
                         />
                         <YAxis
                             axisLine={false}

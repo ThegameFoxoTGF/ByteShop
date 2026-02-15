@@ -36,7 +36,6 @@ const getUserCart = asyncHandler(async (req, res) => {
 
     let isChanged = false;
 
-    // Filter out inactive products or nulls
     const originalCount = cart.items.length;
     cart.items = cart.items.filter(item => item.product && item.product.is_active);
 
@@ -46,7 +45,6 @@ const getUserCart = asyncHandler(async (req, res) => {
 
     cart.items.forEach(item => {
         const product = item.product;
-        // Check if product exists (it should due to populate, but safety first)
         if (product && item.quantity > product.stock) {
             item.quantity = product.stock;
             isChanged = true;
@@ -151,7 +149,6 @@ const updateCart = asyncHandler(async (req, res) => {
         throw new Error("จำนวนสินค้าต้องมีอย่างน้อย 1 ชิ้น")
     }
 
-    // Check stock but cap instead of error if requested > stock
     const productToCheck = await Product.findById(productId);
     if (!productToCheck) {
         res.status(404);
@@ -161,11 +158,7 @@ const updateCart = asyncHandler(async (req, res) => {
     let finalQuantity = quantity;
     if (quantity > productToCheck.stock) {
         finalQuantity = productToCheck.stock;
-        // Optionally warn user? But backend just returns json. 
-        // The frontend will receive the updated cart with the capped quantity.
     }
-
-    // await checkProductStock(productId, quantity); // Removed throwing check
 
     const cart = await Cart.findOne({ user });
     if (!cart) {

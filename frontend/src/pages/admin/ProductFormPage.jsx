@@ -26,11 +26,9 @@ function ProductFormPage() {
     const [fetching, setFetching] = useState(false);
     const [uploading, setUploading] = useState(false);
 
-    // Initial Data
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
 
-    // Category specific schemas
     const [categorySchema, setCategorySchema] = useState({ filters: [], specifications: [] });
 
     const [formData, setFormData] = useState({
@@ -71,7 +69,6 @@ function ProductFormPage() {
         fetchInitialData();
     }, []);
 
-    // Fetch Product if Edit
     useEffect(() => {
         if (isEditMode) {
             fetchProduct();
@@ -110,7 +107,6 @@ function ProductFormPage() {
                 search_keywords: data.search_keywords ? data.search_keywords.join(', ') : ''
             });
 
-            // If category exists, fetch schema
             if (data.category_id) {
                 const catId = typeof data.category_id === 'object' ? data.category_id._id : data.category_id;
                 fetchCategorySchema(catId);
@@ -153,7 +149,6 @@ function ProductFormPage() {
 
         if (name === 'category') {
             fetchCategorySchema(value);
-            // Clear filters/specs when category changes? 
             setFormData(prev => ({
                 ...prev,
                 category: value,
@@ -169,13 +164,11 @@ function ProductFormPage() {
         }
     };
 
-    const isSavedRef = React.useRef(false); // Track save status with ref to avoid closure staleness in cleanup
-    const uploadedImagesRef = React.useRef([]); // Track new uploads for cleanup
+    const isSavedRef = React.useRef(false);
+    const uploadedImagesRef = React.useRef([]);
 
-    // Cleanup on unmount if not saved
     useEffect(() => {
         return () => {
-            // Only cleanup if NOT saved and there are uploaded images
             if (!isSavedRef.current && uploadedImagesRef.current.length > 0) {
                 uploadedImagesRef.current.forEach(public_id => {
                     uploadService.deleteImage(public_id).catch(err => console.error('Cleanup error:', err));
@@ -196,7 +189,7 @@ function ProductFormPage() {
         try {
             const res = await uploadService.uploadImage(uploadData);
             setFormData(prev => ({ ...prev, main_image: res }));
-            uploadedImagesRef.current.push(res.public_id); // Track
+            uploadedImagesRef.current.push(res.public_id);
         } catch (error) {
             toast.error('อัปโหลดรูปภาพไม่สำเร็จ');
         } finally {
@@ -217,7 +210,7 @@ function ProductFormPage() {
             });
             const results = await Promise.all(uploadPromises);
 
-            results.forEach(res => uploadedImagesRef.current.push(res.public_id)); // Track
+            results.forEach(res => uploadedImagesRef.current.push(res.public_id));
 
             setFormData(prev => ({ ...prev, images: [...prev.images, ...results] }));
         } catch (error) {
@@ -232,7 +225,6 @@ function ProductFormPage() {
         if (public_id) {
             try {
                 await uploadService.deleteImage(public_id);
-                // Remove from ref if it was just uploaded
                 uploadedImagesRef.current = uploadedImagesRef.current.filter(id => id !== public_id);
             } catch (error) {
                 console.error("Failed to delete image", error);
@@ -267,12 +259,10 @@ function ProductFormPage() {
         navigate('/admin/products');
     };
 
-    // Filters & Specs Handlers
     const handleFilterChange = (key, value, isArray = false) => {
         setFormData(prev => {
             const newFilters = { ...prev.filters };
             if (isArray) {
-                // Should handle array if multiselect
                 newFilters[key] = value;
             } else {
                 newFilters[key] = value;
@@ -304,12 +294,10 @@ function ProductFormPage() {
         setLoading(true);
 
         // Prepare Payload
-        // Ensure numbers are numbers
         const originalPrice = Number(formData.price);
         const sellingPrice = Number(formData.selling_price) || originalPrice;
         const discount = originalPrice - sellingPrice;
 
-        // Transform filters object to array for backend
         const filtersArray = Object.entries(formData.filters).map(([key, value]) => {
             const schema = categorySchema.filters.find(f => f.key === key);
             return {
@@ -317,7 +305,7 @@ function ProductFormPage() {
                 value,
                 label: schema ? schema.label : key
             };
-        }).filter(f => f.value !== ''); // Only keep filters with values
+        }).filter(f => f.value !== '');
 
         const payload = {
             ...formData,
@@ -333,7 +321,6 @@ function ProductFormPage() {
             warranty_provider: formData.warranty_provider,
             search_keywords: formData.search_keywords ? formData.search_keywords.split(',').map(k => k.trim()).filter(k => k !== '') : []
         };
-        // ...
 
 
         try {
@@ -540,10 +527,6 @@ function ProductFormPage() {
                                     <option value="SIS" />
                                     <option value="SVOA" />
                                     <option value="Ascenti Resources" />
-                                    <option value="Advice" />
-                                    <option value="JIB" />
-                                    <option value="IT City" />
-                                    <option value="Banana IT" />
                                     <option value="ศูนย์ไทย" />
                                     <option value="ประกันร้าน" />
                                 </datalist>

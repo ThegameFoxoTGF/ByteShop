@@ -31,7 +31,6 @@ function AdminSidebar() {
             {/* Navigation */}
             <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
                 {menuItems.map((item) => {
-                    // Check if active: exact match for dashboard, startswith for others
                     const isActive = item.path === '/admin'
                         ? location.pathname === '/admin'
                         : location.pathname.startsWith(item.path);

@@ -19,7 +19,7 @@ function CouponFormPage() {
         discount_value: 0,
         max_discount_amount: 0,
         min_order_value: 0,
-        usage_limit: 0, // 0 means unlimited
+        usage_limit: 0,
         start_date: new Date().toISOString().split('T')[0],
         end_date: '',
         is_active: true

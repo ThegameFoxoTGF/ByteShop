@@ -44,12 +44,10 @@ function Home() {
   const searchParams = new URLSearchParams(location.search);
   const keyword = searchParams.get('keyword') || '';
 
-  // Pagination State
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(0);
+  const [total, setTotal] = useState(0);
   const [limit] = useState(12);
-
-  // Filter State
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [selectedBrand, setSelectedBrand] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
@@ -57,11 +55,9 @@ function Home() {
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [sort, setSort] = useState('newest');
 
-  // Dynamic Filters State
-  const [dynamicFilters, setDynamicFilters] = useState([]); // [{ key, label, options: [] }]
-  const [activeDynamicFilters, setActiveDynamicFilters] = useState({}); // { key: value }
+  const [dynamicFilters, setDynamicFilters] = useState([]);
+  const [activeDynamicFilters, setActiveDynamicFilters] = useState({});
 
-  // Fetch initial data (Categories & Brands)
   const [initialBrands, setInitialBrands] = useState([]);
 
   useEffect(() => {
@@ -82,18 +78,14 @@ function Home() {
     fetchData();
   }, []);
 
-  // Update Dynamic Filters AND Brands when Category changes
   useEffect(() => {
     const fetchCategoryData = async () => {
       if (selectedCategory) {
         try {
-          // Fetch dynamic specs
           const filtersData = await productService.getCategoryFilters(selectedCategory);
           setDynamicFilters(filtersData);
 
-          // Fetch relevant brands
           const brandsData = await productService.getCategoryBrands(selectedCategory);
-          // Clear selected brand if it's not in the new list
           setBrands(brandsData);
         } catch (error) {
           console.error('Error fetching category data:', error);
@@ -103,18 +95,15 @@ function Home() {
       } else {
         setDynamicFilters([]);
         setActiveDynamicFilters({});
-        setBrands(initialBrands); // Reset to all brands
+        setBrands(initialBrands);
       }
     };
     fetchCategoryData();
-  }, [selectedCategory, initialBrands]); // Add initialBrands dep
+  }, [selectedCategory, initialBrands]);
 
-  // Reset active dynamic filters ONLY when category changes
   useEffect(() => {
     setActiveDynamicFilters({});
   }, [selectedCategory]);
-
-  // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -127,13 +116,11 @@ function Home() {
           is_active: true
         };
 
-        //Logic: Send all current filters (Category, Brand, Price, Dynamic) to Backend
         if (selectedCategory) params.category = selectedCategory;
         if (selectedBrand) params.brand = selectedBrand;
         if (appliedPriceRange.min) params.minPrice = appliedPriceRange.min;
         if (appliedPriceRange.max) params.maxPrice = appliedPriceRange.max;
 
-        // Add dynamic filters to params
         if (Object.keys(activeDynamicFilters).length > 0) {
           params.filters = JSON.stringify(activeDynamicFilters);
         }
@@ -142,6 +129,7 @@ function Home() {
         setProducts(response.products || []);
         setPages(response.pages || 0);
         setPage(response.page || 1);
+        setTotal(response.total || 0);
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -152,10 +140,14 @@ function Home() {
     fetchProducts();
   }, [page, limit, keyword, selectedCategory, selectedBrand, appliedPriceRange, activeDynamicFilters, sort]);
 
-  // Reset page when filters change
   useEffect(() => {
     setPage(1);
   }, [keyword, selectedCategory, selectedBrand, appliedPriceRange, activeDynamicFilters, sort]);
+
+  // Scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [page]);
 
   const handleApplyPrice = () => {
     setAppliedPriceRange(priceRange);
@@ -169,10 +161,8 @@ function Home() {
     setAppliedPriceRange({ min: '', max: '' });
     setActiveDynamicFilters({});
     setShowMobileFilter(false);
-    // Note: Keyword clearing is handled by navigation in real app, staying simple here
   };
 
-  // Fetch Category Specific Filters (Dynamic)
   useEffect(() => {
     const fetchDynamicFilters = async () => {
       if (selectedCategory) {
@@ -200,7 +190,6 @@ function Home() {
     fetchDynamicFilters();
   }, [selectedCategory, selectedBrand, appliedPriceRange, keyword, activeDynamicFilters]);
 
-  // Reset active dynamic filters ONLY when category changes
   useEffect(() => {
     setActiveDynamicFilters({});
   }, [selectedCategory]);
@@ -209,9 +198,9 @@ function Home() {
     setActiveDynamicFilters(prev => {
       const newState = { ...prev };
       if (newState[key] === value) {
-        delete newState[key]; // Deselect if already selected
+        delete newState[key];
       } else {
-        newState[key] = value; // Select new value (replace existing)
+        newState[key] = value;
       }
       return newState;
     });
@@ -371,7 +360,6 @@ function Home() {
                 </span>
               )}
               {Object.keys(activeDynamicFilters).map(key => {
-                // Find label from dynamicFilters, otherwise fallback to formatted key
                 const filter = dynamicFilters.find(f => f.key === key);
                 const label = filter ? filter.label : key.replace('_', ' ');
                 return (
@@ -415,7 +403,7 @@ function Home() {
               {/* Sort Dropdown */}
               <div className="flex justify-between items-center mb-6">
                 <p className="text-sea-subtext text-sm">
-                  แสดงทั้งหมด <span className="font-bold text-sea-deep">{products.length}</span> รายการ
+                  แสดง <span className="font-bold text-sea-deep">{(page - 1) * limit + 1} ถึง {Math.min(page * limit, total)}</span> จาก <span className="font-bold text-sea-deep">{total}</span> รายการ
                 </p>
                 <select
                   className="pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm text-sea-deep focus:outline-none focus:border-sea-primary cursor-pointer shadow-sm hover:border-sea-primary transition-colors"

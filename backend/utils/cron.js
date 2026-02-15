@@ -2,7 +2,6 @@ import Order from "../models/order.model.js";
 
 const checkOverdueOrders = async () => {
     try {
-        // Cancel orders older than 1 hour
         const thresholdTime = new Date(Date.now() - 60 * 60 * 1000);
 
         const overdueOrders = await Order.find({

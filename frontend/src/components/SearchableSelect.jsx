@@ -17,7 +17,6 @@ const SearchableSelect = ({
     const dropdownRef = useRef(null);
     const searchInputRef = useRef(null);
 
-    // Normalize options for display
     const normalizedOptions = options.map(opt => {
         if (typeof opt === 'string' || typeof opt === 'number') {
             return { value: opt, label: opt };
@@ -28,7 +27,6 @@ const SearchableSelect = ({
         };
     });
 
-    // Find selected option label
     const selectedOption = normalizedOptions.find(opt => opt.value === value);
 
     const filteredOptions = normalizedOptions.filter(opt =>
@@ -41,7 +39,6 @@ const SearchableSelect = ({
         setSearchTerm('');
     };
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -57,7 +54,6 @@ const SearchableSelect = ({
 
     const [dropUp, setDropUp] = useState(false);
 
-    // Focus search input when opening
     useEffect(() => {
         if (isOpen && searchInputRef.current) {
             searchInputRef.current.focus();

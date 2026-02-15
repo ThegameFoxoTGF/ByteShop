@@ -31,7 +31,7 @@ function Checkout() {
         detail: ''
     });
 
-    const [paymentMethod, setPaymentMethod] = useState('bank_transfer'); // Default
+    const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
     const [couponCode, setCouponCode] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState(null);
     const [couponError, setCouponError] = useState('');
@@ -66,12 +66,10 @@ function Checkout() {
             const addrList = res.address || [];
             setSavedAddresses(addrList);
 
-            // Auto-fill default address if available
             const defaultAddr = addrList.find(a => a.is_default);
             if (defaultAddr) {
                 fillAddress(defaultAddr);
             } else if (addrList.length > 0 && !selectedAddressId) {
-                // Determine logic: If no default is set, select the first one automatically
                 fillAddress(addrList[0]);
             }
         } catch (error) {
@@ -167,7 +165,7 @@ function Checkout() {
 
             const order = await orderService.createOrder(payload);
             toast.success('สั่งซื้อสำเร็จ! กรุณาชำระเงิน');
-            await fetchCartCount(); // Update cart count in navbar
+            await fetchCartCount();
             navigate(`/order/${order._id}`, { replace: true });
         } catch (error) {
             console.error(error);

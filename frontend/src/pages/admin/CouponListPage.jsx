@@ -24,7 +24,6 @@ function CouponListPage() {
             });
 
             if (Array.isArray(response)) {
-                // Fallback
                 setCoupons(response);
                 setTotal(response.length);
                 setPages(1);

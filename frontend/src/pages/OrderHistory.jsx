@@ -62,7 +62,7 @@ function OrderHistory() {
         try {
             await orderService.confirmReceived(orderId);
             toast.success("ยืนยันการรับสินค้าเรียบร้อยแล้ว");
-            fetchOrders(); // Refresh list
+            fetchOrders();
         } catch (error) {
             console.error(error);
             toast.error("ไม่สามารถยืนยันได้: " + (error.response?.data?.message || "เกิดข้อผิดพลาดภายในระบบ"));

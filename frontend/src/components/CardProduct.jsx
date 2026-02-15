@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 function CardProduct({ product }) {
     const { user, toggleWishlist, is_admin } = useAuth();
 
-    // Default empty state handling
     if (!product) return null;
 
     const [wishlistLoading, setWishlistLoading] = useState(false);
@@ -15,7 +14,7 @@ function CardProduct({ product }) {
     const isWishlisted = user?.wishlist?.includes(product._id);
 
     const handleWishlist = async (e) => {
-        e.preventDefault(); // Prevent navigation
+        e.preventDefault();
         if (!user) {
             toast.info("กรุณาเข้าสู่ระบบ");
             return;

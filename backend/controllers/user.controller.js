@@ -275,7 +275,7 @@ const getUsers = asyncHandler(async (req, res) => {
     const count = await User.countDocuments(query);
 
     const users = await User.find(query)
-        .sort({ is_admin: -1, createdAt: -1 }) // Admin first, then newest
+        .sort({ is_admin: -1, createdAt: -1 })
         .limit(pageSize)
         .skip(pageSize * (pageNumber - 1));
 

@@ -33,7 +33,7 @@ function CartDrawer({ isOpen, onClose }) {
 
             const items = response.items || [];
             setCartItems(items);
-            updateCartCount(items.length); // Sync global badge immediately without refetch
+            updateCartCount(items.length);
 
             if (response.total_price !== undefined) {
                 setTotal(response.total_price);
@@ -62,8 +62,8 @@ function CartDrawer({ isOpen, onClose }) {
     const handleRemove = async (productId) => {
         try {
             await cartService.removeFromCart(productId);
-            await fetchCartCount(); // Update global count
-            loadCart(); // Reload local list
+            await fetchCartCount();
+            loadCart();
         } catch (error) {
             console.error("Failed to remove item", error);
         }
@@ -78,7 +78,6 @@ function CartDrawer({ isOpen, onClose }) {
             return;
         }
 
-        // Optimistic UI Update
         const oldItems = [...cartItems];
         const updatedItems = cartItems.map(item => {
             if (item.product._id === productId) {
@@ -87,20 +86,17 @@ function CartDrawer({ isOpen, onClose }) {
             return item;
         });
 
-        // Update local state immediately
         setCartItems(updatedItems);
         calculateTotal(updatedItems);
 
         try {
-            // Send request silently
             await cartService.updateCartItem(productId, newQuantity);
-            await fetchCartCount(); // Sync badge in background
+            await fetchCartCount();
         } catch (error) {
             console.error("Failed to update quantity", error);
             const message = error.response?.data?.message || "อัปเดตจำนวนสินค้าไม่สำเร็จ";
             toast.error(message);
 
-            // Revert on error
             setCartItems(oldItems);
             calculateTotal(oldItems);
         }

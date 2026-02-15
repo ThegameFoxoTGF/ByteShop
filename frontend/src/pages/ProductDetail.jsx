@@ -19,13 +19,12 @@ function ProductDetail() {
     const fetchProduct = async () => {
         try {
             let data;
-            // Check if id is a valid Mongo Object ID (24 hex chars)
             const isMongoId = /^[0-9a-fA-F]{24}$/.test(id);
 
             if (isMongoId) {
                 data = await productService.getProductById(id);
             } else {
-                data = await productService.getProductBySlug(id); // Treat as slug
+                data = await productService.getProductBySlug(id);
             }
 
             setProduct(data);

@@ -22,7 +22,6 @@ function CustomerListPage() {
                 keyword
             });
             if (Array.isArray(res)) {
-                // Fallback for old API behavior
                 setUsers(res);
                 setTotal(res.length);
                 setPages(1);
@@ -46,7 +45,7 @@ function CustomerListPage() {
 
     const handleSearch = (e) => {
         setKeyword(e.target.value);
-        setPage(1); // Reset to first page
+        setPage(1);
     };
 
     const handleToggleStatus = async (user) => {

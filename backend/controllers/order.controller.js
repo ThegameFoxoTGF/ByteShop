@@ -20,7 +20,6 @@ const createOrder = asyncHandler(async (req, res) => {
     const user = req.user._id;
     const { shipping_address, payment_method, coupon_code } = req.body;
 
-    // Security: Admin cannot place orders
     if (req.user.is_admin) {
         res.status(403);
         throw new Error("ผู้ดูแลระบบ (Admin) ไม่สามารถสั่งซื้อสินค้าได้");
@@ -143,7 +142,6 @@ const createOrder = asyncHandler(async (req, res) => {
     });
 
     if (status === 'processing') {
-        // If COD (Processing), deduct stock immediately
         const bulkOps = orderItems.map(item => ({
             updateOne: {
                 filter: { _id: item.product_id },
@@ -171,21 +169,14 @@ const getAllOrders = asyncHandler(async (req, res) => {
 
     let query = {};
 
-    // 1. Role-based filter
-    // If user is NOT admin OR specifically requesting their own orders (view='my_orders')
     if ((req.user && !req.user.is_admin) || view === 'my_orders') {
         query.user_id = req.user._id;
     }
 
-    // 2. Status filter
     if (status) {
         query.status = status;
     }
-
-    // 3. Keyword Search (Order ID, Name, Email, Phone)
     if (keyword) {
-        // Need to find users first to search by email/name on User model
-        // Although shipping_address has name/phone, email is only on User.
         const users = await mongoose.model("User").find({
             $or: [
                 { email: { $regex: keyword, $options: 'i' } },
@@ -200,23 +191,12 @@ const getAllOrders = asyncHandler(async (req, res) => {
             { order_id: { $regex: keyword, $options: 'i' } },
             { "shipping_address.name": { $regex: keyword, $options: 'i' } },
             { "shipping_address.phone_number": { $regex: keyword, $options: 'i' } },
-            { user_id: { $in: userIds } } // Match orders belonging to found users
+            { user_id: { $in: userIds } }
         ];
 
-        // If filtering by specific user (non-admin), we must ensure we only search within their orders
-        // MongoDB $and implicitly used for top-level query object keys.
-        // If we add $or for search, we need to make sure it doesn't override the user_id filter above.
-
         if (query.$or) {
-            // If there was already an $or (unlikely here but safe coding), merge? 
-            // Actually, we should just assign to $or if it's new.
             query.$or = searchConditions;
         } else {
-            // Combine with existing filters using $and is safer if we want to be explicit, 
-            // but here "query" object keys act as AND. 
-            // EXCEPT: if query.user_id exists, and we have { user_id: { $in: userIds } } in $or, 
-            // it means "Match (Order ID OR Name OR Email) AND (My User ID)".
-            // This structure: { user_id: myID, $or: [...] } works perfectly.
             query.$or = searchConditions;
         }
     }
@@ -260,7 +240,6 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
         throw new Error("ไม่พบคำสั่งซื้อ");
     }
 
-    // Check if there is an existing slip and delete it
     if (order.payment_info && order.payment_info.slip_url && order.payment_info.slip_url.public_id) {
         try {
             await cloudinary.uploader.destroy(order.payment_info.slip_url.public_id);
@@ -302,7 +281,6 @@ const updateOrderAddress = asyncHandler(async (req, res) => {
         throw new Error("ไม่พบคำสั่งซื้อ");
     }
 
-    // Only allow address update if not shipped yet
     if (['shipped', 'completed', 'cancelled'].includes(order.status)) {
         res.status(400);
         throw new Error("ไม่สามารถแก้ไขที่อยู่ได้แล้ว");
@@ -325,7 +303,6 @@ const cancelOrder = asyncHandler(async (req, res) => {
         throw new Error("ไม่พบคำสั่งซื้อ");
     }
 
-    // Check user ownership
     if (order.user_id.toString() !== req.user._id.toString()) {
         res.status(401);
         throw new Error("ไม่มีสิทธิ์ยกเลิกคำสั่งซื้อนี้");
@@ -354,11 +331,9 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
         throw new Error("ไม่พบคำสั่งซื้อ");
     }
 
-    // Logic for Cancellation / Refund
     if (status === 'cancelled') {
         const activeStatuses = ['processing', 'paid', 'shipped', 'completed'];
 
-        // 1. Restock if order was in active status (meaning stock was previously deducted)
         if (activeStatuses.includes(order.status)) {
             const bulkOps = order.items.map(item => ({
                 updateOne: {
@@ -371,7 +346,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
             }
         }
 
-        // 2. Handle Payment Status
         if (req.body.is_refund) {
             order.payment_info.payment_status = 'refunded';
         }
@@ -382,8 +356,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
         order.status = 'cancelled';
 
     } else {
-        // Stock Deduction Logic (Pending -> Active Status)
-        // If transitioning from Pending/Waiting to a "Confirmed" state, deduct stock
         const activeStatuses = ['processing', 'paid', 'shipped', 'completed'];
         const pendingStatuses = ['pending', 'waiting_verification'];
 
@@ -408,19 +380,17 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
         order.status = status;
 
-        // Shipping Info Update
         if (status === 'shipped') {
             if (tracking_number) order.shipping_info.tracking_number = tracking_number;
             if (provider) order.shipping_info.provider = provider;
             order.shipping_info.is_delivered = false;
         }
 
-        // Delivery Completion
+
         if (status === 'completed') {
             order.shipping_info.is_delivered = true;
             order.shipping_info.delivered_at = new Date();
 
-            // Special Case: COD, when completed => Payment Paid
             if (order.payment_method === 'cod') {
                 order.payment_info.payment_status = 'paid';
                 if (!order.payment_info.payment_date) {
@@ -445,14 +415,10 @@ const confirmOrderReceived = asyncHandler(async (req, res) => {
         throw new Error("ไม่พบคำสั่งซื้อ");
     }
 
-    // Check user ownership
     if (order.user_id.toString() !== req.user._id.toString()) {
         res.status(401);
         throw new Error("ไม่มีสิทธิ์จัดการคำสั่งซื้อนี้");
     }
-
-    // Check current status
-    // Allow if status is shipped
     if (order.status !== 'shipped') {
         res.status(400);
         throw new Error("ต้องรอให้สินค้าจัดส่งก่อนจึงจะยืนยันรับได้");
@@ -462,7 +428,6 @@ const confirmOrderReceived = asyncHandler(async (req, res) => {
     order.shipping_info.is_delivered = true;
     order.shipping_info.delivered_at = new Date();
 
-    // If COD, ensure payment is marked as paid
     if (order.payment_method === 'cod') {
         order.payment_info.payment_status = 'paid';
         if (!order.payment_info.payment_date) {

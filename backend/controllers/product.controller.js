@@ -45,7 +45,6 @@ const getProducts = asyncHandler(async (req, res) => {
         query.is_active = true;
     }
 
-    // Dynamic Attribute Filters
     let filterParams = filters;
     if (typeof filters === 'string') {
         try {
@@ -63,7 +62,6 @@ const getProducts = asyncHandler(async (req, res) => {
             filterKeys.forEach(key => {
                 let value = filterParams[key];
 
-                // Support array values (multi-select)
                 if (Array.isArray(value)) {
                     query.$and.push({
                         filters: {
@@ -91,7 +89,7 @@ const getProducts = asyncHandler(async (req, res) => {
         const aggregatePipeline = [
             { $match: query },
             { $addFields: { hasStock: { $gt: ["$stock", 0] } } },
-            { $sort: { hasStock: -1, createdAt: -1 } },
+            { $sort: { createdAt: -1 } },
             { $skip: pageSize * (pageNumber - 1) },
             { $limit: pageSize },
             { $project: { _id: 1 } }
@@ -112,7 +110,7 @@ const getProducts = asyncHandler(async (req, res) => {
         if (sort === "price_asc") sortOption = { selling_price: 1 };
         else if (sort === "price_desc") sortOption = { selling_price: -1 };
         else if (sort === "name_asc") sortOption = { name: 1 };
-        else sortOption = { stock: -1, createdAt: -1 };
+        else sortOption = { createdAt: -1 };
 
         products = await Product.find(query)
             .populate("category_id", "name slug")
@@ -137,11 +135,9 @@ const getProducts = asyncHandler(async (req, res) => {
 const getCategoryFilters = asyncHandler(async (req, res) => {
     const { categoryId } = req.params;
 
-    // ใช้ Aggregation เพื่อดึงค่า Key และ Value ที่ไม่ซ้ำกันออกมาพร้อมกัน
     const filters = await Product.aggregate([
         { $match: { category_id: new mongoose.Types.ObjectId(categoryId), is_active: true } },
         { $unwind: "$filters" },
-        // Unwind values if they are arrays, so each value becomes an option
         { $unwind: { path: "$filters.value", preserveNullAndEmptyArrays: true } },
         {
             $group: {
@@ -161,7 +157,6 @@ const getCategoryFilters = asyncHandler(async (req, res) => {
         { $sort: { key: 1 } }
     ]);
 
-    // Sort options alphabetically to prevent random swapping in UI
     const filtersSorted = filters.map(f => ({
         ...f,
         options: f.options.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))

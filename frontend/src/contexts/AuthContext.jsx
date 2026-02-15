@@ -16,14 +16,11 @@ export const AuthProvider = ({ children }) => {
                     const parsedUser = JSON.parse(storedUser);
                     setUser(parsedUser);
 
-                    // Fetch fresh profile in background to ensure data is up-to-date
                     try {
                         const profile = await userService.getProfile();
-                        // Merge profile with existing data (or just use profile as it's the source of truth)
-                        // Note: Backend now returns flattened structure matching authUser
                         const updatedUser = { ...parsedUser, ...profile };
                         setUser(updatedUser);
-                        localStorage.setItem('user', JSON.stringify(updatedUser)); // Update cache
+                        localStorage.setItem('user', JSON.stringify(updatedUser));
                     } catch (err) {
                         console.error('Background profile fetch failed:', err);
                         // If token is invalid (401), logout
@@ -62,7 +59,6 @@ export const AuthProvider = ({ children }) => {
 
     const is_admin = user?.is_admin === true;
 
-    // Helper to check if user is authenticated
     const isAuthenticated = !!user;
 
     const updateUser = (userData) => {
@@ -87,7 +83,6 @@ export const AuthProvider = ({ children }) => {
                 res = await userService.addToWishlist(productId);
             }
 
-            // Update local user state with new wishlist from backend
             if (res.wishlist) {
                 updateUser({ wishlist: res.wishlist });
             }

@@ -50,7 +50,6 @@ const optionalAuth = asyncHandler(async (req, res, next) => {
             req.user = await User.findById(decoded.userId).select("-password");
         } catch (error) {
             console.error(error);
-            // Don't throw error, just continue as guest
         }
     }
     next();

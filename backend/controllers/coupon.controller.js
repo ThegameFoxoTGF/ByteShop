@@ -23,7 +23,6 @@ const checkCoupon = asyncHandler(async (req, res) => {
     throw new Error("คูปองไม่ถูกต้อง");
   }
 
-  // Check Expiry
   const now = new Date();
   if (coupon.start_date && now < new Date(coupon.start_date)) {
     res.status(400);

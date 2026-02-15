@@ -22,7 +22,6 @@ function CategoryListPage() {
                 keyword
             });
             if (Array.isArray(data)) {
-                // Fallback
                 setCategories(data);
                 setTotal(data.length);
                 setPages(1);

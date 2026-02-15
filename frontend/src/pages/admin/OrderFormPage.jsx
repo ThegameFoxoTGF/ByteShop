@@ -191,8 +191,7 @@ function OrderFormPage() {
                         <button
                             onClick={() => {
                                 if (window.confirm('ยืนยันว่าสินค้าถึงมือลูกค้าแล้ว? สถานะจะเปลี่ยนเป็น "สำเร็จ"')) {
-                                    setStatus('completed'); // Update local state for consistency immediately or just call API
-                                    // Actually calling API directly is better for a specific action button
+                                    setStatus('completed');
                                     setSaving(true);
                                     orderService.updateOrderStatus(id, 'completed', {})
                                         .then(() => {

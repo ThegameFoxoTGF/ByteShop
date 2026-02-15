@@ -56,7 +56,7 @@ function App() {
             <Route path="forgot" element={<Forgot />} />
           </Route>
 
-          {/* User Routes (Restricted for Admin) */}
+          {/* User Routes */}
           <Route element={<UserRoute />}>
             <Route path="checkout" element={<Checkout />} />
             <Route path="order/:id" element={<Order />} />

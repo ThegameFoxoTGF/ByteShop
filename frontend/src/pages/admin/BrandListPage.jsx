@@ -22,7 +22,6 @@ function BrandListPage() {
                 keyword
             });
             if (Array.isArray(data)) {
-                // Fallback
                 setBrands(data);
                 setTotal(data.length);
                 setPages(1);

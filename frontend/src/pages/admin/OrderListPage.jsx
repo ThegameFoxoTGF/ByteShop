@@ -24,7 +24,6 @@ function OrderListPage() {
                 keyword,
                 status: statusFilter
             });
-            // Handle both old array format (just in case) and new object format
             if (Array.isArray(response)) {
                 setOrders(response);
                 setTotal(response.length);

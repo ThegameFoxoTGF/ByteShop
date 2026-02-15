@@ -6,22 +6,20 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cartCount, setCartCount] = useState(0);
-  const { user } = useAuth(); // ต้องรู้ว่าใครล็อกอิน ถึงจะไปดึงตะกร้าถูก
+  const { user } = useAuth();
 
-  // ฟังก์ชันดึงจำนวนสินค้าล่าสุดจาก Backend
   const fetchCartCount = async () => {
     if (!user) {
       setCartCount(0);
       return;
     }
     try {
-      const data = await cartService.getCart(); // API getUserCart ของเรา
+      const data = await cartService.getCart();
 
       if (!data || !data.items) {
         setCartCount(0);
         return;
       }
-      // นับรวมจำนวนชิ้นทั้งหมด (quantity)
       const count = data.items.length;
       setCartCount(count);
     } catch (error) {
@@ -29,12 +27,9 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // ดึงข้อมูลเมื่อ User เปลี่ยน (Login/Logout) หรือโหลดหน้าเว็บ
   useEffect(() => {
     fetchCartCount();
   }, [user]);
-
-  // Allow manual update of cart count (e.g. from CartDrawer after it fetches/updates)
   const updateCartCount = (count) => {
     setCartCount(count);
   };

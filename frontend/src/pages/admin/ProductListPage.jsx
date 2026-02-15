@@ -53,7 +53,7 @@ function ProductListPage() {
 
     const handleSearch = (e) => {
         setKeyword(e.target.value);
-        setPage(1); // Reset to first page on search
+        setPage(1);
     };
 
     return (
@@ -85,7 +85,6 @@ function ProductListPage() {
                         className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all text-sea-text placeholder-slate-400"
                     />
                 </div>
-                {/* Additional filters can go here */}
             </div>
 
             {/* Content */}
