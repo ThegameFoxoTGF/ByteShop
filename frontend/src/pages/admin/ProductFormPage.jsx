@@ -6,6 +6,7 @@ import productService from '../../services/product.service';
 import categoryService from '../../services/category.service';
 import brandService from '../../services/brand.service';
 import uploadService from '../../services/upload.service';
+import SearchableSelect from '../../components/SearchableSelect';
 
 const simpleSlugify = (text, separator = '-') => {
     return text
@@ -38,15 +39,15 @@ function ProductFormPage() {
         description: '',
         sku: '',
         price: '',
-        selling_price: '', // if different from price? or usually original_price vs price. Let's assume price = original, selling_price = current selling
+        selling_price: '',
         stock: 0,
         category: '',
         brand: '',
-        main_image: null, // { url: '', public_id: '' }
-        images: [], // [ { url: '', public_id: '' } ]
+        main_image: null,
+        images: [],
         is_active: true,
-        filters: {}, // { key: value } or { key: [values] }
-        specifications: [], // [ { key: 'screen_size', value: '15 inch', label: 'Screen Size' } ] ? Or just match the schema
+        filters: {},
+        specifications: [],
         warranty_period: '',
         warranty_provider: '',
         search_keywords: ''
@@ -57,8 +58,8 @@ function ProductFormPage() {
         const fetchInitialData = async () => {
             try {
                 const [cats, brds] = await Promise.all([
-                    categoryService.getCategories(),
-                    brandService.getBrands()
+                    categoryService.getCategories({ limit: 1000 }),
+                    brandService.getBrands({ limit: 1000 })
                 ]);
                 setCategories(cats.categories || (Array.isArray(cats) ? cats : []));
                 setBrands(brds.brands || (Array.isArray(brds) ? brds : []));
@@ -81,14 +82,7 @@ function ProductFormPage() {
         setFetching(true);
         try {
             const data = await productService.getProductById(id);
-            // Map data to form
-            // Check if price/selling_price mapping is correct based on backend. 
-            // Usually backend might use price as selling price and original_price as MSRP. 
-            // Let's assume selling_price is the main price, original_price is "price" in form?
-            // Actually, let's check standard. usually: price (regular), sale_price (discounted).
-            // Let's map: original_price -> price, selling_price -> selling_price
 
-            // Transform filters array to object for form state
             const filtersObj = {};
             if (data.filters && Array.isArray(data.filters)) {
                 data.filters.forEach(f => {
@@ -159,8 +153,7 @@ function ProductFormPage() {
 
         if (name === 'category') {
             fetchCategorySchema(value);
-            // Clear filters/specs when category changes? Maybe yes to avoid conflicts
-            // But maybe user wants to keep basic info
+            // Clear filters/specs when category changes? 
             setFormData(prev => ({
                 ...prev,
                 category: value,
@@ -280,7 +273,6 @@ function ProductFormPage() {
             const newFilters = { ...prev.filters };
             if (isArray) {
                 // Should handle array if multiselect
-                // For now assume value is the final value (e.g. from a select)
                 newFilters[key] = value;
             } else {
                 newFilters[key] = value;
@@ -574,16 +566,13 @@ function ProductFormPage() {
                                         </label>
 
                                         {['select', 'multiselect'].includes(filter.type) ? (
-                                            <select
+                                            <SearchableSelect
                                                 value={formData.filters[filter.key] || ''}
                                                 onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sea-primary"
-                                            >
-                                                <option value="">-- เลือก --</option>
-                                                {filter.options?.map(opt => (
-                                                    <option key={opt} value={opt}>{opt}</option>
-                                                ))}
-                                            </select>
+                                                options={filter.options}
+                                                placeholder="-- เลือก --"
+                                                className="w-full"
+                                            />
                                         ) : filter.type === 'boolean' ? (
                                             <div className="flex gap-2">
                                                 <button
@@ -776,38 +765,30 @@ function ProductFormPage() {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    <div className="flex-1">
-                                                        <input
-                                                            type={spec.type === 'number' ? 'number' : 'text'}
+                                                    {spec.type === 'select' && spec.options ? (
+                                                        <SearchableSelect
                                                             value={getSpecValue(spec.key)}
                                                             onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
-                                                            className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none transition-colors ${spec.type === 'select'
-                                                                ? 'bg-slate-100 border-slate-200 text-slate-500 cursor-not-allowed'
-                                                                : 'bg-slate-50 border-slate-200 focus:border-sea-primary'
-                                                                }`}
-                                                            placeholder={`ระบุ ${spec.label}`}
-                                                            readOnly={spec.type === 'select'}
+                                                            options={spec.options}
+                                                            placeholder={`เลือก ${spec.label}`}
+                                                            className="w-full"
                                                         />
-                                                        {spec.type === 'number' && (
-                                                            <p className="text-xs text-sea-subtext mt-1">
-                                                                * กรุณาระบุเป็นตัวเลขเท่านั้น
-                                                            </p>
-                                                        )}
-                                                        {spec.unit && <span className="text-xs text-slate-500 mt-1 block">หน่วย: {spec.unit}</span>}
-                                                    </div>
-                                                    {spec.type === 'select' && spec.options && (
-                                                        <select
-                                                            value=""
-                                                            onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
-                                                            className="w-33 px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none hover:border-sea-primary text-sm text-slate-700 cursor-pointer shadow-sm"
-                                                        >
-                                                            <option value="" disabled>เลือกตัวเลือก</option>
-                                                            {spec.options.map((option, idx) => (
-                                                                <option key={idx} value={option}>
-                                                                    {option}
-                                                                </option>
-                                                            ))}
-                                                        </select>
+                                                    ) : (
+                                                        <div className="flex-1">
+                                                            <input
+                                                                type={spec.type === 'number' ? 'number' : 'text'}
+                                                                value={getSpecValue(spec.key)}
+                                                                onChange={(e) => handleSpecChange(spec.key, e.target.value, spec.label, spec.unit)}
+                                                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sea-primary transition-colors"
+                                                                placeholder={`ระบุ ${spec.label}`}
+                                                            />
+                                                            {spec.type === 'number' && (
+                                                                <p className="text-xs text-sea-subtext mt-1">
+                                                                    * กรุณาระบุเป็นตัวเลขเท่านั้น
+                                                                </p>
+                                                            )}
+                                                            {spec.unit && <span className="text-xs text-slate-500 mt-1 block">หน่วย: {spec.unit}</span>}
+                                                        </div>
                                                     )}
                                                 </>
                                             )}
@@ -827,34 +808,26 @@ function ProductFormPage() {
 
                         <div>
                             <label className="block text-sm font-medium text-sea-text mb-1">หมวดหมู่ <span className="text-red-500">*</span></label>
-                            <select
+                            <SearchableSelect
                                 name="category"
-                                value={formData.category}
+                                value={formData.category} // category ID sent to SearchableSelect
+                                options={categories.map(c => ({ value: c._id, label: c.name }))}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
+                                placeholder="-- เลือกหมวดหมู่ --"
                                 required
-                            >
-                                <option value="">-- เลือกหมวดหมู่ --</option>
-                                {categories.map(cat => (
-                                    <option key={cat._id} value={cat._id}>{cat.name}</option>
-                                ))}
-                            </select>
+                            />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-sea-text mb-1">แบรนด์ <span className="text-red-500">*</span></label>
-                            <select
+                            <SearchableSelect
                                 name="brand"
-                                value={formData.brand}
+                                value={formData.brand} // brand ID
+                                options={brands.map(b => ({ value: b._id, label: b.name }))}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sea-primary/20 focus:border-sea-primary transition-all"
+                                placeholder="-- เลือกแบรนด์ --"
                                 required
-                            >
-                                <option value="">-- เลือกแบรนด์ --</option>
-                                {brands.map(brand => (
-                                    <option key={brand._id} value={brand._id}>{brand.name}</option>
-                                ))}
-                            </select>
+                            />
                         </div>
 
                         <div className="pt-4 border-t border-slate-100 space-y-3">

@@ -228,7 +228,6 @@ function ProductListPage() {
                                 <Icon icon="ic:round-chevron-left" width="20" />
                             </button>
                             {Array.from({ length: Math.min(5, pages) }, (_, i) => {
-                                // Logic to show window of pages, simplifying to show first 5 for now or sliding window
                                 let p = i + 1;
                                 if (pages > 5 && page > 3) {
                                     p = page - 2 + i;

@@ -68,8 +68,8 @@ function Home() {
     const fetchData = async () => {
       try {
         const [cats, brds] = await Promise.all([
-          categoryService.getCategories(),
-          brandService.getBrands()
+          categoryService.getCategories({ limit: 1000 }),
+          brandService.getBrands({ limit: 1000 })
         ]);
         setCategories(cats.categories || (Array.isArray(cats) ? cats : []));
         const allBrands = brds.brands || (Array.isArray(brds) ? brds : []);
@@ -93,19 +93,12 @@ function Home() {
 
           // Fetch relevant brands
           const brandsData = await productService.getCategoryBrands(selectedCategory);
-          setBrands(brandsData);
-
           // Clear selected brand if it's not in the new list
-          // logic: if(selectedBrand && !brandsData.find(b=>b._id === selectedBrand)) setSelectedBrand('');
-          // But `selectedBrand` state update inside async might be tricky if checked before setBrands propagation.
-          // Effectively, if the old brand isn't in new list, it just filters to 0 products (correct behavior) or we force clear it.
-          // Let's force clear it IF it's not valid, but getting state synchronously is hard here.
-          // A separate useEffect for validation could work, or just let the user see 0 results.
-
+          setBrands(brandsData);
         } catch (error) {
           console.error('Error fetching category data:', error);
           setDynamicFilters([]);
-          setBrands(initialBrands); // Fallback? Or empty? Better fallback to all? No, if error, maybe empty.
+          setBrands(initialBrands);
         }
       } else {
         setDynamicFilters([]);
@@ -134,7 +127,7 @@ function Home() {
           is_active: true
         };
 
-        // 3. Logic: Send all current filters (Category, Brand, Price, Dynamic) to Backend
+        //Logic: Send all current filters (Category, Brand, Price, Dynamic) to Backend
         if (selectedCategory) params.category = selectedCategory;
         if (selectedBrand) params.brand = selectedBrand;
         if (appliedPriceRange.min) params.minPrice = appliedPriceRange.min;

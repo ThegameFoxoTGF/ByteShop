@@ -2,16 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 
-/**
- * Breadcrumb Component
- * 
- * Renders a breadcrumb navigation trail.
- * 
- * Props:
- * - items: Array of objects with { label, path, icon }. 
- *          If path is present, it renders a Link. Otherwise, it renders text.
- *          The last item is usually the current page and shouldn't have a path.
- */
 function Breadcrumb({ items }) {
     if (!items || items.length === 0) return null;
 
