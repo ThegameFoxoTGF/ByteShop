@@ -74,7 +74,7 @@ function CartDrawer({ isOpen, onClose }) {
 
         const currentItem = cartItems.find(item => item.product._id === productId);
         if (currentItem && newQuantity > currentItem.product.stock) {
-            toast.warning("ขออภัย จำนวนสินค้าไม่เพียงพอ");
+            toast.error("ขออภัย จำนวนสินค้าไม่เพียงพอ");
             return;
         }
 

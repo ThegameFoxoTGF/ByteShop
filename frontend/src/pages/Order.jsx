@@ -266,6 +266,43 @@ function Order() {
                 )}
             </div>
 
+            {/* Shipping Tracking Info */}
+            {order.shipping_info?.tracking_number && (
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in slide-in-from-top-2">
+                    <h2 className="text-lg font-semibold text-sea-text mb-4 flex items-center gap-2">
+                        <Icon icon="ic:round-local-shipping" className="text-sea-primary" />
+                        ข้อมูลการจัดส่ง
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <p className="text-xs text-slate-500 mb-1">ผู้ให้บริการขนส่ง</p>
+                            <p className="font-bold text-slate-800 flex items-center gap-2">
+                                <Icon icon="ic:round-business" className="text-slate-400" />
+                                {order.shipping_info.provider || 'ไม่ระบุ'}
+                            </p>
+                        </div>
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <p className="text-xs text-slate-500 mb-1">หมายเลขพัสดุ</p>
+                            <div className="flex items-center justify-between">
+                                <p className="font-bold text-sea-primary text-lg tracking-wider">
+                                    {order.shipping_info.tracking_number}
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(order.shipping_info.tracking_number);
+                                        toast.success('คัดลอกหมายเลขพัสดุแล้ว');
+                                    }}
+                                    className="p-2 hover:bg-sea-primary/10 rounded-lg text-sea-primary transition-colors"
+                                    title="คัดลอก"
+                                >
+                                    <Icon icon="ic:round-content-copy" width="20" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Left: Items & Address */}
                 <div className="md:col-span-2 space-y-6">

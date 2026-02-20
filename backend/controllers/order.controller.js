@@ -59,21 +59,30 @@ const createOrder = asyncHandler(async (req, res) => {
 
     if (coupon_code) {
         const coupon = await Coupon.findOne({
-            code: coupon_code,
+            code: coupon_code.toUpperCase(),
             is_active: true,
-            start_date: { $lte: Date.now() },
-            end_date: { $gte: Date.now() },
         });
 
         if (!coupon) {
             res.status(404);
-            throw new Error("คูปองไม่ถูกต้องหรือหมดอายุ");
+            throw new Error("คูปองไม่ถูกต้อง");
+        }
+
+        const now = new Date();
+        if (coupon.start_date && now < new Date(coupon.start_date)) {
+            res.status(400);
+            throw new Error("คูปองยังไม่ถึงเวลาเริ่มใช้งาน");
+        }
+
+        if (coupon.end_date && now > new Date(coupon.end_date)) {
+            res.status(400);
+            throw new Error("คูปองหมดอายุแล้ว");
         }
 
         const userUsedCount = await Order.countDocuments({
             user_id: req.user._id,
             "coupon_info.coupon_code": coupon_code,
-            status: { $ne: "cancelled" }
+            status: { $ne: "cancelled" },
         });
 
         if (userUsedCount >= 1) {
@@ -311,6 +320,10 @@ const cancelOrder = asyncHandler(async (req, res) => {
     if (order.status !== 'pending') {
         res.status(400);
         throw new Error("สามารถยกเลิกได้เฉพาะคำสั่งซื้อที่รอชำระเงินเท่านั้น");
+    }
+
+    if (order.coupon_info) {
+        await Coupon.findByIdAndUpdate(order.coupon_info.coupon_id, { $inc: { used_count: -1 } });
     }
 
     order.status = 'cancelled';
