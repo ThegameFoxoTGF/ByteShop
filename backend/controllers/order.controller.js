@@ -393,9 +393,11 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
         order.status = status;
 
+        // Update shipping info if provided
+        if (tracking_number) order.shipping_info.tracking_number = tracking_number;
+        if (provider) order.shipping_info.provider = provider;
+
         if (status === 'shipped') {
-            if (tracking_number) order.shipping_info.tracking_number = tracking_number;
-            if (provider) order.shipping_info.provider = provider;
             order.shipping_info.is_delivered = false;
         }
 

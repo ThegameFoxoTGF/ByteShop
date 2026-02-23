@@ -34,6 +34,7 @@ import CouponFormPage from "./pages/admin/CouponFormPage";
 import CustomerListPage from "./pages/admin/CustomerListPage";
 import OrderListPage from "./pages/admin/OrderListPage";
 import OrderFormPage from "./pages/admin/OrderFormPage";
+import ReceiptPage from "./pages/admin/ReceiptPage";
 import BrandListPage from "./pages/admin/BrandListPage";
 import BrandFormPage from "./pages/admin/BrandFormPage";
 
@@ -85,6 +86,11 @@ function App() {
             <Route path="brands" element={<BrandListPage />} />
             <Route path="brands/:id" element={<BrandFormPage />} />
           </Route>
+        </Route>
+
+        {/* Standalone Admin Routes (Without Sidebar/Layout) */}
+        <Route element={<AdminRoute />}>
+          <Route path="admin/orders/:id/receipt" element={<ReceiptPage />} />
         </Route>
 
       </Routes>

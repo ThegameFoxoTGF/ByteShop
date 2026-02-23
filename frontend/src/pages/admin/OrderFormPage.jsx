@@ -140,6 +140,10 @@ function OrderFormPage() {
         }
     };
 
+    // เช็คว่าออกใบเสร็จได้หรือไม่ (ชำระเงินแล้ว หรือ เป็นการชำระแบบเงินสด/COD ที่ยังไม่ถูกยกเลิก)
+    const canPrintReceipt = order.payment_info?.payment_status === 'paid' ||
+        (order.payment_method === 'cod' && order.status !== 'cancelled');
+
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             {/* Header */}
@@ -151,15 +155,30 @@ function OrderFormPage() {
                     >
                         <Icon icon="ic:round-arrow-back" /> กลับสู่รายการคำสั่งซื้อ
                     </button>
-                    <h1 className="text-2xl font-bold text-sea-text flex items-center gap-3">
-                        Order #{order.order_id || order._id.substring(0, 8).toUpperCase()}
-                        <span className={`text-base px-3 py-1 rounded-full border uppercase ${getStatusColor(order.status)}`}>
-                            {getStatusText(order.status)}
-                        </span>
-                    </h1>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <h1 className="text-2xl font-bold text-sea-text flex items-center gap-3">
+                            Order #{order.order_id || order._id.substring(0, 8).toUpperCase()}
+                            <span className={`text-base px-3 py-1 rounded-full border uppercase ${getStatusColor(order.status)}`}>
+                                {getStatusText(order.status)}
+                            </span>
+                        </h1>
+                        {canPrintReceipt ? (
+                            <button
+                                onClick={() => window.open(`/admin/orders/${id}/receipt`, '_blank')}
+                                className="px-3 py-1.5 bg-white text-sea-primary border border-sea-primary rounded-lg text-sm font-medium hover:bg-slate-50 transition-all flex items-center gap-1.5 shadow-sm"
+                            >
+                                <Icon icon="ic:round-receipt" width="18" /> ดูใบเสร็จ
+                            </button>
+                        ) : (
+                            <div className="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5 border border-slate-200" title="ออกใบเสร็จได้เมื่อชำระเงิน หรือเป็นรายการเงินสด">
+                                <Icon icon="ic:round-info" width="16" /> ยังไม่อนุญาตให้ออกใบเสร็จ
+                            </div>
+                        )}
+                    </div>
                     <p className="text-sea-subtext mt-1">
                         สั่งซื้อเมื่อ {new Date(order.createdAt).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' })} {new Date(order.createdAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                     </p>
+
                 </div>
 
                 {/* Status Control */}
@@ -226,7 +245,7 @@ function OrderFormPage() {
 
             {/* Shipping Info Input - Show when status is shipped or changing to shipped */}
             {
-                (status === 'shipped' || order.status === 'shipped') && (
+                (status === 'shipped' || order.status === 'shipped' || status === 'completed' || order.status === 'completed') && (
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in slide-in-from-top-2">
                         <h3 className="font-bold text-sea-text mb-4 flex items-center gap-2">
                             <Icon icon="ic:round-local-shipping" className="text-sea-primary" /> ข้อมูลการจัดส่ง
@@ -240,6 +259,7 @@ function OrderFormPage() {
                                     placeholder="เช่น Kerry, Flash, Thai Post"
                                     value={provider}
                                     onChange={(e) => setProvider(e.target.value)}
+                                    disabled={order.status === 'completed' && status === 'completed'}
                                 />
                             </div>
                             <div>
@@ -250,12 +270,18 @@ function OrderFormPage() {
                                     placeholder="กรอกเลขพัสดุ"
                                     value={trackingNumber}
                                     onChange={(e) => setTrackingNumber(e.target.value)}
+                                    disabled={order.status === 'completed' && status === 'completed'}
                                 />
                             </div>
                         </div>
                         {status === 'shipped' && status !== order.status && (
                             <p className="text-sm text-yellow-600 mt-2 flex items-center gap-1">
                                 <Icon icon="ic:round-info" /> กรุณาตรวจสอบเลขพัสดุให้ถูกต้องก่อนบันทึก
+                            </p>
+                        )}
+                        {order.status === 'completed' && order.shipping_info?.delivered_at && (
+                            <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
+                                <Icon icon="ic:round-check-circle" /> สินค้าจัดส่งสำเร็จแล้ว เมื่อ {new Date(order.shipping_info?.delivered_at).toLocaleDateString('th-TH')}
                             </p>
                         )}
                     </div>
@@ -303,7 +329,14 @@ function OrderFormPage() {
                             </div>
                             {order.pricing_info?.discount > 0 && (
                                 <div className="flex justify-between text-green-600">
-                                    <span>ส่วนลด</span>
+                                    <div className="flex items-center gap-2">
+                                        <span>ส่วนลด</span>
+                                        {order.coupon_info?.coupon_code && (
+                                            <span className="text-[10px] px-1.5 py-0.5 bg-green-100 border border-green-200 rounded uppercase font-bold">
+                                                {order.coupon_info.coupon_code}
+                                            </span>
+                                        )}
+                                    </div>
                                     <span>-฿{order.pricing_info?.discount?.toLocaleString()}</span>
                                 </div>
                             )}

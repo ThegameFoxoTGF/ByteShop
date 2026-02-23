@@ -122,7 +122,6 @@ function Checkout() {
         if (!couponCode.trim()) return;
         setCouponError('');
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
             const res = await couponService.checkCoupon({
                 code: couponCode,
                 subtotal: calculateSubtotal()
@@ -135,12 +134,16 @@ function Checkout() {
                 });
                 toast.success('ใช้คูปองเรียบร้อยแล้ว');
             } else {
-                setCouponError(res.message || 'คูปองใช้ไม่ได้');
+                const msg = res.message || 'คูปองใช้ไม่ได้';
+                setCouponError(msg);
+                toast.error(msg);
                 setAppliedCoupon(null);
             }
         } catch (error) {
             console.error(error);
-            setCouponError(error.response?.data?.message || 'ตรวจสอบคูปองไม่สำเร็จ');
+            const msg = error.response?.data?.message || 'ตรวจสอบคูปองไม่สำเร็จ';
+            setCouponError(msg);
+            toast.error(msg);
             setAppliedCoupon(null);
         }
     };
@@ -420,7 +423,6 @@ function Checkout() {
                                         </button>
                                     )}
                                 </div>
-                                {couponError && <p className="text-xs text-red-500 mt-1">{couponError}</p>}
                             </div>
                         </div>
 

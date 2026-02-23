@@ -11,7 +11,7 @@ const getDashboardStats = asyncHandler(async (req, res) => {
         $or: [
             {
                 payment_method: { $ne: 'cod' },
-                status: { $in: ['paid', 'processing', 'shipped', 'completed'] }
+                status: { $in: ['paid', 'processing', 'waiting_verification', 'shipped', 'completed'] }
             },
             {
                 payment_method: 'cod',
